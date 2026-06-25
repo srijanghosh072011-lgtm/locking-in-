@@ -1,0 +1,17 @@
+# Netlify deployment config.
+# The site is pre-built plain HTML, so there is no build step to run —
+# we just publish the repo root. Security/caching headers live in /_headers.
+
+[build]
+  publish = "."
+  command = "python3 build/build.py"
+
+# Netlify automatically serves /404.html for unmatched routes.
+
+# Example secure endpoint for the contact/booking/quote forms.
+# Replace with a real serverless function that validates input, verifies
+# CAPTCHA, rate-limits, and emails/stores the lead. See CUSTOMIZE.md.
+# [[redirects]]
+#   from = "/api/*"
+#   to = "/.netlify/functions/:splat"
+#   status = 200

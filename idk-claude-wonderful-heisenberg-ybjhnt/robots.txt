@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /build/
+
+Sitemap: https://www.wascanaplumbing.ca/sitemap.xml
