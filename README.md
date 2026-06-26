@@ -14,9 +14,10 @@ a blog, legal/compliance pages, and front-end booking/quote/pay flows.
 ## Quick start
 
 ```bash
-# 1. Preview locally (the site uses absolute /paths, so serve it — don't open file://)
-python3 -m http.server 8000
-#    → open http://localhost:8000
+# 1. Preview: open index.html directly in a browser, OR serve it:
+python3 -m http.server 8000      # → http://localhost:8000
+# (Paths are relative, so it works opened directly, on a subpath like
+#  GitHub Pages /repo-name/, or at a domain root.)
 
 # 2. After editing anything in /src or /partials, rebuild:
 python3 build.py

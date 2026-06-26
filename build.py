@@ -65,7 +65,7 @@ def parse_frontmatter(text):
                 meta[k.strip()] = v.strip()
     return meta, body
 
-def render(meta, body):
+def render(meta, body, out_rel):
     layout = meta.get("layout", "marketing")
     head = HEAD_TMPL.format(
         title=meta.get("title", "BlueLine Plumbing"),
@@ -77,8 +77,14 @@ def render(meta, body):
         bodyclass=(' class="%s"' % meta["bodyclass"]) if meta.get("bodyclass") else "",
     )
     if layout == "bare":
-        return head + body + "\n" + SCRIPT + "</body>\n</html>\n"
-    return head + HEADER + "\n" + body + "\n" + FOOTER + "\n</body>\n</html>\n"
+        page = head + body + "\n" + SCRIPT + "</body>\n</html>\n"
+    else:
+        page = head + HEADER + "\n" + body + "\n" + FOOTER + "\n</body>\n</html>\n"
+    # Make all internal links relative to this page's depth so the site works
+    # opened directly (file://), on a subpath (e.g. GitHub Pages), or at a domain
+    # root. External (https:), tel:, mailto:, #anchors are untouched.
+    base = "../" * str(out_rel).replace("\\", "/").count("/")
+    return page.replace('="/', '="' + base)
 
 def write(out_rel, content):
     out = ROOT / out_rel
@@ -93,7 +99,7 @@ def build_src():
     for path in sorted(SRC.rglob("*.html")):
         rel = path.relative_to(SRC)
         meta, body = parse_frontmatter(path.read_text(encoding="utf-8"))
-        write(str(rel), render(meta, body))
+        write(str(rel), render(meta, body, str(rel)))
         if meta.get("canonical"):
             urls.append(meta["canonical"])
 
@@ -297,7 +303,7 @@ def service_page(slug, s):
     meta = {"title": f'{s["name"]} | BlueLine Plumbing Greater Vancouver',
             "description": s["tagline"] + " Licensed, insured, upfront pricing. Book online or call BlueLine Plumbing.",
             "canonical": canonical, "ogimage": pexels(s["img"], 1200)}
-    write(f"services/{slug}.html", render(meta, body))
+    write(f"services/{slug}.html", render(meta, body, f"services/{slug}.html"))
 
 def _json(s):
     import json
@@ -370,7 +376,7 @@ def city_page(slug, data):
     meta = {"title": f"Plumber in {name}, BC | BlueLine Plumbing — 24/7 Licensed",
             "description": f"Licensed 24/7 plumbers in {name}, BC. Blocked drains, hot water, gas fitting, leak detection and emergencies. Upfront pricing, 4.9★. Book online.",
             "canonical": canonical}
-    write(f"locations/{slug}.html", render(meta, body))
+    write(f"locations/{slug}.html", render(meta, body, f"locations/{slug}.html"))
 
 # --------------------------------------------------------------- sitemap ----
 def sitemap():
