@@ -1,0 +1,12 @@
+{
+  "name": "BlueLine Plumbing",
+  "short_name": "BlueLine",
+  "description": "Licensed 24/7 plumbers serving Greater Vancouver.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A2540",
+  "theme_color": "#0A2540",
+  "icons": [
+    { "src": "/assets/img/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,52 @@
+<!--PAGE
+title: Pay My Bill | BlueLine Plumbing
+description: Pay your BlueLine Plumbing invoice securely online. Look up your invoice and pay by card via our secure hosted checkout.
+canonical: /pay.html
+-->
+<main id="main">
+  <section class="page-hero on-navy">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/index.html" style="color:var(--slate-300)">Home</a></li><li>Pay my bill</li></ol></nav>
+      <span class="eyebrow">Fast &amp; secure</span>
+      <h1>Pay your invoice online</h1>
+      <p class="lead" style="color:var(--slate-300)">Look up your invoice and pay securely by card. Payments are processed by a PCI-compliant provider — your card details never touch our servers.</p>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="container split" style="align-items:start">
+      <div>
+        <form class="form-card" data-validate novalidate
+              data-success="Invoice found. You'll be redirected to our secure checkout to complete payment."
+              data-toast="Redirecting to secure checkout">
+          <h2>Find your invoice</h2>
+          <div class="field"><label for="p-invoice">Invoice number <span class="req">*</span></label><input class="input" id="p-invoice" name="invoice" type="text" placeholder="e.g. BL-10428" required /><span class="error-msg" role="alert">Please enter your invoice number.</span></div>
+          <div class="field"><label for="p-email">Email on the invoice <span class="req">*</span></label><input class="input" id="p-email" name="email" type="email" autocomplete="email" required /><span class="error-msg" role="alert">Please enter a valid email.</span></div>
+          <div class="field"><label for="p-amount">Amount (CAD)</label><input class="input" id="p-amount" name="amount" type="text" inputmode="decimal" placeholder="Auto-filled from your invoice" readonly /></div>
+          <div class="honeypot" aria-hidden="true"><label>Leave empty<input type="text" name="company" tabindex="-1" autocomplete="off" /></label></div>
+          <button class="btn btn--primary btn--block btn--lg" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Continue to secure payment
+          </button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+          <p class="hint mt-4"><strong>Secure by design:</strong> card data is collected on the payment provider’s hosted page (Stripe / Square), so no card numbers or secret keys are ever handled by this website. Connect your provider in the README to go live.</p>
+        </form>
+      </div>
+      <aside>
+        <div class="card">
+          <h3>Other ways to pay</h3>
+          <ul class="price-list mt-4">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Card or tap on site with your plumber</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Interac e-Transfer to pay@bluelineplumbing.ca</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Stored in your customer portal</li>
+          </ul>
+          <hr class="divider" />
+          <div class="cluster">
+            <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 256-bit TLS encrypted</span>
+          </div>
+          <p class="muted mt-4" style="margin:0">Questions about a charge? <a href="/contact.html">Contact our team</a>.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>

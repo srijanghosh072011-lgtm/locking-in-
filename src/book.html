@@ -1,0 +1,106 @@
+<!--PAGE
+title: Book a Plumber Online | BlueLine Plumbing Greater Vancouver
+description: Book a licensed BlueLine plumber online in under a minute. Choose a service and time, get a fixed price, and we'll confirm by text. 24/7 across Greater Vancouver.
+canonical: /book.html
+-->
+<main id="main">
+  <section class="page-hero on-navy">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/index.html" style="color:var(--slate-300)">Home</a></li><li>Book online</li></ol></nav>
+      <span class="eyebrow">60-second booking</span>
+      <h1>Book your plumber</h1>
+      <p class="lead" style="color:var(--slate-300)">Tell us what’s wrong and when suits — we’ll confirm by text and give you a fixed price before any work starts.</p>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="container split" style="align-items:start">
+      <div>
+        <form class="form-card" data-validate novalidate
+              data-success="You're booked in! Check your phone — we've sent a confirmation and we'll be in touch to lock the time."
+              data-toast="Booking received">
+          <h2>Your booking</h2>
+          <div class="field">
+            <label for="b-service">Service needed <span class="req">*</span></label>
+            <select class="select" id="b-service" name="service" required>
+              <option value="">Choose a service…</option>
+              <option value="blocked-drain">Blocked drain</option>
+              <option value="hot-water">Hot water</option>
+              <option value="tap-toilet">Tap / toilet / leak</option>
+              <option value="gas">Gas fitting</option>
+              <option value="leak-detection">Leak detection</option>
+              <option value="emergency">Emergency (urgent)</option>
+              <option value="renovation">Renovation</option>
+            </select>
+            <span class="error-msg" role="alert">Please choose a service.</span>
+          </div>
+          <div class="input-group">
+            <div class="field"><label for="b-date">Preferred date</label><input class="input" id="b-date" name="date" type="date" /></div>
+            <div class="field"><label for="b-window">Time window</label>
+              <select class="select" id="b-window" name="window">
+                <option value="">Any time</option>
+                <option>Morning (8am–12pm)</option>
+                <option>Afternoon (12pm–4pm)</option>
+                <option>Evening (4pm–7pm)</option>
+                <option>ASAP / emergency</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="field"><label for="b-name">Full name <span class="req">*</span></label><input class="input" id="b-name" name="name" type="text" autocomplete="name" required /><span class="error-msg" role="alert">Please enter your name.</span></div>
+            <div class="field"><label for="b-phone">Mobile <span class="req">*</span></label><input class="input" id="b-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required /><span class="error-msg" role="alert">Please enter a valid phone number.</span></div>
+          </div>
+          <div class="field"><label for="b-email">Email <span class="req">*</span></label><input class="input" id="b-email" name="email" type="email" autocomplete="email" required /><span class="error-msg" role="alert">Please enter a valid email.</span></div>
+          <div class="field"><label for="b-address">Service address <span class="req">*</span></label><input class="input" id="b-address" name="address" type="text" autocomplete="street-address" required /><span class="error-msg" role="alert">Please enter the address.</span></div>
+          <div class="field"><label for="b-notes">Describe the problem</label><textarea class="textarea" id="b-notes" name="notes" placeholder="e.g. No hot water since this morning, gas system about 10 years old…"></textarea></div>
+          <div class="honeypot" aria-hidden="true"><label>Leave empty<input type="text" name="company" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="field">
+            <label class="consent"><input type="checkbox" name="consent" required /> <span>I agree to be contacted about this booking and accept the <a href="/legal/privacy.html">Privacy Policy</a> &amp; <a href="/legal/terms.html">Terms</a>. <span class="req">*</span></span></label>
+            <span class="error-msg" role="alert">Please tick to continue.</span>
+          </div>
+          <button class="btn btn--primary btn--block btn--lg" type="submit">Confirm booking</button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+          <p class="hint mt-4">Front-end demo — wire to your scheduling/CRM backend to capture real bookings (see README). Abandoned-booking recovery hooks in here too.</p>
+        </form>
+      </div>
+
+      <aside>
+        <div class="card" style="border:var(--bw-2) solid var(--navy-900)">
+          <span class="eyebrow">Instant estimate</span>
+          <h3 class="mt-2">See a price first</h3>
+          <form class="mt-4" data-quote>
+            <div class="field">
+              <label for="bq-service">Service</label>
+              <select class="select" id="bq-service" name="service">
+                <option value="">Choose…</option>
+                <option value="blocked-drain">Blocked drain</option>
+                <option value="hot-water">Hot water</option>
+                <option value="tap-toilet">Tap / toilet / leak</option>
+                <option value="gas">Gas fitting</option>
+                <option value="leak-detection">Leak detection</option>
+                <option value="emergency">Emergency</option>
+                <option value="renovation">Renovation</option>
+              </select>
+            </div>
+            <button class="btn btn--navy btn--block" type="submit">Estimate</button>
+            <div class="quote-result" role="status" aria-live="polite">
+              <div class="muted" data-est-label>Estimated range</div>
+              <div class="est" data-est>—</div>
+              <p class="hint mt-2">Ballpark only (CAD). Fixed price confirmed on site.</p>
+            </div>
+          </form>
+        </div>
+        <div class="card mt-6">
+          <h4>What happens next</h4>
+          <ul class="price-list mt-4">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Instant confirmation by text &amp; email</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> A reminder before your window</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> A fixed price approved before work</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Your warranty record emailed after</li>
+          </ul>
+          <p class="muted mt-4" style="margin:0">Urgent? <a href="tel:+16045550188">Call (604) 555-0188</a> for our 24/7 line.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>

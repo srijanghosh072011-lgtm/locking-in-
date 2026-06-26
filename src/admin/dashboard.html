@@ -1,0 +1,91 @@
+<!--PAGE
+title: Admin Dashboard (Demo) | BlueLine Plumbing
+description: BlueLine Plumbing internal admin dashboard demo.
+canonical: /admin/dashboard.html
+layout: bare
+bodyclass: dash-body
+-->
+<div style="background:var(--orange-100);border-bottom:2px solid var(--orange-500);color:var(--orange-600);text-align:center;padding:.5rem 1rem;font-weight:700;font-size:.85rem">
+  Front-end demo with sample data · in production this is auth-gated and reads live data from your CRM/API · <a href="/index.html" style="color:var(--orange-600);text-decoration:underline">Back to website</a>
+</div>
+<div class="dash">
+  <aside class="dash-side">
+    <a class="brand" href="/index.html" aria-label="BlueLine Plumbing">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="8" fill="#143A5E"/><path d="M20 9c4.5 5 7 8.4 7 11.8A7 7 0 0 1 13 20.8C13 17.4 15.5 14 20 9z" fill="#fff"/><circle cx="20" cy="21" r="2.6" fill="#F97316"/></svg>
+      <span style="color:#fff">Blue<span style="color:var(--blue-500)">Line</span></span>
+    </a>
+    <nav aria-label="Admin"><ul class="dash-nav">
+      <li><a class="active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> Dashboard</a></li>
+      <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Bookings</a></li>
+      <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg> Customers (CRM)</a></li>
+      <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Technicians</a></li>
+      <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Invoices</a></li>
+      <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a></li>
+    </ul></nav>
+  </aside>
+
+  <main class="dash-main" id="main">
+    <div class="dash-topbar">
+      <div><span class="eyebrow">Tuesday, 26 June 2026</span><h1 style="font-size:1.8rem;margin-top:.25rem">Good morning, Alex</h1></div>
+      <div class="btn-row">
+        <button class="btn btn--ghost btn--sm tip" data-tip="Export this month to CSV" aria-label="Export data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <a href="/book.html" class="btn btn--primary btn--sm">+ New booking</a>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Today’s bookings</div><div class="val">14</div><div class="delta up">▲ 3 vs yesterday</div></div>
+      <div class="kpi"><div class="label">Revenue (June)</div><div class="val">$182,400</div><div class="delta up">▲ 12% MoM</div></div>
+      <div class="kpi"><div class="label">Jobs completed</div><div class="val">238</div><div class="delta up">▲ 18 this week</div></div>
+      <div class="kpi"><div class="label">Avg rating</div><div class="val">4.9★</div><div class="delta up">▲ 0.1</div></div>
+    </div>
+
+    <div class="grid grid-2 mt-6" style="align-items:start">
+      <div class="card">
+        <div class="dash-topbar"><h3 style="margin:0">Revenue — last 7 months</h3><span class="badge badge--success">On target</span></div>
+        <div class="barchart" role="img" aria-label="Revenue trending upward over the last seven months, from about 110k to 182k.">
+          <div class="bar" style="height:60%"><span>Dec</span></div>
+          <div class="bar" style="height:54%"><span>Jan</span></div>
+          <div class="bar" style="height:66%"><span>Feb</span></div>
+          <div class="bar" style="height:72%"><span>Mar</span></div>
+          <div class="bar" style="height:80%"><span>Apr</span></div>
+          <div class="bar" style="height:88%"><span>May</span></div>
+          <div class="bar" style="height:100%"><span>Jun</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Today’s technician schedule</h3>
+        <div class="table-wrap mt-4">
+          <table class="data">
+            <thead><tr><th>Tech</th><th>Job</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Marcus</td><td>Hot water swap · Burnaby</td><td>8:00</td><td><span class="status-pill completed">En route</span></td></tr>
+              <tr><td>Priya</td><td>Blocked sewer · Surrey</td><td>9:30</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+              <tr><td>Dan</td><td>Leak detection · Vancouver</td><td>11:00</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+              <tr><td>Lena</td><td>Gas cooktop · Richmond</td><td>13:00</td><td><span class="status-pill pending">Pending</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-6">
+      <div class="dash-topbar"><h3 style="margin:0">Recent leads &amp; bookings (CRM)</h3><a href="#" class="link-arrow" data-noop>View all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
+      <div class="table-wrap mt-4">
+        <table class="data">
+          <thead><tr><th>Customer</th><th>Service</th><th>Source</th><th>Value</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>S. Mitchell</td><td>Emergency burst pipe</td><td>Google Ads</td><td>$540</td><td><span class="status-pill completed">Completed</span></td></tr>
+            <tr><td>D. Kaur</td><td>Hot water replace</td><td>Organic search</td><td>$1,480</td><td><span class="status-pill confirmed">Booked</span></td></tr>
+            <tr><td>M. Rossi</td><td>Bathroom reno rough-in</td><td>Referral</td><td>$6,200</td><td><span class="status-pill pending">Quote sent</span></td></tr>
+            <tr><td>A. Chen</td><td>Blocked drain</td><td>Facebook</td><td>$210</td><td><span class="status-pill pending">New lead</span></td></tr>
+            <tr><td>R. Singh</td><td>Leak detection</td><td>Organic search</td><td>$320</td><td><span class="status-pill confirmed">Booked</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>

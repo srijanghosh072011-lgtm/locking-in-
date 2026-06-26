@@ -1,0 +1,61 @@
+<!--PAGE
+title: Warranty &amp; Maintenance Records | BlueLine Plumbing Portal
+description: Access your BlueLine Plumbing warranty certificates, invoices and maintenance history in one secure place. Sign in to your customer portal.
+canonical: /warranty.html
+-->
+<main id="main">
+  <section class="page-hero on-navy">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/index.html" style="color:var(--slate-300)">Home</a></li><li>Warranty &amp; records</li></ol></nav>
+      <span class="eyebrow">Customer portal</span>
+      <h1>Your warranty &amp; maintenance records</h1>
+      <p class="lead" style="color:var(--slate-300)">Every job we do is documented. Sign in to view warranty certificates, invoices and your full service history — anytime.</p>
+    </div>
+  </section>
+
+  <section class="section section--surface">
+    <div class="container split" style="align-items:start">
+      <div>
+        <form class="form-card" data-validate novalidate
+              data-success="Signed in (demo). Your records would load here from your secure account."
+              data-toast="Welcome back">
+          <h2>Sign in</h2>
+          <div class="field"><label for="w-email">Email <span class="req">*</span></label><input class="input" id="w-email" name="email" type="email" autocomplete="email" required /><span class="error-msg" role="alert">Please enter a valid email.</span></div>
+          <div class="field"><label for="w-pass">Password <span class="req">*</span></label><input class="input" id="w-pass" name="password" type="password" autocomplete="current-password" required minlength="8" /><span class="error-msg" role="alert">Please enter your password.</span></div>
+          <div class="honeypot" aria-hidden="true"><label>Leave empty<input type="text" name="company" tabindex="-1" autocomplete="off" /></label></div>
+          <button class="btn btn--primary btn--block btn--lg" type="submit">Sign in</button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+          <p class="hint mt-4"><a href="/contact.html">Need access?</a> · Passwords must be hashed (bcrypt/argon2) and accounts protected by rate-limiting &amp; optional 2FA on the backend — see README security notes.</p>
+        </form>
+      </div>
+      <aside>
+        <div class="card">
+          <h3>What’s in your portal</h3>
+          <ul class="price-list mt-4">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Warranty certificates for every job</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Downloadable invoices &amp; receipts</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Full maintenance &amp; service history</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Service reminders for ageing systems</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <div class="container mt-8">
+      <div class="card">
+        <div class="dash-topbar"><h3 style="margin:0">Example: your records</h3><span class="badge">Demo data</span></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>Date</th><th>Job</th><th>Invoice</th><th>Warranty</th><th>Document</th></tr></thead>
+            <tbody>
+              <tr><td>14 Mar 2026</td><td>Hot water replacement (Rheem 50G)</td><td>BL-10428</td><td><span class="status-pill confirmed">Active · 6 yr</span></td><td><a href="#" data-noop>PDF</a></td></tr>
+              <tr><td>02 Nov 2025</td><td>Kitchen mixer tap replacement</td><td>BL-09913</td><td><span class="status-pill confirmed">Active · 25 yr</span></td><td><a href="#" data-noop>PDF</a></td></tr>
+              <tr><td>21 Jul 2025</td><td>Blocked sewer jetting + CCTV</td><td>BL-09102</td><td><span class="status-pill completed">Completed</span></td><td><a href="#" data-noop>PDF</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint mt-4">Illustrative only — real records load from each signed-in customer’s account (row-level access enforced server-side).</p>
+      </div>
+    </div>
+  </section>
+</main>
