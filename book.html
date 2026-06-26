@@ -102,9 +102,10 @@
   <section class="section section--surface">
     <div class="container split" style="align-items:start">
       <div>
-        <form class="form-card" data-validate novalidate
+        <form class="form-card" name="booking" method="POST" data-netlify="true" netlify-honeypot="company" data-validate novalidate
               data-success="You're booked in! Check your phone — we've sent a confirmation and we'll be in touch to lock the time."
               data-toast="Booking received">
+          <input type="hidden" name="form-name" value="booking" />
           <h2>Your booking</h2>
           <div class="field">
             <label for="b-service">Service needed <span class="req">*</span></label>
@@ -146,7 +147,7 @@
           </div>
           <button class="btn btn--primary btn--block btn--lg" type="submit">Confirm booking</button>
           <div class="form-status" role="status" aria-live="polite"></div>
-          <p class="hint mt-4">Front-end demo — wire to your scheduling/CRM backend to capture real bookings (see README). Abandoned-booking recovery hooks in here too.</p>
+          <p class="hint mt-4">Bookings are captured on deploy (Netlify Forms, or set <code>data-endpoint</code>). Connect your scheduler/CRM and abandoned-booking recovery — see the README.</p>
         </form>
       </div>
 

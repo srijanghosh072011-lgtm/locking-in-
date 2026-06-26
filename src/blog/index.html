@@ -35,7 +35,8 @@ canonical: /blog/index.html
           <h3 style="margin-top:.35rem">Seasonal tips in your inbox</h3>
           <p class="muted" style="margin:0;max-width:46ch">Spring pipe check-ups, winter freeze warnings and the occasional offer. No spam — unsubscribe anytime.</p>
         </div>
-        <form class="cluster" data-validate novalidate style="gap:.6rem" data-success="You're subscribed — watch for our next seasonal tip!" data-toast="Subscribed">
+        <form class="cluster" name="newsletter" method="POST" data-netlify="true" netlify-honeypot="company" data-validate novalidate style="gap:.6rem" data-success="You're subscribed — watch for our next seasonal tip!" data-toast="Subscribed">
+          <input type="hidden" name="form-name" value="newsletter" />
           <div class="field" style="margin:0">
             <label class="sr-only" for="nl-email">Email address</label>
             <input class="input" id="nl-email" name="email" type="email" placeholder="you@email.com" required style="min-width:240px" />

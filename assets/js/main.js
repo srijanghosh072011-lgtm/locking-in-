@@ -130,22 +130,45 @@
         return;
       }
 
-      // Optimistic UI: disable, show progress, then confirm.
+      // Optimistic UI: disable + show progress.
       var submitBtn = $('button[type="submit"]', form);
       var original = submitBtn ? submitBtn.innerHTML : "";
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Sending…"; }
 
-      // NOTE: front-end demo. Wire this to your backend endpoint (see README).
-      window.setTimeout(function () {
+      function onSuccess() {
         if (status) {
           status.className = "form-status is-success";
           status.textContent = form.getAttribute("data-success") ||
-            "Thanks! Your request has been received — we’ll call you back shortly.";
+            "Thanks! Your request has been received — we’ll be in touch shortly.";
         }
-        showToast(form.getAttribute("data-toast") || "Request sent successfully");
+        showToast(form.getAttribute("data-toast") || "Sent successfully");
         form.reset();
         if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = original; }
-      }, 700);
+      }
+      function onError() {
+        if (status) {
+          status.className = "form-status is-error";
+          status.textContent = "Sorry — that didn’t send. Please call (604) 555-0188 or try again.";
+        }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = original; }
+      }
+
+      // Real submission when configured. `data-netlify` works with zero config on
+      // Netlify; `data-endpoint="https://…"` posts anywhere (Formspree, your API).
+      // With neither, fall back to an optimistic demo so the UX is still complete.
+      var endpoint = form.getAttribute("data-endpoint");
+      var isNetlify = form.hasAttribute("data-netlify");
+      if (endpoint || isNetlify) {
+        var url = endpoint || form.getAttribute("action") || location.pathname;
+        var body = new URLSearchParams(new FormData(form)).toString();
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: body
+        }).then(function (r) { return r.ok ? onSuccess() : onError(); }).catch(onError);
+      } else {
+        window.setTimeout(onSuccess, 700);
+      }
     });
   });
 

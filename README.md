@@ -141,8 +141,8 @@ build environment (they need *your* accounts, billing, and a server/database).
 | Schema markup (rating/area in search) | ✅ Done |
 | Blog + articles ("How to unclog a drain") | ✅ Done |
 | Privacy Policy, Terms, Accessibility, Cookie consent | ✅ Done (lawyer review recommended) |
-| Booking / quote / contact / referral forms | ✅ Front-end done · 🔌 connect a form handler/CRM |
-| Pay bills online | ✅ Front-end done · 🔌 connect Stripe/Square **hosted** checkout (PCI-safe) |
+| Booking / quote / contact / referral / newsletter forms | ✅ Done — **live capture** on Netlify (zero-config) or any host via `data-endpoint` |
+| Pay bills online | ✅ Front-end page only — payment integration intentionally **not** wired (per request) |
 | Warranty / maintenance records portal | ✅ Front-end done · 🔌 needs auth + database |
 | Google Business Profile integration | 🔌 Needs the client's Google account (link + reviews API) |
 | Email list + seasonal offers (CASL-compliant) | ✅ Signup UI done · 🔌 connect Mailchimp/Resend |
@@ -166,8 +166,10 @@ build environment (they need *your* accounts, billing, and a server/database).
 
 ## Wiring the backend (pointers)
 
-- **Forms** → set each `<form>`'s action to your handler (Formspree/Netlify Forms
-  for no-code, or your API). Server-side validation is mandatory — see SECURITY.md.
+- **Forms** → already live: deploy to **Netlify** and the contact/booking/referral/
+  newsletter forms capture submissions with **no config** (honeypot wired). On other
+  hosts, set `data-endpoint="https://…"` (Formspree or your API). Validate server-side
+  too — see SECURITY.md.
 - **Payments** → Stripe Checkout or Square hosted payment links (no card data on-site).
 - **Booking/CRM** → your scheduling tool or a small API + database.
 - **Email** → Resend/Mailchimp with CASL consent (the consent checkboxes are wired).

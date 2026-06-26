@@ -105,9 +105,10 @@
         <span class="eyebrow">Send a message</span>
         <h2>Request a callback or quote</h2>
         <p class="muted">Tell us what’s going on and the best way to reach you. Fields marked <span class="text-orange">*</span> are required.</p>
-        <form class="form-card mt-6" data-validate novalidate
+        <form class="form-card mt-6" name="contact" method="POST" data-netlify="true" netlify-honeypot="company" data-validate novalidate
               data-success="Thanks! Your message is in — we’ll call you back shortly."
               data-toast="Message sent">
+          <input type="hidden" name="form-name" value="contact" />
           <div class="input-group">
             <div class="field"><label for="c-name">Full name <span class="req">*</span></label><input class="input" id="c-name" name="name" type="text" autocomplete="name" required /><span class="error-msg" role="alert">Please enter your name.</span></div>
             <div class="field"><label for="c-phone">Phone <span class="req">*</span></label><input class="input" id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required /><span class="error-msg" role="alert">Please enter a valid phone number.</span></div>
@@ -138,7 +139,7 @@
           </div>
           <button class="btn btn--primary btn--block btn--lg" type="submit">Send message</button>
           <div class="form-status" role="status" aria-live="polite"></div>
-          <p class="hint mt-4">This form is a front-end demo. Connect it to your form handler or CRM to receive submissions — see the project README.</p>
+          <p class="hint mt-4">Submissions are captured automatically on Netlify (zero config), or set <code>data-endpoint</code> for any other host/CRM — see the README.</p>
         </form>
       </div>
 

@@ -115,9 +115,10 @@
       <div>
         <span class="eyebrow">Refer now</span>
         <h2>Send a referral</h2>
-        <form class="form-card mt-6" data-validate novalidate
+        <form class="form-card mt-6" name="referral" method="POST" data-netlify="true" netlify-honeypot="company" data-validate novalidate
               data-success="Thanks for the referral! We'll reach out to your friend and pop your $50 credit on once their first job is done."
               data-toast="Referral sent — thank you!">
+          <input type="hidden" name="form-name" value="referral" />
           <h4>Your details</h4>
           <div class="input-group">
             <div class="field"><label for="r-name">Your name <span class="req">*</span></label><input class="input" id="r-name" name="name" type="text" autocomplete="name" required /><span class="error-msg" role="alert">Please enter your name.</span></div>
