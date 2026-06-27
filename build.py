@@ -19,6 +19,11 @@ DEFAULT_OG = "https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg
 
 HEADER = (ROOT / "partials" / "header.html").read_text(encoding="utf-8")
 FOOTER = (ROOT / "partials" / "footer.html").read_text(encoding="utf-8")
+# Inline CSS + JS into every page so each file is fully self-contained — it
+# renders correctly opened directly (file://), on any subpath, or at a domain
+# root, with no separate stylesheet/script that could fail to load.
+CSS_TEXT = (ROOT / "assets" / "css" / "styles.css").read_text(encoding="utf-8")
+JS_TEXT = (ROOT / "assets" / "js" / "main.js").read_text(encoding="utf-8")
 
 PEX = "https://images.pexels.com/photos/{id}/pexels-photo-{id}.jpeg?auto=compress&cs=tinysrgb&w={w}{extra}"
 def pexels(pid, w=900, h=None):
@@ -46,13 +51,11 @@ HEAD_TMPL = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/assets/css/styles.css" />
+  __STYLES__
 {extra_head}</head>
 <body{bodyclass}>
 <a class="skip-link" href="#main">Skip to content</a>
 """
-
-SCRIPT = '<script src="/assets/js/main.js" defer></script>\n'
 
 def parse_frontmatter(text):
     meta, body = {}, text
@@ -77,14 +80,18 @@ def render(meta, body, out_rel):
         bodyclass=(' class="%s"' % meta["bodyclass"]) if meta.get("bodyclass") else "",
     )
     if layout == "bare":
-        page = head + body + "\n" + SCRIPT + "</body>\n</html>\n"
+        page = head + body + "\n__SCRIPTS__\n</body>\n</html>\n"
     else:
-        page = head + HEADER + "\n" + body + "\n" + FOOTER + "\n</body>\n</html>\n"
+        page = head + HEADER + "\n" + body + "\n" + FOOTER + "\n__SCRIPTS__\n</body>\n</html>\n"
     # Make all internal links relative to this page's depth so the site works
     # opened directly (file://), on a subpath (e.g. GitHub Pages), or at a domain
-    # root. External (https:), tel:, mailto:, #anchors are untouched.
+    # root. External (https:), tel:, mailto:, #anchors are untouched. Done BEFORE
+    # CSS/JS injection so their contents are never touched by the rewrite.
     base = "../" * str(out_rel).replace("\\", "/").count("/")
-    return page.replace('="/', '="' + base)
+    page = page.replace('="/', '="' + base)
+    page = page.replace("__STYLES__", "<style>\n" + CSS_TEXT + "\n</style>")
+    page = page.replace("__SCRIPTS__", "<script>\n" + JS_TEXT + "\n</script>")
+    return page
 
 def write(out_rel, content):
     out = ROOT / out_rel
