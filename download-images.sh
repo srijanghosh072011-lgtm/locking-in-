@@ -16,7 +16,7 @@ set -eu
 cd "$(dirname "$0")"
 mkdir -p assets/img
 
-PAIRS="6419128:hero-plumber 8978316:technician 3173206:hot-water 6782428:bathroom 6444979:bathroom-2 9462224:kitchen-drain"
+PAIRS="4262167:hero-family 6419128:pipe-repair 8978316:technician 3173206:hot-water 6782428:bathroom 6444979:bathroom-2 9462224:kitchen-drain 6126281:gas-flame 8112851:leak-tap"
 
 for pair in $PAIRS; do
   id="${pair%%:*}"; name="${pair##*:}"
@@ -28,8 +28,9 @@ done
 echo "localising <img src> in built HTML -> /assets/img ..."
 python3 - <<'PY'
 import re, glob, os
-IMG = {"6419128":"hero-plumber","8978316":"technician","3173206":"hot-water",
-       "6782428":"bathroom","6444979":"bathroom-2","9462224":"kitchen-drain"}
+IMG = {"4262167":"hero-family","6419128":"pipe-repair","8978316":"technician",
+       "3173206":"hot-water","6782428":"bathroom","6444979":"bathroom-2",
+       "9462224":"kitchen-drain","6126281":"gas-flame","8112851":"leak-tap"}
 files = []
 for d in [".", "services", "locations", "blog", "legal", "admin"]:
     files += glob.glob(os.path.join(d, "*.html"))

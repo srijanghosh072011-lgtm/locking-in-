@@ -458,6 +458,43 @@ small { font-size: var(--fs-xs); }
 }
 .hero-badge svg { width: 18px; height: 18px; }
 
+/* ----------------------------------------- Hero v2 (photo + soft blur) -- */
+.hero-photo-sec { position: relative; min-height: clamp(560px, 86vh, 820px); display: flex; overflow: hidden; background: var(--navy-900); }
+.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+.hero-overlay { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; }
+.hero-overlay > .container { min-width: 0; }
+.hero-content .display { overflow-wrap: break-word; }
+/* Words hover on the photo; the area behind them is softly blurred + lightly
+   darkened for legibility (no glass card, no visible gradient — alpha mask only). */
+.hero-overlay::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  -webkit-backdrop-filter: blur(7px) brightness(0.82);
+  backdrop-filter: blur(7px) brightness(0.82);
+  background: rgba(8, 16, 30, 0.34);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 46%, transparent 80%);
+  mask-image: linear-gradient(to right, #000 0%, #000 46%, transparent 80%);
+}
+.hero-content { max-width: 620px; padding: clamp(2rem, 6vw, 4rem) clamp(1.5rem, 5vw, 3rem); color: #fff; }
+.hero-content .display { color: #fff; text-shadow: 0 2px 26px rgba(0, 0, 0, 0.42); }
+.hero-content .hero-sub { color: rgba(255, 255, 255, 0.94); font-size: 1.18rem; max-width: 42ch; text-shadow: 0 1px 16px rgba(0, 0, 0, 0.5); }
+.hero-content .hero-eyebrow { color: var(--orange-400); }
+.hero-trustline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; font-size: var(--fs-sm); font-weight: 600; color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,0.5); }
+.hero-trustline .star { color: var(--star); }
+.hero-trustline .sep { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+.btn--white { --btn-bg: #fff; --btn-fg: var(--navy-900); --btn-bd: #fff; }
+.btn--white:hover { --btn-bg: var(--surface-2); --btn-bd: var(--surface-2); box-shadow: var(--shadow-md); }
+@media (max-width: 900px) {
+  .hero-overlay::before { -webkit-mask-image: none; mask-image: none; background: rgba(8, 16, 30, 0.5); -webkit-backdrop-filter: blur(4px) brightness(0.78); backdrop-filter: blur(4px) brightness(0.78); }
+  .hero-content { max-width: 100%; padding-inline: 0; padding-block: clamp(2rem, 8vw, 3.5rem); }
+}
+@media (max-width: 620px) {
+  .hero-photo-sec { min-height: clamp(520px, 80vh, 680px); }
+  .hero-content .display { font-size: clamp(2rem, 10vw, 2.7rem); }
+  .hero-content .hero-eyebrow { letter-spacing: 0.06em; font-size: 0.7rem; }
+  .hero-content .hero-sub { font-size: 1.02rem; }
+  .hero-trustline { font-size: 0.8rem; gap: 0.3rem 0.7rem; }
+}
+
 /* --------------------------------------------------------------- Trust bar -- */
 .trustbar { background: var(--white); border-bottom: 1px solid var(--line); }
 .trustbar .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; padding-block: 1.1rem; }
@@ -475,17 +512,22 @@ small { font-size: var(--fs-xs); }
 .card.is-interactive { cursor: pointer; }
 .card.is-interactive:hover { border-color: var(--navy-900); box-shadow: var(--shadow-md); }
 
-/* Service card */
-.service-card { display: flex; flex-direction: column; gap: 0.85rem; height: 100%; position: relative; overflow: hidden; }
+/* Service card (photo header + icon badge) */
+.service-card { display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; padding: 0; }
+.service-card-media { position: relative; display: block; aspect-ratio: 16 / 10; background: var(--navy-800); overflow: hidden; }
+.service-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--t); }
+.service-card.is-interactive:hover .service-card-media img { transform: scale(1.04); }
 .service-card .icon-box {
-  width: 52px; height: 52px; flex: none; display: grid; place-items: center;
-  background: var(--navy-900); color: #fff; border-radius: var(--r-sm);
+  position: absolute; left: 16px; bottom: 16px; z-index: 1;
+  width: 48px; height: 48px; flex: none; display: grid; place-items: center;
+  background: var(--navy-900); color: #fff; border-radius: var(--r-sm); box-shadow: var(--shadow-md);
 }
-.service-card .icon-box svg { width: 26px; height: 26px; }
+.service-card .icon-box svg { width: 24px; height: 24px; }
+.service-card-body { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.4rem 1.5rem 1.5rem; flex: 1; }
 .service-card h3 { font-size: 1.3rem; }
 .service-card p { font-size: var(--fs-sm); color: var(--ink-500); margin: 0; }
-.service-card .card-link { margin-top: auto; }
-.service-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--orange-500); transform: scaleX(0); transform-origin: left; transition: transform var(--t); }
+.service-card .card-link { margin-top: auto; padding-top: 0.3rem; }
+.service-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--orange-500); transform: scaleX(0); transform-origin: left; transition: transform var(--t); z-index: 2; }
 .service-card.is-interactive:hover::after { transform: scaleX(1); }
 
 /* Feature media row */
@@ -869,29 +911,59 @@ table.data tr:last-child td { border-bottom: 0; }
     <div class="section-head"><span class="eyebrow">Richmond plumbing</span><h2>Your local Richmond plumbing team</h2>
     <p class="muted">BlueLine has plumbers working across Richmond every day. We know low-lying properties where drainage and sump pumps matter, so we turn up prepared and fix it properly the first time — whether it’s a blocked drain in Steveston or a hot water emergency across town.</p></div>
     <div class="grid grid-3"><a class="card service-card is-interactive" href="../services/blocked-drains.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
-          <h3>Blocked Drain Clearing</h3><p>Blocked sink, toilet or sewer? Cleared fast — and kept clear.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/9462224/pexels-photo-9462224.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="Blocked Drain Clearing." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>Blocked Drain Clearing</h3><p>Blocked sink, toilet or sewer? Cleared fast — and kept clear.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a><a class="card service-card is-interactive" href="../services/hot-water.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .24.97l2.52 4.55A4 4 0 0 1 13.27 20H10.7a4 4 0 0 1-3.49-6.48L9.76 8.97A2 2 0 0 0 10 8V2"/><line x1="8" y1="2" x2="16" y2="2"/></svg></span>
-          <h3>Hot Water Systems</h3><p>No hot water? We’ll usually have it back the same day.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/3173206/pexels-photo-3173206.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="Hot Water Systems." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2v6a2 2 0 0 0 .24.97l2.52 4.55A4 4 0 0 1 13.27 20H10.7a4 4 0 0 1-3.49-6.48L9.76 8.97A2 2 0 0 0 10 8V2"/><line x1="8" y1="2" x2="16" y2="2"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>Hot Water Systems</h3><p>No hot water? We’ll usually have it back the same day.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a><a class="card service-card is-interactive" href="../services/emergency-plumbing.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-12h-7z"/></svg></span>
-          <h3>24/7 Emergency Plumbing</h3><p>A real plumber on the line, day or night — at your door within 60 minutes.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/6419128/pexels-photo-6419128.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="24/7 Emergency Plumbing." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 11-12h-7z"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>24/7 Emergency Plumbing</h3><p>A real plumber on the line, day or night — at your door within 60 minutes.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a><a class="card service-card is-interactive" href="../services/gas-fitting.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8.5 14.5A4.5 4.5 0 0 0 13 19c2.5 0 4.5-2 4.5-4.5 0-2-1-3.5-2.5-5.5-.5 1-1.5 1.5-2.5 1.5 0-2-1-4-3-5 .5 3-1.5 4.5-2.5 6.5a4.5 4.5 0 0 0 .5 2.5z"/></svg></span>
-          <h3>Licensed Gas Fitting</h3><p>Safe, certified gas work — cooktops, heaters, BBQ points and leak repairs.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/6126281/pexels-photo-6126281.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="Licensed Gas Fitting." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8.5 14.5A4.5 4.5 0 0 0 13 19c2.5 0 4.5-2 4.5-4.5 0-2-1-3.5-2.5-5.5-.5 1-1.5 1.5-2.5 1.5 0-2-1-4-3-5 .5 3-1.5 4.5-2.5 6.5a4.5 4.5 0 0 0 .5 2.5z"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>Licensed Gas Fitting</h3><p>Safe, certified gas work — cooktops, heaters, BBQ points and leak repairs.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a><a class="card service-card is-interactive" href="../services/leak-detection.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-          <h3>Leak Detection</h3><p>Find hidden leaks fast — without jackhammering your home to go looking.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/8112851/pexels-photo-8112851.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="Leak Detection." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>Leak Detection</h3><p>Find hidden leaks fast — without jackhammering your home to go looking.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a><a class="card service-card is-interactive" href="../services/bathroom-renovation.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M4 12v3a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-3"/><line x1="7" y1="20" x2="6" y2="22"/><line x1="17" y1="20" x2="18" y2="22"/></svg></span>
-          <h3>Bathroom & Kitchen Renovations</h3><p>All the plumbing for your reno — roughed-in on time and waterproofed to last.</p>
-          <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="https://images.pexels.com/photos/6444979/pexels-photo-6444979.jpeg?auto=compress&cs=tinysrgb&w=700&h=438&fit=crop" width="700" height="438" alt="Bathroom & Kitchen Renovations." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M4 12v3a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-3"/><line x1="7" y1="20" x2="6" y2="22"/><line x1="17" y1="20" x2="18" y2="22"/></svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>Bathroom & Kitchen Renovations</h3><p>All the plumbing for your reno — roughed-in on time and waterproofed to last.</p>
+            <span class="link-arrow card-link">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </span>
         </a></div>
   </div></section>
 

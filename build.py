@@ -116,7 +116,7 @@ ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 
 SERVICES = {
   "blocked-drains": {
-    "name": "Blocked Drain Clearing", "from": "$149", "img": 6419128,
+    "name": "Blocked Drain Clearing", "from": "$149", "img": 9462224,
     "icon": '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
     "tagline": "Blocked sink, toilet or sewer? Cleared fast — and kept clear.",
     "intro": "A blocked drain never picks a good time. Our plumbers clear blockages at the source with high-pressure water jetting and confirm the fix with a CCTV camera, so you’re not paying for a guess. Most domestic blockages are cleared on the first visit.",
@@ -170,7 +170,7 @@ SERVICES = {
     ],
   },
   "gas-fitting": {
-    "name": "Licensed Gas Fitting", "from": "$180", "img": 6419128,
+    "name": "Licensed Gas Fitting", "from": "$180", "img": 6126281,
     "icon": '<path d="M8.5 14.5A4.5 4.5 0 0 0 13 19c2.5 0 4.5-2 4.5-4.5 0-2-1-3.5-2.5-5.5-.5 1-1.5 1.5-2.5 1.5 0-2-1-4-3-5 .5 3-1.5 4.5-2.5 6.5a4.5 4.5 0 0 0 .5 2.5z"/>',
     "tagline": "Safe, certified gas work — cooktops, heaters, BBQ points and leak repairs.",
     "intro": "Gas is not a DIY job. Our licensed gas fitters install, service and certify gas appliances to BC code, and respond fast to suspected gas leaks. Every job is tested and documented so you have proof it’s safe.",
@@ -188,7 +188,7 @@ SERVICES = {
     ],
   },
   "leak-detection": {
-    "name": "Leak Detection", "from": "$160", "img": 9462224,
+    "name": "Leak Detection", "from": "$160", "img": 8112851,
     "icon": '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
     "tagline": "Find hidden leaks fast — without jackhammering your home to go looking.",
     "intro": "A spiking water bill or a damp patch usually means a hidden leak. We use acoustic and thermal-imaging equipment to pinpoint leaks inside walls and under slabs precisely, so the repair is small and targeted — not destructive.",
@@ -332,9 +332,14 @@ def city_page(slug, data):
     urls.append(canonical)
     svc_cards = "".join(
         f'''<a class="card service-card is-interactive" href="/services/{k}.html">
-          <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{v["icon"]}</svg></span>
-          <h3>{v["name"]}</h3><p>{v["tagline"]}</p>
-          <span class="link-arrow card-link">Learn more {ARROW}</span>
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="{pexels(v["img"], 700, 438)}" width="700" height="438" alt="{v["name"]}." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{v["icon"]}</svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>{v["name"]}</h3><p>{v["tagline"]}</p>
+            <span class="link-arrow card-link">Learn more {ARROW}</span>
+          </span>
         </a>''' for k, v in list(SERVICES.items())[:6])
     body = f'''<main id="main">
   <section class="page-hero on-navy">
