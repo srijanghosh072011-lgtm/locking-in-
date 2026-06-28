@@ -17,12 +17,12 @@
   <link rel="manifest" href="site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
   <style>
 /* ==========================================================================
    BlueLine Plumbing — Design System
    Style: Sharp Editorial · Deep navy + electric orange · No gradients
-   Type:  Sora (display) + Inter (body)
+   Type:  Instrument Serif (display) + Inter (body)
    Author note: hand-built tokens + components (no framework) for a bespoke,
    fast, accessible, SEO-friendly static site.
    ========================================================================== */
@@ -97,7 +97,7 @@
   --shadow-hard-orange: 8px 8px 0 0 var(--orange-500);
 
   /* Type */
-  --font-display: "Sora", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --fs-display: clamp(2.9rem, 6.2vw, 5.25rem);
@@ -159,6 +159,9 @@ body {
   background: var(--surface);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Instrument Serif ships only a 400 weight — allow synthetic italics for body
+     <em> but never synthesise bold, so serif headings stay clean at any weight. */
+  font-synthesis: style;
 }
 
 img, picture, svg, video { display: block; max-width: 100%; height: auto; }
@@ -199,13 +202,13 @@ button { font: inherit; cursor: pointer; }
 /* ------------------------------------------------------------ Typography -- */
 h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.04;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
   color: var(--navy-900);
   text-wrap: balance;
 }
-h1 { font-size: var(--fs-h1); font-weight: 600; }
+h1 { font-size: var(--fs-h1); font-weight: 400; }
 h2 { font-size: var(--fs-h2); }
 h3 { font-size: var(--fs-h3); }
 h4 { font-size: var(--fs-h4); font-family: var(--font-body); font-weight: 700; letter-spacing: 0; }
@@ -240,10 +243,10 @@ small { font-size: var(--fs-xs); }
 
 .display {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   font-size: var(--fs-display);
-  line-height: 1.02;
-  letter-spacing: -0.015em;
+  line-height: 1.06;
+  letter-spacing: 0;
   color: var(--navy-900);
   text-wrap: balance;
 }
