@@ -64,9 +64,9 @@ front-matter. Run `python3 build.py` to propagate changes everywhere.
 | Token | Value |
 |------|-------|
 | Navy | `#0A2540` · Blue `#1E5BD6` · **Accent orange `#F97316`** |
-| Fonts | **Oswald** (condensed display) + **Inter** (body) |
+| Fonts | **Sora** (geometric display) + **Inter** (body) |
 | Finish | Sharp editorial — tight radii, strong borders, flat fills, **no gradients** |
-| Hero | Custom split-editorial: navy panel + real photo + floating ★ review card |
+| Hero | Full-bleed friendly photo; headline hovers on a softly-blurred area (no glass, no gradient) |
 
 ---
 
