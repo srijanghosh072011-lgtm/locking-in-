@@ -485,6 +485,24 @@ small { font-size: var(--fs-xs); }
 .hero-trustline .sep { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.5); }
 .btn--white { --btn-bg: #fff; --btn-fg: var(--navy-900); --btn-bd: #fff; }
 .btn--white:hover { --btn-bg: var(--surface-2); --btn-bd: var(--surface-2); box-shadow: var(--shadow-md); }
+
+/* Liquid-glass CTAs (hero, over the photo): translucent + blurred backdrop,
+   bright rim and inner highlight, soft drop shadow. No gradients. */
+.btn--glass {
+  --btn-bg: rgba(255, 255, 255, 0.13);
+  --btn-fg: #fff;
+  --btn-bd: rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 10px 30px rgba(8, 16, 30, 0.30);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+}
+.btn--glass:hover { --btn-bg: rgba(255, 255, 255, 0.22); --btn-bd: rgba(255, 255, 255, 0.62); color: #fff; }
+.btn--glass:focus-visible { outline-color: #fff; }
+/* Brighter glass for the primary action */
+.btn--glass-strong { --btn-bg: rgba(255, 255, 255, 0.26); --btn-bd: rgba(255, 255, 255, 0.64); }
+.btn--glass-strong:hover { --btn-bg: rgba(255, 255, 255, 0.40); --btn-bd: rgba(255, 255, 255, 0.82); }
 @media (max-width: 900px) {
   .hero-overlay::before { -webkit-mask-image: none; mask-image: none; background: rgba(8, 16, 30, 0.5); -webkit-backdrop-filter: blur(4px) brightness(0.78); backdrop-filter: blur(4px) brightness(0.78); }
   .hero-content { max-width: 100%; padding-inline: 0; padding-block: clamp(2rem, 8vw, 3.5rem); }
