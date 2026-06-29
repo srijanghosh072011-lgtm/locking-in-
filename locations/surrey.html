@@ -488,6 +488,13 @@ small { font-size: var(--fs-xs); }
 .hero-content .display { color: #fff; text-shadow: 0 2px 26px rgba(0, 0, 0, 0.42); }
 .hero-content .hero-sub { color: rgba(255, 255, 255, 0.94); font-size: 1.18rem; max-width: 42ch; text-shadow: 0 1px 16px rgba(0, 0, 0, 0.5); }
 .hero-content .hero-eyebrow { color: var(--orange-400); }
+/* Service landing-page hero: same photo+blur treatment, shorter than home hero */
+.hero-photo-sec--compact { min-height: clamp(420px, 56vh, 560px); }
+.hero-content h1 { color: #fff; text-shadow: 0 2px 22px rgba(0, 0, 0, 0.42); }
+.hero-content .breadcrumbs { color: rgba(255, 255, 255, 0.82); padding-top: 0; margin-bottom: 0.6rem; }
+.hero-content .breadcrumbs a { color: rgba(255, 255, 255, 0.82); }
+.hero-content .breadcrumbs a:hover { color: #fff; }
+.hero-content .breadcrumbs li::after { color: rgba(255, 255, 255, 0.45); }
 .hero-trustline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; font-size: var(--fs-sm); font-weight: 600; color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,0.5); }
 .hero-trustline .star { color: var(--star); }
 .hero-trustline .sep { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.5); }

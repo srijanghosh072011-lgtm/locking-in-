@@ -116,7 +116,7 @@ ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 
 SERVICES = {
   "blocked-drains": {
-    "name": "Blocked Drain Clearing", "from": "$149", "img": 9462224,
+    "name": "Blocked Drain Clearing", "from": "$149", "img": 9462224, "img2": 6419128,
     "icon": '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
     "tagline": "Blocked sink, toilet or sewer? Cleared fast — and kept clear.",
     "intro": "A blocked drain never picks a good time. Our plumbers clear blockages at the source with high-pressure water jetting and confirm the fix with a CCTV camera, so you’re not paying for a guess. Most domestic blockages are cleared on the first visit.",
@@ -134,7 +134,7 @@ SERVICES = {
     ],
   },
   "hot-water": {
-    "name": "Hot Water Systems", "from": "$320", "img": 3173206,
+    "name": "Hot Water Systems", "from": "$320", "img": 3173206, "img2": 8978316,
     "icon": '<path d="M14 2v6a2 2 0 0 0 .24.97l2.52 4.55A4 4 0 0 1 13.27 20H10.7a4 4 0 0 1-3.49-6.48L9.76 8.97A2 2 0 0 0 10 8V2"/><line x1="8" y1="2" x2="16" y2="2"/>',
     "tagline": "No hot water? We’ll usually have it back the same day.",
     "intro": "Whether it’s a pilot light that won’t hold, a leaking tank or a unit that’s simply had its day, BlueLine repairs and replaces every type of hot water system. We stock the major brands on the van, so most repairs and like-for-like swaps are done same day.",
@@ -152,7 +152,7 @@ SERVICES = {
     ],
   },
   "emergency-plumbing": {
-    "name": "24/7 Emergency Plumbing", "from": "$180", "img": 6419128,
+    "name": "24/7 Emergency Plumbing", "from": "$180", "img": 6419128, "img2": 8978316,
     "icon": '<path d="M13 2 3 14h7l-1 8 11-12h-7z"/>',
     "tagline": "A real plumber on the line, day or night — at your door within 60 minutes.",
     "intro": "Burst pipe? Sewer backing up? Gas smell? When water (or worse) is where it shouldn’t be, every minute counts. BlueLine runs a genuine 24/7 emergency line, 365 days a year, with fully stocked vans ready to roll across Greater Vancouver.",
@@ -170,7 +170,7 @@ SERVICES = {
     ],
   },
   "gas-fitting": {
-    "name": "Licensed Gas Fitting", "from": "$180", "img": 6126281,
+    "name": "Licensed Gas Fitting", "from": "$180", "img": 6126281, "img2": 6419128,
     "icon": '<path d="M8.5 14.5A4.5 4.5 0 0 0 13 19c2.5 0 4.5-2 4.5-4.5 0-2-1-3.5-2.5-5.5-.5 1-1.5 1.5-2.5 1.5 0-2-1-4-3-5 .5 3-1.5 4.5-2.5 6.5a4.5 4.5 0 0 0 .5 2.5z"/>',
     "tagline": "Safe, certified gas work — cooktops, heaters, BBQ points and leak repairs.",
     "intro": "Gas is not a DIY job. Our licensed gas fitters install, service and certify gas appliances to BC code, and respond fast to suspected gas leaks. Every job is tested and documented so you have proof it’s safe.",
@@ -188,7 +188,7 @@ SERVICES = {
     ],
   },
   "leak-detection": {
-    "name": "Leak Detection", "from": "$160", "img": 8112851,
+    "name": "Leak Detection", "from": "$160", "img": 8112851, "img2": 9462224,
     "icon": '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
     "tagline": "Find hidden leaks fast — without jackhammering your home to go looking.",
     "intro": "A spiking water bill or a damp patch usually means a hidden leak. We use acoustic and thermal-imaging equipment to pinpoint leaks inside walls and under slabs precisely, so the repair is small and targeted — not destructive.",
@@ -206,7 +206,7 @@ SERVICES = {
     ],
   },
   "bathroom-renovation": {
-    "name": "Bathroom & Kitchen Renovations", "from": "$2,500", "img": 6444979,
+    "name": "Bathroom & Kitchen Renovations", "from": "$2,500", "img": 6444979, "img2": 6782428,
     "icon": '<path d="M4 12V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M4 12v3a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-3"/><line x1="7" y1="20" x2="6" y2="22"/><line x1="17" y1="20" x2="18" y2="22"/>',
     "tagline": "All the plumbing for your reno — roughed-in on time and waterproofed to last.",
     "intro": "Renovating a bathroom, kitchen or laundry? We handle the complete plumbing scope — rough-in, fixtures, waterproofing sign-off and final fit-off — and coordinate cleanly with your builder, tiler and the rest of the trades so your project stays on schedule.",
@@ -239,21 +239,34 @@ def service_page(slug, s):
         '{{"@type":"Question","name":{q},"acceptedAnswer":{{"@type":"Answer","text":{a}}}}}'.format(
             q=_json(q), a=_json(a)) for q, a in s["faqs"])
     points = "".join(f'<li>{CHECK} {p}</li>' for p in s["points"])
-    related = "".join(
-        f'<a class="chip" href="/services/{k}.html">{v["name"]}</a>'
-        for k, v in SERVICES.items() if k != slug)
+    related_cards = "".join(
+        f'''<a class="card service-card is-interactive" href="/services/{k}.html">
+          <span class="service-card-media">
+            <img data-photo loading="lazy" src="{pexels(v["img"], 700, 438)}" width="700" height="438" alt="{v["name"]}." />
+            <span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">{v["icon"]}</svg></span>
+          </span>
+          <span class="service-card-body">
+            <h3>{v["name"]}</h3><p>{v["tagline"]}</p>
+            <span class="link-arrow card-link">Learn more {ARROW}</span>
+          </span>
+        </a>''' for k, v in SERVICES.items() if k != slug)
     body = f'''<main id="main">
-  <section class="page-hero on-navy">
-    <div class="container">
-      <nav class="breadcrumbs" aria-label="Breadcrumb" style="color:var(--slate-400)">
-        <ol><li><a href="/index.html" style="color:var(--slate-300)">Home</a></li><li><a href="/services.html" style="color:var(--slate-300)">Services</a></li><li>{s["name"]}</li></ol>
-      </nav>
-      <span class="eyebrow">Plumbing service</span>
-      <h1>{s["name"]}</h1>
-      <p class="lead" style="color:var(--slate-300)">{s["tagline"]}</p>
-      <div class="btn-row mt-6">
-        <a href="/book.html" class="btn btn--primary btn--lg">Book this service</a>
-        <a href="tel:+16045550188" class="btn btn--ghost btn--lg">Call (604) 555-0188</a>
+  <section class="hero-photo-sec hero-photo-sec--compact" aria-label="{s["name"]}">
+    <img class="hero-bg" data-photo fetchpriority="high" src="{pexels(s["img"], 1900)}" width="1900" height="1000" alt="{s["name"]} — BlueLine Plumbing, Greater Vancouver." />
+    <div class="hero-overlay">
+      <div class="container">
+        <div class="hero-content">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol><li><a href="/index.html">Home</a></li><li><a href="/services.html">Services</a></li><li>{s["name"]}</li></ol>
+          </nav>
+          <span class="hero-eyebrow">Plumbing service</span>
+          <h1>{s["name"]}</h1>
+          <p class="hero-sub">{s["tagline"]}</p>
+          <div class="btn-row mt-6">
+            <a href="/book.html" class="btn btn--primary btn--lg">Book this service {ARROW}</a>
+            <a href="tel:+16045550188" class="btn btn--glass btn--lg">Call (604) 555-0188</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -272,7 +285,7 @@ def service_page(slug, s):
         </div>
       </div>
       <div class="media-card">
-        <img data-photo loading="lazy" src="{pexels(s["img"], 900, 1000)}" width="900" height="1000" alt="{s["name"]} by a licensed BlueLine plumber." />
+        <img data-photo loading="lazy" src="{pexels(s["img2"], 900, 1000)}" width="900" height="1000" alt="A licensed BlueLine plumber providing {s["name"].lower()}." />
       </div>
     </div>
   </section>
@@ -286,8 +299,8 @@ def service_page(slug, s):
 
   <section class="section section--white">
     <div class="container">
-      <div class="section-head center"><span class="eyebrow">Explore</span><h2>Other services</h2></div>
-      <div class="cluster" style="justify-content:center">{related}</div>
+      <div class="section-head center"><span class="eyebrow">Explore</span><h2>Other services we offer</h2></div>
+      <div class="grid grid-3">{related_cards}</div>
     </div>
   </section>
 
