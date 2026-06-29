@@ -150,6 +150,7 @@ build environment (they need *your* accounts, billing, and a server/database).
 | Abandoned-booking recovery | 🔌 Backend + email automation (hook noted in `book.html`) |
 | Loyalty + referral programs | ✅ UI + rules copy done · 🔌 needs accounts/credits in a backend |
 | Admin dashboard (bookings, revenue, schedules) | ✅ Demo UI done · 🔌 needs auth + live data API |
+| Staff / admin login | ✅ Login UI + demo flow (`/admin/login.html`) · 🔌 needs backend auth: password hashing, sessions, rate-limiting |
 | CRM (track every lead/customer) | ✅ Demo table done · 🔌 use a CRM or build one |
 | Automated post-job follow-up | 🔌 Backend + email/SMS automation |
 | QuickBooks invoicing integration | 🔌 Needs QuickBooks account + OAuth + a backend |

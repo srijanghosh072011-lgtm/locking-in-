@@ -136,6 +136,14 @@
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Sending…"; }
 
       function onSuccess() {
+        // Login / flows that should navigate on success use data-redirect.
+        var redirect = form.getAttribute("data-redirect");
+        if (redirect) {
+          try { sessionStorage.setItem("bl_demo_session", "1"); } catch (e) {}
+          if (status) { status.className = "form-status is-success"; status.textContent = form.getAttribute("data-success") || "Signing you in…"; }
+          window.location.href = redirect;
+          return;
+        }
         if (status) {
           status.className = "form-status is-success";
           status.textContent = form.getAttribute("data-success") ||
@@ -228,6 +236,11 @@
   /* ----------------------------------------- Demo no-op links -- */
   $$("[data-noop]").forEach(function (a) {
     a.addEventListener("click", function (e) { e.preventDefault(); });
+  });
+
+  /* ----------------------------------------------- Demo sign-out -- */
+  $$("[data-signout]").forEach(function (a) {
+    a.addEventListener("click", function () { try { sessionStorage.removeItem("bl_demo_session"); } catch (e) {} });
   });
 
   /* ------------------------------------------ Active nav state -- */
