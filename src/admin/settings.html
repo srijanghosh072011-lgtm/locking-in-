@@ -1,0 +1,47 @@
+<!--PAGE
+title: Settings (Demo) | BlueLine Plumbing Admin
+description: BlueLine Plumbing admin — settings.
+canonical: /admin/settings.html
+layout: admin
+active: settings
+bodyclass: dash-body
+-->
+    <div class="dash-topbar">
+      <div><span class="eyebrow">Account</span><h1 style="font-size:1.8rem;margin-top:.25rem">Settings</h1></div>
+    </div>
+
+    <div class="grid grid-2 mt-2" style="align-items:start">
+      <div class="card">
+        <h3>Business details</h3>
+        <form class="mt-4" data-validate novalidate data-success="Settings saved (demo)." data-toast="Settings saved">
+          <div class="field"><label for="s-name">Business name</label><input class="input" id="s-name" name="name" type="text" value="BlueLine Plumbing Ltd." /></div>
+          <div class="input-group">
+            <div class="field"><label for="s-phone">Phone</label><input class="input" id="s-phone" name="phone" type="tel" inputmode="tel" value="(604) 555-0188" /></div>
+            <div class="field"><label for="s-email">Email</label><input class="input" id="s-email" name="email" type="email" value="hello@bluelineplumbing.ca" /></div>
+          </div>
+          <div class="field"><label for="s-address">Address</label><input class="input" id="s-address" name="address" type="text" value="120 Industrial Ave, Unit 4, Vancouver, BC" /></div>
+          <div class="field"><label for="s-hours">Office hours</label><input class="input" id="s-hours" name="hours" type="text" value="Mon–Fri 7am–6pm, Sat 8am–4pm · Emergency 24/7" /></div>
+          <button class="btn btn--primary mt-2" type="submit">Save changes</button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+      <div class="card">
+        <h3>Notifications</h3>
+        <p class="muted" style="font-size:var(--fs-sm)">Choose what the team gets alerted about.</p>
+        <div class="stack mt-4">
+          <label class="consent"><input type="checkbox" checked /> <span>New booking received</span></label>
+          <label class="consent"><input type="checkbox" checked /> <span>Emergency call-out (SMS the on-call tech)</span></label>
+          <label class="consent"><input type="checkbox" checked /> <span>Invoice overdue reminder</span></label>
+          <label class="consent"><input type="checkbox" /> <span>Daily revenue summary email</span></label>
+          <label class="consent"><input type="checkbox" checked /> <span>New review posted</span></label>
+        </div>
+        <hr class="divider" />
+        <h4>Integrations</h4>
+        <div class="cluster mt-4">
+          <span class="chip">QuickBooks — <span class="text-orange" style="margin-left:.25rem">Connect</span></span>
+          <span class="chip">Stripe — <span class="text-orange" style="margin-left:.25rem">Connect</span></span>
+          <span class="chip">Google Business — <span class="text-orange" style="margin-left:.25rem">Connect</span></span>
+        </div>
+        <p class="hint mt-4">Demo — wire these to your backend and provider OAuth.</p>
+      </div>
+    </div>

@@ -1,0 +1,58 @@
+<!--PAGE
+title: Technician Schedule (Demo) | BlueLine Plumbing Admin
+description: BlueLine Plumbing admin — technician schedule.
+canonical: /admin/schedule.html
+layout: admin
+active: schedule
+bodyclass: dash-body
+-->
+    <div class="dash-topbar">
+      <div><span class="eyebrow">Dispatch</span><h1 style="font-size:1.8rem;margin-top:.25rem">Technician schedule</h1></div>
+      <div class="btn-row">
+        <button class="btn btn--ghost btn--sm" data-noop aria-label="Previous day">‹ Prev</button>
+        <span class="chip">Tuesday, 26 June</span>
+        <button class="btn btn--ghost btn--sm" data-noop aria-label="Next day">Next ›</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Jobs today</div><div class="val">14</div><div class="delta up">▲ 3</div></div>
+      <div class="kpi"><div class="label">Techs on shift</div><div class="val">6</div><div class="delta">of 8</div></div>
+      <div class="kpi"><div class="label">Utilisation</div><div class="val">88%</div><div class="delta up">▲ 4%</div></div>
+      <div class="kpi"><div class="label">Unassigned</div><div class="val">1</div><div class="delta down">needs dispatch</div></div>
+    </div>
+
+    <div class="grid grid-2 mt-6" style="align-items:start">
+      <div class="card">
+        <h3>Today’s jobs</h3>
+        <div class="table-wrap mt-4">
+          <table class="data">
+            <thead><tr><th>Time</th><th>Technician</th><th>Customer · Service</th><th>Area</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>8:00</td><td>Marcus</td><td>S. Mitchell · Hot water swap</td><td>Burnaby</td><td><span class="status-pill completed">In progress</span></td></tr>
+              <tr><td>9:30</td><td>Priya</td><td>P. Tran · Blocked sewer</td><td>Surrey</td><td><span class="status-pill completed">En route</span></td></tr>
+              <tr><td>11:00</td><td>Dan</td><td>J. Lowe · Leak detection</td><td>Vancouver</td><td><span class="status-pill confirmed">Scheduled</span></td></tr>
+              <tr><td>13:00</td><td>Lena</td><td>R. Chen · Gas cooktop</td><td>Richmond</td><td><span class="status-pill confirmed">Scheduled</span></td></tr>
+              <tr><td>14:30</td><td>Marcus</td><td>A. Singh · Hot water service</td><td>North Van</td><td><span class="status-pill confirmed">Scheduled</span></td></tr>
+              <tr><td>15:30</td><td>—</td><td>M. Okafor · Tap repair</td><td>Coquitlam</td><td><span class="status-pill pending">Unassigned</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Technicians on shift</h3>
+        <div class="table-wrap mt-4">
+          <table class="data">
+            <thead><tr><th>Technician</th><th>Today</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Marcus B.</td><td>3 jobs</td><td><span class="status-pill completed">On a job</span></td></tr>
+              <tr><td>Priya S.</td><td>2 jobs</td><td><span class="status-pill completed">En route</span></td></tr>
+              <tr><td>Dan W.</td><td>3 jobs</td><td><span class="status-pill confirmed">Available</span></td></tr>
+              <tr><td>Lena K.</td><td>2 jobs</td><td><span class="status-pill confirmed">Available</span></td></tr>
+              <tr><td>Omar F.</td><td>2 jobs</td><td><span class="status-pill confirmed">Available</span></td></tr>
+              <tr><td>Jess M.</td><td>2 jobs</td><td><span class="status-pill pending">Lunch</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>

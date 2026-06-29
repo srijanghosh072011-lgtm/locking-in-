@@ -1,0 +1,38 @@
+<!--PAGE
+title: Customers / CRM (Demo) | BlueLine Plumbing Admin
+description: BlueLine Plumbing admin — customers / CRM.
+canonical: /admin/customers.html
+layout: admin
+active: customers
+bodyclass: dash-body
+-->
+    <div class="dash-topbar">
+      <div><span class="eyebrow">CRM</span><h1 style="font-size:1.8rem;margin-top:.25rem">Customers</h1></div>
+      <div class="btn-row"><button class="btn btn--primary btn--sm">+ Add customer</button></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Total customers</div><div class="val">3,412</div><div class="delta up">▲ 84 this month</div></div>
+      <div class="kpi"><div class="label">New this month</div><div class="val">84</div><div class="delta up">▲ 12%</div></div>
+      <div class="kpi"><div class="label">Repeat rate</div><div class="val">61%</div><div class="delta up">▲ 2%</div></div>
+      <div class="kpi"><div class="label">Avg lifetime value</div><div class="val">$1,240</div><div class="delta up">▲ $40</div></div>
+    </div>
+
+    <div class="card mt-6">
+      <div class="dash-topbar"><h3 style="margin:0">All customers</h3><span class="muted" style="font-size:var(--fs-sm)">Showing 8 of 3,412</span></div>
+      <div class="table-wrap mt-4">
+        <table class="data">
+          <thead><tr><th>Customer</th><th>Contact</th><th>Area</th><th>Jobs</th><th>Lifetime value</th><th>Last service</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Sarah Mitchell</td><td>sarah.m@email.com</td><td>Burnaby</td><td>6</td><td>$3,180</td><td>14 Mar 2026</td><td><span class="status-pill confirmed">VIP</span></td></tr>
+            <tr><td>David Kaur</td><td>(604) 555-0102</td><td>Richmond</td><td>3</td><td>$2,460</td><td>02 Mar 2026</td><td><span class="status-pill confirmed">Active</span></td></tr>
+            <tr><td>Marco Rossi</td><td>marco.r@email.com</td><td>Vancouver</td><td>1</td><td>$0</td><td>—</td><td><span class="status-pill pending">Lead</span></td></tr>
+            <tr><td>Priya Tran</td><td>(604) 555-0144</td><td>Surrey</td><td>4</td><td>$1,720</td><td>21 Feb 2026</td><td><span class="status-pill confirmed">Active</span></td></tr>
+            <tr><td>Amir Hassan</td><td>amir.h@email.com</td><td>Coquitlam</td><td>2</td><td>$980</td><td>18 Jan 2026</td><td><span class="status-pill confirmed">Active</span></td></tr>
+            <tr><td>Grace Wong</td><td>(604) 555-0188</td><td>North Van</td><td>5</td><td>$2,910</td><td>09 Jan 2026</td><td><span class="status-pill confirmed">VIP</span></td></tr>
+            <tr><td>Thanh Nguyen</td><td>thanh.n@email.com</td><td>Richmond</td><td>2</td><td>$640</td><td>21 Dec 2025</td><td><span class="status-pill completed">Lapsed</span></td></tr>
+            <tr><td>Sam Park</td><td>(604) 555-0170</td><td>Surrey</td><td>1</td><td>$210</td><td>—</td><td><span class="status-pill pending">New lead</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

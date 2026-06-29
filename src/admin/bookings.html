@@ -1,0 +1,40 @@
+<!--PAGE
+title: Bookings (Demo) | BlueLine Plumbing Admin
+description: BlueLine Plumbing admin — bookings.
+canonical: /admin/bookings.html
+layout: admin
+active: bookings
+bodyclass: dash-body
+-->
+    <div class="dash-topbar">
+      <div><span class="eyebrow">Operations</span><h1 style="font-size:1.8rem;margin-top:.25rem">Bookings</h1></div>
+      <div class="btn-row"><a href="/book.html" class="btn btn--primary btn--sm">+ New booking</a></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Today</div><div class="val">14</div><div class="delta up">▲ 3 vs yesterday</div></div>
+      <div class="kpi"><div class="label">This week</div><div class="val">68</div><div class="delta up">▲ 9%</div></div>
+      <div class="kpi"><div class="label">Awaiting confirmation</div><div class="val">5</div><div class="delta">needs action</div></div>
+      <div class="kpi"><div class="label">Completion rate</div><div class="val">98%</div><div class="delta up">▲ 1%</div></div>
+    </div>
+
+    <div class="cluster mt-6"><span class="chip">All</span><span class="chip">Today</span><span class="chip">This week</span><span class="chip">Emergency</span><span class="chip">Unassigned</span></div>
+
+    <div class="card mt-6">
+      <div class="dash-topbar"><h3 style="margin:0">All bookings</h3><span class="muted" style="font-size:var(--fs-sm)">Showing 8 of 68</span></div>
+      <div class="table-wrap mt-4">
+        <table class="data">
+          <thead><tr><th>Time</th><th>Customer</th><th>Service</th><th>Area</th><th>Technician</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Today 8:00</td><td>S. Mitchell</td><td>Hot water swap</td><td>Burnaby</td><td>Marcus</td><td><span class="status-pill completed">In progress</span></td></tr>
+            <tr><td>Today 9:30</td><td>P. Tran</td><td>Blocked sewer</td><td>Surrey</td><td>Priya</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+            <tr><td>Today 11:00</td><td>J. Lowe</td><td>Leak detection</td><td>Vancouver</td><td>Dan</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+            <tr><td>Today 13:00</td><td>R. Chen</td><td>Gas cooktop</td><td>Richmond</td><td>Lena</td><td><span class="status-pill pending">Pending</span></td></tr>
+            <tr><td>Today 15:30</td><td>M. Okafor</td><td>Tap repair</td><td>Coquitlam</td><td>—</td><td><span class="status-pill pending">Unassigned</span></td></tr>
+            <tr><td>Tue 8:00</td><td>A. Singh</td><td>Hot water service</td><td>North Van</td><td>Marcus</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+            <tr><td>Tue 10:00</td><td>G. Rossi</td><td>Bathroom rough-in</td><td>Vancouver</td><td>Dan</td><td><span class="status-pill confirmed">Confirmed</span></td></tr>
+            <tr><td>Tue 14:00</td><td>H. Park</td><td>Emergency burst pipe</td><td>Burnaby</td><td>Priya</td><td><span class="status-pill completed">Completed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

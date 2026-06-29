@@ -1,0 +1,37 @@
+<!--PAGE
+title: Invoices (Demo) | BlueLine Plumbing Admin
+description: BlueLine Plumbing admin — invoices.
+canonical: /admin/invoices.html
+layout: admin
+active: invoices
+bodyclass: dash-body
+-->
+    <div class="dash-topbar">
+      <div><span class="eyebrow">Billing</span><h1 style="font-size:1.8rem;margin-top:.25rem">Invoices</h1></div>
+      <div class="btn-row"><button class="btn btn--primary btn--sm">+ New invoice</button></div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Outstanding</div><div class="val">$24,180</div><div class="delta">22 invoices</div></div>
+      <div class="kpi"><div class="label">Paid (June)</div><div class="val">$168,200</div><div class="delta up">▲ 11%</div></div>
+      <div class="kpi"><div class="label">Overdue</div><div class="val">$3,420</div><div class="delta down">4 invoices</div></div>
+      <div class="kpi"><div class="label">Avg days to pay</div><div class="val">9</div><div class="delta up">▼ 1 day</div></div>
+    </div>
+
+    <div class="card mt-6">
+      <div class="dash-topbar"><h3 style="margin:0">All invoices</h3><span class="badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Syncs to QuickBooks when connected</span></div>
+      <div class="table-wrap mt-4">
+        <table class="data">
+          <thead><tr><th>Invoice</th><th>Customer</th><th>Issued</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>BL-10428</td><td>S. Mitchell</td><td>14 Mar 2026</td><td>$540</td><td><span class="status-pill confirmed">Paid</span></td></tr>
+            <tr><td>BL-10427</td><td>D. Kaur</td><td>12 Mar 2026</td><td>$1,480</td><td><span class="status-pill confirmed">Paid</span></td></tr>
+            <tr><td>BL-10426</td><td>G. Rossi</td><td>10 Mar 2026</td><td>$6,200</td><td><span class="status-pill pending">Sent</span></td></tr>
+            <tr><td>BL-10425</td><td>A. Chen</td><td>05 Mar 2026</td><td>$210</td><td><span class="status-pill pending">Sent</span></td></tr>
+            <tr><td>BL-10419</td><td>T. Nguyen</td><td>18 Feb 2026</td><td>$640</td><td><span class="status-pill overdue">Overdue</span></td></tr>
+            <tr><td>BL-10414</td><td>R. Singh</td><td>11 Feb 2026</td><td>$320</td><td><span class="status-pill confirmed">Paid</span></td></tr>
+            <tr><td>BL-10408</td><td>H. Park</td><td>02 Feb 2026</td><td>$1,120</td><td><span class="status-pill overdue">Overdue</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
