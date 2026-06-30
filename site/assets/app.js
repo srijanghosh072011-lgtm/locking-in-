@@ -83,6 +83,20 @@
     t.addEventListener("click",function(){
       t.setAttribute("aria-checked",t.getAttribute("aria-checked")==="true"?"false":"true");});});
 
+  // scroll-entry choreography — IntersectionObserver, transform/opacity only
+  if(!window.matchMedia("(prefers-reduced-motion:reduce)").matches&&"IntersectionObserver" in window){
+    var targets=document.querySelectorAll(".section .card, .section .tcard, .section .kpi, .section .why, .section .step, .section h2, .section .lead, .formcard, .tier, .pricetable");
+    targets.forEach(function(el){el.classList.add("reveal");});
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){
+        // stagger siblings for a cascade
+        var sibs=Array.prototype.slice.call(e.target.parentNode.children).filter(function(n){return n.classList&&n.classList.contains("reveal");});
+        var i=sibs.indexOf(e.target);if(i>0&&i<4)e.target.classList.add("d"+i);
+        e.target.classList.add("in");io.unobserve(e.target);}});
+    },{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+    targets.forEach(function(el){io.observe(el);});
+  }
+
   // image fallback to CDN if self-hosted file missing
   document.querySelectorAll("img[data-cdn]").forEach(function(img){
     img.addEventListener("error",function(){if(img.src!==img.dataset.cdn)img.src=img.dataset.cdn;},{once:true});});
