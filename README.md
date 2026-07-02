@@ -12,6 +12,8 @@ Player photos and club crests load from sofifa's public CDN at runtime (with cle
 
 **Easiest:** download **`LockingInFC.html`** (one file, everything inside) and open it in any browser.
 
+**As a desktop app:** clone the repo, then `npm install electron --save-dev && npm start` — same game in its own window, installable and offline.
+
 Or download the whole repo and open `index.html` — it needs `data.js` and `engine.js` next to it. Rebuild the single file anytime with `node tools/bundle.js`.
 
 ## The world

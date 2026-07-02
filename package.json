@@ -1,0 +1,10 @@
+{
+  "name": "locking-in-fc",
+  "version": "1.0.0",
+  "description": "Football career mode game with real players and 3D matches",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test.js"
+  }
+}
