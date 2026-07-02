@@ -145,6 +145,24 @@ function genSeason(G) {
       dates: koDays(wd).concat(nthWeekday(Y + 1, 4, 6, 4) + (comp === 'UEL' ? -2 * DAY : 0)), round: 0 };
   }
   G.seasonOver = false;
+  G.expect = boardExpectation(G);
+}
+
+function boardExpectation(G) {
+  const c = G.clubs[G.userClub], L = DB.leagues[c.lg];
+  const ranked = leagueClubs(G, c.lg).sort((a, b) => power(b) - power(a));
+  const rank = ranked.indexOf(c) + 1, n = ranked.length;
+  if (L.level === 2) return rank <= 4 ? { txt: 'Win promotion', pos: 3 } : { txt: 'Finish in the top half', pos: Math.ceil(n / 2) };
+  if (rank <= 2) return { txt: 'Win the league title', pos: 1 };
+  if (rank <= 4) return { txt: 'Qualify for the Champions League', pos: 4 };
+  if (rank <= 8) return { txt: 'Qualify for Europe', pos: 7 };
+  if (rank <= n - 6) return { txt: 'A solid mid-table finish', pos: n - 8 };
+  return { txt: 'Stay clear of the relegation zone', pos: n - 3 };
+}
+function acceptJob(G, id) {
+  G.userClub = id;
+  G.expect = boardExpectation(G);
+  news(G, `👔 ${G.managerName} appointed manager of ${G.clubs[id].n}!`);
 }
 
 function drawRound(G, comp) {
@@ -213,11 +231,24 @@ function strength(c, xi, home) {
   const ment = c.mentality === 'attacking' ? 2 : c.mentality === 'defensive' ? -2 : 0;
   return avgOvr + (c.morale - 70) / 10 + (avgFit - 85) / 10 + (home ? 2.5 : 0) + ment;
 }
+// tactical presets: [own chance mult, openness given to opponent]
+const PRESETS = {
+  balanced: [1, 1], pressing: [1.13, 1.08], counter: [1, 0.97],
+  possession: [1.05, 0.96], longball: [1.08, 1.03],
+};
+const DEF_APPR = { deep: 0.94, balanced: 1, aggressive: 0.92 }; // mult on opponent chances
 function simMatch(G, hc, ac, detailed) {
   const hXI = bestXI(hc), aXI = bestXI(ac);
   const hs = strength(hc, hXI, true), as = strength(ac, aXI, false);
+  const mult = (mine, opp, weaker) => {
+    const p = PRESETS[mine.preset] || PRESETS.balanced;
+    let m = p[0] * (PRESETS[opp.preset] || PRESETS.balanced)[1] * (DEF_APPR[opp.defAppr] || 1);
+    if (mine.preset === 'counter' && weaker) m *= 1.18;
+    return m;
+  };
+  const hMult = mult(hc, ac, hs < as), aMult = mult(ac, hc, as < hs);
   let hg = 0, ag = 0;
-  const ev = [], scorers = { h: [], a: [] };
+  const ev = [], scorers = { h: [], a: [] }, plays = [];
   const stats = { h: { shots: 0, sot: 0 }, a: { shots: 0, sot: 0 } };
   const pickScorer = xi => {
     const pool = xi.flatMap(p => Array(p.pos === 'AT' ? 8 : p.pos === 'MF' ? 3 : p.pos === 'DF' ? 1 : 0).fill(p));
@@ -228,7 +259,7 @@ function simMatch(G, hc, ac, detailed) {
       const my = side === 'h' ? hs : as, opp = side === 'h' ? as : hs;
       const c = side === 'h' ? hc : ac, xi = side === 'h' ? hXI : aXI;
       const r = clamp(my / opp, 0.6, 1.7);
-      if (Math.random() < 0.13 * r * r) {
+      if (Math.random() < 0.13 * r * r * (side === 'h' ? hMult : aMult)) {
         const shooter = pickScorer(xi);
         stats[side].shots++;
         if (Math.random() < 0.105 * r) {
@@ -236,12 +267,15 @@ function simMatch(G, hc, ac, detailed) {
           side === 'h' ? hg++ : ag++;
           shooter.sg++;
           scorers[side].push(shooter.name + " " + min + "'");
+          plays.push({ min, side, out: 'goal', name: shooter.name });
           let txt = `⚽ ${min}' GOAL! ${shooter.name} scores for ${c.s}!`;
           const mates = xi.filter(p => p !== shooter && p.pos !== 'GK');
           if (Math.random() < 0.65 && mates.length) { const a2 = pick(mates); a2.sa++; txt += ` (assist: ${a2.name})`; }
           ev.push({ min, txt, goal: side, score: `${hg}-${ag}` });
         } else {
-          if (Math.random() < 0.35) stats[side].sot++; // on target but kept out
+          const onT = Math.random() < 0.35;
+          if (onT) stats[side].sot++;
+          plays.push({ min, side, out: onT ? 'save' : 'miss', name: shooter.name });
           if (detailed && Math.random() < 0.25)
             ev.push({ min, txt: `${min}' ${shooter.name} (${c.s}) shoots — ${pick(['saved!', 'just wide!', 'off the bar!', 'blocked!'])}` });
         }
@@ -260,9 +294,10 @@ function simMatch(G, hc, ac, detailed) {
       if (detailed) ratings.push({ club: c.id, name: p.name, pos: p.pos, img: p.img, ovr: p.ovr, r: Math.round(clamp(6.4 + g * 1.2 + res * 0.4 + rnd(-0.7, 0.7), 4, 10) * 10) / 10 });
     }
   }
-  stats.h.poss = Math.round(clamp(50 + (hs - as) * 2.2, 30, 70));
+  stats.h.poss = Math.round(clamp(50 + (hs - as) * 2.2 + (hc.preset === 'possession' ? 5 : 0) - (ac.preset === 'possession' ? 5 : 0), 30, 70));
   stats.a.poss = 100 - stats.h.poss;
-  return { hg, ag, ev, scorers, ratings, stats };
+  const snapXI = xi => xi.map(p => ({ name: p.name, pos: p.pos, ovr: p.ovr }));
+  return { hg, ag, ev, scorers, ratings, stats, plays, xis: detailed ? { h: snapXI(hXI), a: snapXI(aXI) } : null };
 }
 
 function playDay(G) {
@@ -451,6 +486,9 @@ function endSeason(G) {
   me.budget += prize;
   G.tx.push({ t: G.time, txt: `Season ${G.season} prize money (finished ${G.userPos})`, amt: prize });
   G.rep = clamp(G.rep + (G.userPos <= 4 ? 3 : G.userPos <= 10 ? 1 : -2), 0, 100);
+  // board verdict on the season objective
+  const board = { ...G.expect, met: G.userPos <= G.expect.pos };
+  G.rep = clamp(G.rep + (board.met ? 3 : -3), 0, 100);
   // promotion & relegation (bottom 3 ↔ top 3; nobody drops out of D2)
   const proms = [];
   DB.leagues.forEach((LL, li) => {
@@ -495,7 +533,14 @@ function endSeason(G) {
   G.season++; G.year++;
   G.time = Date.UTC(G.year, 6, 10);
   genSeason(G);
-  return { userPos: G.userPos, prize, champions, proms, awards };
+  const summary = { userPos: G.userPos, prize, champions, proms, awards, board };
+  // manager market: bigger clubs come calling when your rep is high
+  if (G.rep >= 55 && Math.random() < 0.6) {
+    const myPw = power(G.clubs[G.userClub]);
+    const cands = G.clubs.filter(x => x.id !== G.userClub && DB.leagues[x.lg].play && power(x) > myPw + 1);
+    if (cands.length) summary.jobOffer = pick(cands).id;
+  }
+  return summary;
 }
 
 // ---------- new game ----------
@@ -514,6 +559,7 @@ function newGame(managerName, clubIdx) {
     clubs: DB.clubs.map((c, i) => ({
       id: i, n: c.n, s: c.s, lg: c.lg, c1: c.c1, c2: c.c2, t: c.t || 0,
       morale: 70, formation: '4-3-3', mentality: 'balanced',
+      preset: i === clubIdx ? 'balanced' : pick(Object.keys(PRESETS)), defAppr: 'balanced',
       players: c.p.map(row => ({
         id: nextId++, name: row[0], nat: row[1], pos: row[2], age: row[3],
         ovr: row[4], pot: row[5], value: row[6], wage: row[7], years: row[8],
@@ -528,8 +574,8 @@ function newGame(managerName, clubIdx) {
 }
 
 const ENG = {
-  DAY, FORMATIONS, newGame, advanceDay, playDay, table, bestXI, power, leagueClubs,
+  DAY, FORMATIONS, PRESETS, newGame, advanceDay, playDay, table, bestXI, power, leagueClubs,
   windowOpen, bid, signPlayer, sellPlayer, completeSale, acceptOffer, endSeason, wageBill,
-  genYouth, calcValue, news,
+  genYouth, calcValue, news, boardExpectation, acceptJob,
 };
 if (typeof module !== 'undefined') module.exports = ENG;
