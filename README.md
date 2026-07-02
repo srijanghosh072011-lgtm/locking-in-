@@ -38,6 +38,16 @@ All 11 European leagues are manageable (yes, you can start in the Championship).
 - **Champions League & Europa League** — 8 groups of 4, then knockout rounds to a final; qualification from real league finishes each season
 - End-of-season awards, per-league champions, top scorer charts
 
+## Tactics (FC IQ-style)
+
+A full custom-tactics board modelled on EA FC 26:
+
+- **Drag any player anywhere** — pull your striker into midfield, invert a full-back, build a 5-3-1 or a diamond, whatever shape you want. The pitch is free-form, and where you put players actually changes the match (push everyone up and you make more chances *and* concede more).
+- **12 formations** as starting points (4-3-3, 4-2-3-1, 4-3-2-1, 4-1-2-1-2, 3-5-2, 3-4-3, 5-3-2, 5-4-1, and more)
+- **Player Roles & Focuses** per position — Poacher, False 9, Inside Forward, Deep-Lying Playmaker, Box Crasher, Ball-Playing Defender, Inverted Wingback, Sweeper Keeper and the rest. Tap a player to set them.
+- **Build-up style** (Balanced / Counter / Slow), **defensive approach** (Deep / Balanced / High / Aggressive) and **width** (Narrow / Balanced / Wide)
+- Live tactical feedback: attacking-threat / solidity / line-height / width meters plus strength & weakness read-outs — all of which feed the simulation. AI clubs pick their own shapes and styles too.
+
 ## Career features
 
 - Day-by-day calendar; matchdays with live text commentary and player ratings

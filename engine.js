@@ -214,45 +214,183 @@ function progressComps(G) {
 }
 
 // ---------- selection & match sim ----------
-const FORMATIONS = { '4-4-2': [4, 4, 2], '4-3-3': [4, 3, 3], '3-5-2': [3, 5, 2], '4-5-1': [4, 5, 1], '5-3-2': [5, 3, 2] };
-function bestXI(c) {
-  const [d, m, a] = FORMATIONS[c.formation] || [4, 3, 3];
-  const need = { GK: 1, DF: d, MF: m, AT: a };
-  const fit = c.players.filter(p => !p.injury).sort((x, y) => y.ovr * y.fit - x.ovr * x.fit);
-  const xi = [];
-  for (const pos of ['GK', 'DF', 'MF', 'AT'])
-    xi.push(...fit.filter(p => p.pos === pos && !xi.includes(p)).slice(0, need[pos]));
-  for (const p of fit.concat(c.players)) { if (xi.length >= 11) break; if (!xi.includes(p)) xi.push(p); }
-  return xi;
+// FC26-style player roles. Each kind (position type) has a set of Roles; each Role
+// has allowed Focuses. atk/def are the role's off-ball contribution (0..8); focus tweaks it.
+const KIND_LINE = { GK: 'GK', CB: 'DF', FB: 'DF', CDM: 'MF', CM: 'MF', CAM: 'MF', WM: 'MF', WF: 'AT', ST: 'AT' };
+const KIND_LABEL = { GK: 'GK', CB: 'CB', FB: 'FB', CDM: 'CDM', CM: 'CM', CAM: 'CAM', WM: 'WM', WF: 'WF', ST: 'ST' };
+const ROLE_CATALOG = {
+  GK: { 'Goalkeeper': { atk: 0, def: 3, focuses: ['Defend', 'Sweeper Keeper'] } },
+  CB: {
+    'Defender': { atk: 0, def: 6, focuses: ['Defend', 'Stopper'] },
+    'Ball-Playing Def': { atk: 2, def: 5, focuses: ['Defend', 'Build-Up'] },
+  },
+  FB: {
+    'Fullback': { atk: 2, def: 4, focuses: ['Defend', 'Balanced'] },
+    'Falseback': { atk: 1, def: 5, focuses: ['Defend', 'Balanced'] },
+    'Wingback': { atk: 4, def: 3, focuses: ['Balanced', 'Attack'] },
+    'Attacking WB': { atk: 5, def: 2, focuses: ['Attack', 'Balanced'] },
+    'Inverted WB': { atk: 3, def: 4, focuses: ['Defend', 'Balanced'] },
+  },
+  CDM: {
+    'Holding': { atk: 1, def: 6, focuses: ['Defend'] },
+    'Deep-Lying PM': { atk: 3, def: 4, focuses: ['Defend', 'Build-Up'] },
+    'Centre-Half': { atk: 0, def: 6, focuses: ['Defend'] },
+    'Wide Half': { atk: 3, def: 4, focuses: ['Defend', 'Balanced'] },
+    'Box Crasher': { atk: 5, def: 2, focuses: ['Attack'] },
+  },
+  CM: {
+    'Box-to-Box': { atk: 4, def: 4, focuses: ['Support', 'Attack', 'Defend'] },
+    'Playmaker': { atk: 5, def: 2, focuses: ['Support', 'Attack', 'Roaming'] },
+    'Holding': { atk: 1, def: 6, focuses: ['Defend'] },
+    'Half-Winger': { atk: 5, def: 2, focuses: ['Support', 'Attack'] },
+  },
+  CAM: {
+    'Playmaker': { atk: 6, def: 1, focuses: ['Support', 'Attack', 'Roaming'] },
+    'Shadow Striker': { atk: 7, def: 1, focuses: ['Attack'] },
+    'Classic 10': { atk: 6, def: 1, focuses: ['Support', 'Attack'] },
+    'Half-Winger': { atk: 6, def: 1, focuses: ['Support', 'Attack'] },
+  },
+  WM: {
+    'Winger': { atk: 5, def: 2, focuses: ['Balanced', 'Attack'] },
+    'Wide Midfielder': { atk: 3, def: 4, focuses: ['Defend', 'Balanced'] },
+    'Wide Playmaker': { atk: 5, def: 2, focuses: ['Support', 'Attack'] },
+    'Inside Forward': { atk: 6, def: 1, focuses: ['Support', 'Attack'] },
+  },
+  WF: {
+    'Winger': { atk: 6, def: 1, focuses: ['Balanced', 'Attack'] },
+    'Inside Forward': { atk: 7, def: 1, focuses: ['Support', 'Attack'] },
+    'Wide Playmaker': { atk: 6, def: 1, focuses: ['Support', 'Attack'] },
+  },
+  ST: {
+    'Advanced Forward': { atk: 8, def: 0, focuses: ['Attack'] },
+    'Poacher': { atk: 8, def: 0, focuses: ['Attack'] },
+    'Target Forward': { atk: 7, def: 1, focuses: ['Support', 'Attack'] },
+    'False 9': { atk: 6, def: 2, focuses: ['Support', 'Roaming'] },
+  },
+};
+const FOCUS_DELTA = {
+  'Attack': { atk: 1.5, def: -1 }, 'Defend': { atk: -1, def: 1.5 },
+  'Support': { atk: 0, def: 0 }, 'Balanced': { atk: 0, def: 0 },
+  'Build-Up': { atk: 1, def: 0 }, 'Roaming': { atk: 0.8, def: -0.3 },
+  'Stopper': { atk: -0.5, def: 1 }, 'Sweeper Keeper': { atk: 0.5, def: -0.5 },
+};
+function roleStats(kind, role, focus) {
+  const cat = ROLE_CATALOG[kind] || ROLE_CATALOG.CM;
+  const r = cat[role] || cat[Object.keys(cat)[0]];
+  const fd = FOCUS_DELTA[focus] || { atk: 0, def: 0 };
+  return { atk: r.atk + fd.atk, def: r.def + fd.def };
 }
+function defRole(kind) {
+  const role = Object.keys(ROLE_CATALOG[kind] || ROLE_CATALOG.CM)[0];
+  return { role, focus: (ROLE_CATALOG[kind][role].focuses)[0], kind };
+}
+// Formations as 11 pitch slots. x: 0(left)..100(right); y: 0(opponent goal)..100(own goal).
+const S = (x, y, kind) => ({ x, y, kind, line: KIND_LINE[kind] });
+const FORMATION_DEF = {
+  '4-3-3': [S(50, 90, 'GK'), S(16, 72, 'FB'), S(39, 75, 'CB'), S(61, 75, 'CB'), S(84, 72, 'FB'), S(50, 58, 'CDM'), S(30, 47, 'CM'), S(70, 47, 'CM'), S(18, 26, 'WF'), S(50, 20, 'ST'), S(82, 26, 'WF')],
+  '4-4-2': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(14, 48, 'WM'), S(38, 50, 'CM'), S(62, 50, 'CM'), S(86, 48, 'WM'), S(38, 22, 'ST'), S(62, 22, 'ST')],
+  '4-2-3-1': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(38, 60, 'CDM'), S(62, 60, 'CDM'), S(17, 38, 'WM'), S(50, 36, 'CAM'), S(83, 38, 'WM'), S(50, 20, 'ST')],
+  '4-3-2-1': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(50, 58, 'CDM'), S(32, 49, 'CM'), S(68, 49, 'CM'), S(36, 33, 'CAM'), S(64, 33, 'CAM'), S(50, 19, 'ST')],
+  '4-1-2-1-2': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(50, 60, 'CDM'), S(28, 48, 'CM'), S(72, 48, 'CM'), S(50, 34, 'CAM'), S(40, 20, 'ST'), S(60, 20, 'ST')],
+  '4-5-1': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(12, 50, 'WM'), S(33, 51, 'CM'), S(50, 57, 'CDM'), S(67, 51, 'CM'), S(88, 50, 'WM'), S(50, 20, 'ST')],
+  '4-1-4-1': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(50, 60, 'CDM'), S(14, 45, 'WM'), S(38, 47, 'CM'), S(62, 47, 'CM'), S(86, 45, 'WM'), S(50, 20, 'ST')],
+  '4-4-1-1': [S(50, 90, 'GK'), S(14, 72, 'FB'), S(37, 74, 'CB'), S(63, 74, 'CB'), S(86, 72, 'FB'), S(14, 50, 'WM'), S(38, 51, 'CM'), S(62, 51, 'CM'), S(86, 50, 'WM'), S(50, 33, 'CAM'), S(50, 19, 'ST')],
+  '3-5-2': [S(50, 90, 'GK'), S(30, 74, 'CB'), S(50, 76, 'CB'), S(70, 74, 'CB'), S(11, 52, 'FB'), S(34, 50, 'CM'), S(50, 58, 'CDM'), S(66, 50, 'CM'), S(89, 52, 'FB'), S(40, 22, 'ST'), S(60, 22, 'ST')],
+  '3-4-3': [S(50, 90, 'GK'), S(30, 74, 'CB'), S(50, 76, 'CB'), S(70, 74, 'CB'), S(13, 50, 'WM'), S(40, 51, 'CM'), S(60, 51, 'CM'), S(87, 50, 'WM'), S(20, 24, 'WF'), S(50, 20, 'ST'), S(80, 24, 'WF')],
+  '5-3-2': [S(50, 90, 'GK'), S(9, 66, 'FB'), S(30, 75, 'CB'), S(50, 77, 'CB'), S(70, 75, 'CB'), S(91, 66, 'FB'), S(31, 49, 'CM'), S(50, 55, 'CDM'), S(69, 49, 'CM'), S(40, 22, 'ST'), S(60, 22, 'ST')],
+  '5-4-1': [S(50, 90, 'GK'), S(9, 66, 'FB'), S(30, 75, 'CB'), S(50, 77, 'CB'), S(70, 75, 'CB'), S(91, 66, 'FB'), S(14, 50, 'WM'), S(38, 51, 'CM'), S(62, 51, 'CM'), S(86, 50, 'WM'), S(50, 20, 'ST')],
+};
+const FORMATIONS = FORMATION_DEF; // keeps ENG.FORMATIONS as the source of formation keys
+function applyFormation(c, key) {
+  if (!FORMATION_DEF[key]) key = '4-3-3';
+  c.formation = key;
+  c.shape = FORMATION_DEF[key].map(s => ({ x: s.x, y: s.y, kind: s.kind, line: s.line }));
+  c.roles = c.shape.map(s => defRole(s.kind));
+}
+function ensureTactics(c) {
+  if (!FORMATION_DEF[c.formation]) c.formation = '4-3-3';
+  if (!c.shape || c.shape.length !== 11 || !c.roles || c.roles.length !== 11) applyFormation(c, c.formation);
+  if (!c.buildUp) c.buildUp = c.preset === 'counter' ? 'counter' : c.preset === 'possession' ? 'slow' : 'balanced';
+  if (!['deep', 'balanced', 'high', 'aggressive'].includes(c.defApproach))
+    c.defApproach = ['deep', 'aggressive'].includes(c.defAppr) ? c.defAppr : 'balanced';
+  if (!['narrow', 'balanced', 'wide'].includes(c.width)) c.width = 'balanced';
+}
+// How well a player's attributes [pac,sho,pas,dri,def,phy] suit a slot kind — used to
+// arrange the chosen XI so wide players go wide and defenders stay central.
+function kindScore(p, kind) {
+  const A = p.a;
+  switch (kind) {
+    case 'CB': return A[4] * 2 + A[5];
+    case 'FB': return A[4] + A[0] + A[3];
+    case 'CDM': return A[4] * 1.4 + A[2];
+    case 'CM': return A[2] + A[3] + A[4] * 0.5;
+    case 'CAM': return A[2] + A[3] + A[1];
+    case 'WM': return A[0] + A[3] + A[2];
+    case 'WF': return A[0] + A[3] + A[1];
+    case 'ST': return A[1] * 2 + A[0];
+    default: return p.ovr;
+  }
+}
+// Assemble the XI aligned to the formation slots (so the pitch draws each man at his spot).
+function lineup(c) {
+  ensureTactics(c);
+  const fit = c.players.filter(p => !p.injury).sort((x, y) => y.ovr * y.fit - x.ovr * x.fit);
+  const used = new Set(), assigned = new Array(11).fill(null);
+  const slots = c.shape.map((s, i) => ({ x: s.x, y: s.y, kind: s.kind, line: s.line, idx: i }));
+  for (const line of ['GK', 'DF', 'MF', 'AT']) {
+    const lineSlots = slots.filter(s => s.line === line);
+    const picks = [];
+    for (const p of fit) { if (picks.length >= lineSlots.length) break; if (!used.has(p.id) && p.pos === line) { picks.push(p); used.add(p.id); } }
+    for (const s of lineSlots) { // greedily give each slot its best-fitting available pick
+      if (!picks.length) break;
+      let bi = 0, best = -1;
+      picks.forEach((p, j) => { const sc = kindScore(p, s.kind); if (sc > best) { best = sc; bi = j; } });
+      assigned[s.idx] = picks.splice(bi, 1)[0];
+    }
+  }
+  const pool = fit.concat(c.players); // backfill empty slots (thin squad / injuries)
+  slots.forEach(s => { if (assigned[s.idx]) return; const p = pool.find(p => !used.has(p.id)); if (p) { assigned[s.idx] = p; used.add(p.id); } });
+  return c.shape.map((s, i) => ({ x: s.x, y: s.y, kind: s.kind, line: s.line, role: c.roles[i].role, focus: c.roles[i].focus, player: assigned[i] }));
+}
+function bestXI(c) { return lineup(c).map(l => l.player).filter(Boolean); }
 function strength(c, xi, home) {
   const avgOvr = xi.reduce((s, p) => s + p.ovr, 0) / xi.length;
   const avgFit = xi.reduce((s, p) => s + p.fit, 0) / xi.length;
   const ment = c.mentality === 'attacking' ? 2 : c.mentality === 'defensive' ? -2 : 0;
   return avgOvr + (c.morale - 70) / 10 + (avgFit - 85) / 10 + (home ? 2.5 : 0) + ment;
 }
-// tactical presets: [own chance mult, openness given to opponent]
-const PRESETS = {
-  balanced: [1, 1], pressing: [1.13, 1.08], counter: [1, 0.97],
-  possession: [1.05, 0.96], longball: [1.08, 1.03],
-};
-const DEF_APPR = { deep: 0.94, balanced: 1, aggressive: 0.92 }; // mult on opponent chances
+// Team profile derived from roles + shape + build-up + defensive approach.
+// attack = own chance-creation multiplier; openness = chances conceded multiplier.
+const REF_ATK = 33, REF_DEF = 39, REF_ADV = 49; // a balanced 4-3-3 sits at these; profile centers on 1.0
+const BUILD = { balanced: { atk: 0, open: 0 }, counter: { atk: -0.05, open: -0.04 }, slow: { atk: -0.02, open: -0.06 } };
+const APPR = { deep: { atk: -0.02, open: -0.10 }, balanced: { atk: 0, open: 0 }, high: { atk: 0.04, open: 0.08 }, aggressive: { atk: 0.06, open: 0.12 } };
+const WIDTHS = { narrow: { atk: 0, open: -0.02 }, balanced: { atk: 0, open: 0 }, wide: { atk: 0.03, open: 0.02 } };
+function teamProfile(L, c) {
+  let atk = 0, def = 0, adv = 0, n = 0;
+  for (const l of L) {
+    const rs = roleStats(l.kind, l.role, l.focus);
+    atk += rs.atk; def += rs.def;
+    if (l.kind !== 'GK') { adv += (100 - l.y); n++; }
+  }
+  const atkIdx = atk / REF_ATK, defIdx = def / REF_DEF, advIdx = (adv / Math.max(1, n)) / REF_ADV;
+  const bu = BUILD[c.buildUp] || BUILD.balanced, ap = APPR[c.defApproach] || APPR.balanced, wd = WIDTHS[c.width] || WIDTHS.balanced;
+  const attack = clamp(1 + 0.34 * (atkIdx - 1) + 0.20 * (advIdx - 1) + bu.atk + ap.atk + wd.atk, 0.72, 1.35);
+  const openness = clamp(1 + 0.30 * (atkIdx - 1) - 0.34 * (defIdx - 1) + 0.12 * (advIdx - 1) + bu.open + ap.open + wd.open, 0.68, 1.45);
+  return { attack, openness, counter: c.buildUp === 'counter', atkIdx, defIdx, advIdx };
+}
 function simMatch(G, hc, ac, detailed) {
-  const hXI = bestXI(hc), aXI = bestXI(ac);
+  const hL = lineup(hc), aL = lineup(ac);
+  const hXI = hL.map(l => l.player).filter(Boolean), aXI = aL.map(l => l.player).filter(Boolean);
   const hs = strength(hc, hXI, true), as = strength(ac, aXI, false);
-  const mult = (mine, opp, weaker) => {
-    const p = PRESETS[mine.preset] || PRESETS.balanced;
-    let m = p[0] * (PRESETS[opp.preset] || PRESETS.balanced)[1] * (DEF_APPR[opp.defAppr] || 1);
-    if (mine.preset === 'counter' && weaker) m *= 1.18;
-    return m;
-  };
-  const hMult = mult(hc, ac, hs < as), aMult = mult(ac, hc, as < hs);
+  const hP = teamProfile(hL, hc), aP = teamProfile(aL, ac);
+  const hMult = hP.attack * aP.openness * (hP.counter && hs < as ? 1.18 : 1);
+  const aMult = aP.attack * hP.openness * (aP.counter && as < hs ? 1.18 : 1);
   let hg = 0, ag = 0;
   const ev = [], scorers = { h: [], a: [] }, plays = [];
   const stats = { h: { shots: 0, sot: 0 }, a: { shots: 0, sot: 0 } };
-  const pickScorer = xi => {
-    const pool = xi.flatMap(p => Array(p.pos === 'AT' ? 8 : p.pos === 'MF' ? 3 : p.pos === 'DF' ? 1 : 0).fill(p));
-    return pool.length ? pick(pool) : xi[0];
+  const pickScorer = L => {
+    const pool = L.filter(l => l.player).flatMap(l => Array(Math.max(0, Math.round(roleStats(l.kind, l.role, l.focus).atk * 1.1))).fill(l.player));
+    return pool.length ? pick(pool) : (L.find(l => l.player) || {}).player;
   };
   for (let min = 1; min <= 90; min++) {
     for (const side of ['h', 'a']) {
@@ -260,7 +398,7 @@ function simMatch(G, hc, ac, detailed) {
       const c = side === 'h' ? hc : ac, xi = side === 'h' ? hXI : aXI;
       const r = clamp(my / opp, 0.6, 1.7);
       if (Math.random() < 0.13 * r * r * (side === 'h' ? hMult : aMult)) {
-        const shooter = pickScorer(xi);
+        const shooter = pickScorer(side === 'h' ? hL : aL);
         stats[side].shots++;
         if (Math.random() < 0.105 * r) {
           stats[side].sot++;
@@ -558,8 +696,11 @@ function newGame(managerName, clubIdx) {
     news: [], tx: [], seasonOver: false, pendingOffer: null,
     clubs: DB.clubs.map((c, i) => ({
       id: i, n: c.n, s: c.s, lg: c.lg, c1: c.c1, c2: c.c2, t: c.t || 0,
-      morale: 70, formation: '4-3-3', mentality: 'balanced',
-      preset: i === clubIdx ? 'balanced' : pick(Object.keys(PRESETS)), defAppr: 'balanced',
+      morale: 70, mentality: 'balanced',
+      formation: i === clubIdx ? '4-3-3' : pick(['4-3-3', '4-4-2', '4-2-3-1', '4-3-2-1', '3-5-2', '5-3-2', '4-1-4-1']),
+      buildUp: i === clubIdx ? 'balanced' : pick(['balanced', 'balanced', 'counter', 'slow']),
+      defApproach: i === clubIdx ? 'balanced' : pick(['deep', 'balanced', 'balanced', 'high', 'aggressive']),
+      width: 'balanced',
       players: c.p.map(row => ({
         id: nextId++, name: row[0], nat: row[1], pos: row[2], age: row[3],
         ovr: row[4], pot: row[5], value: row[6], wage: row[7], years: row[8],
@@ -574,7 +715,9 @@ function newGame(managerName, clubIdx) {
 }
 
 const ENG = {
-  DAY, FORMATIONS, PRESETS, newGame, advanceDay, playDay, table, bestXI, power, leagueClubs,
+  DAY, FORMATIONS, FORMATION_DEF, ROLE_CATALOG, FOCUS_DELTA, KIND_LINE, KIND_LABEL,
+  roleStats, defRole, applyFormation, ensureTactics, lineup, teamProfile,
+  BUILD, APPR, WIDTHS, newGame, advanceDay, playDay, table, bestXI, power, leagueClubs,
   windowOpen, bid, signPlayer, sellPlayer, completeSale, acceptOffer, endSeason, wageBill,
   genYouth, calcValue, news, boardExpectation, acceptJob,
 };
