@@ -8,7 +8,9 @@ Player photos and club crests load from sofifa's public CDN at runtime (with cle
 
 ## Play
 
-Open `index.html` in any browser. That's it.
+**Easiest:** download **`LockingInFC.html`** (one file, everything inside) and open it in any browser.
+
+Or download the whole repo and open `index.html` — it needs `data.js` and `engine.js` next to it. Rebuild the single file anytime with `node tools/bundle.js`.
 
 ## The world
 
@@ -51,6 +53,7 @@ All 11 European leagues are manageable (yes, you can start in the Championship).
 | `index.html` | The UI, themed in your club's colors |
 | `test.js` | Self-check: simulates two full world seasons headlessly |
 | `tools/build-data.js` | Rebuilds `data.js` from a sofifa CSV dump |
+| `LockingInFC.html` | Single-file build of the whole game (`node tools/bundle.js`) |
 
 ## Test
 

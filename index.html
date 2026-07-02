@@ -138,6 +138,17 @@
 <script src="engine.js"></script>
 <script>
 'use strict';
+// surface failures instead of silently dead buttons
+window.onerror = (msg) => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#a11;color:#fff;padding:10px 16px;z-index:99;font-size:14px';
+  d.textContent = '⚠ Error: ' + msg;
+  document.body.appendChild(d);
+};
+if (typeof DATA === 'undefined' || typeof ENG === 'undefined') {
+  document.body.innerHTML = '<div style="max-width:560px;margin:15vh auto;padding:24px;background:#151a23;border-radius:10px;font-family:system-ui;color:#eee"><h2>⚠ Game files missing</h2><p>This page needs <b>data.js</b> and <b>engine.js</b> in the same folder as index.html.</p><p>Fix: download the <b>whole repository</b> (Code → Download ZIP, then unzip and open index.html from that folder) — or use the all-in-one <b>LockingInFC.html</b>, which is a single file with everything inside.</p></div>';
+  throw new Error('data.js / engine.js not loaded');
+}
 let G = null, tab = 'squad', tickerTimer = null;
 
 const $ = id => document.getElementById(id);
