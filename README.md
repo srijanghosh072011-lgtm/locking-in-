@@ -1,6 +1,10 @@
 # Locking In FC — Career Mode
 
-A FIFA/FC-style football **career mode management game** with **real clubs and real players**, running entirely in your browser. No install, no build step, no dependencies.
+A FIFA/FC-style football **career mode management game** with **real clubs, real players, real faces and crests**, running entirely in your browser. No install, no build step, no dependencies.
+
+Rosters are EA FC 26 **plus the real summer 2026 transfers** (Konaté, Bernardo Silva, Cucurella and Dumfries to Real Madrid; Gordon to Barcelona; Robertson, van Hecke, Senesi and Dúbravka to Spurs; Anderson to Man City; Jacquet to Liverpool).
+
+Player photos and club crests load from sofifa's public CDN at runtime (with clean silhouette/shield fallbacks when offline).
 
 ## Play
 
@@ -42,7 +46,7 @@ All 11 European leagues are manageable (yes, you can start in the Championship).
 
 | File | Purpose |
 |---|---|
-| `data.js` | Generated dataset: 282 clubs / 7,893 players (EA FC 26, update 4) |
+| `data.js` | Generated dataset: 282 clubs / 7,893 players (EA FC 26 + 2026 window patches) |
 | `engine.js` | All game logic — pure JS, runs in browser and Node |
 | `index.html` | The UI, themed in your club's colors |
 | `test.js` | Self-check: simulates two full world seasons headlessly |

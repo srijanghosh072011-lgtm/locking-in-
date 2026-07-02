@@ -84,6 +84,21 @@ function shortCode(name) {
   return s.toUpperCase().replace(/[^A-ZÀ-Þ]/g, '').slice(0, 3) || name.slice(0, 3).toUpperCase();
 }
 const POS = s => { const p = s.split(',')[0].trim(); return p === 'GK' ? 'GK' : ['CB', 'LB', 'RB', 'LWB', 'RWB'].includes(p) ? 'DF' : ['CDM', 'CM', 'CAM', 'LM', 'RM'].includes(p) ? 'MF' : 'AT'; };
+
+// confirmed summer 2026 window moves not yet in the FC26 dump: [shortName, fromClubHint, toClub, newContractYears]
+const TRANSFER_PATCHES = [
+  ['M. Cucurella', 'Chelsea', 'Real Madrid', 6],
+  ['Bernardo Silva', 'Manchester City', 'Real Madrid', 2],
+  ['I. Konaté', 'Liverpool', 'Real Madrid', 4],
+  ['D. Dumfries', 'Inter', 'Real Madrid', 3],
+  ['A. Gordon', 'Newcastle United', 'FC Barcelona', 5],
+  ['van Hecke', 'Brighton', 'Tottenham Hotspur', 5],
+  ['A. Robertson', 'Liverpool', 'Tottenham Hotspur', 2],
+  ['M. Senesi', 'Bournemouth', 'Tottenham Hotspur', 3],
+  ['Dúbravka', '', 'Tottenham Hotspur', 2],
+  ['J. Jacquet', 'Rennais', 'Liverpool', 5],
+  ['E. Anderson', 'Nottingham Forest', 'Manchester City', 5],
+];
 const fallbackValue = (ovr, age) => Math.max(100e3, Math.round(Math.pow(Math.max(1, ovr - 55), 2.9) * 3000 * (age <= 23 ? 1.3 : age <= 30 ? 1 : 0.4) / 1e5) * 1e5);
 
 const rows = parseCSV(fs.readFileSync(csvPath, 'utf8'));
@@ -100,7 +115,7 @@ for (const r of rows.slice(1)) {
   if (!clubName) continue;
   if (!clubs.has(clubName)) {
     const [c1, c2, s] = COLORS[clubName] || [...hashColor(clubName), null];
-    clubs.set(clubName, { n: clubName, s: s || shortCode(clubName), lg: li, c1, c2, p: [] });
+    clubs.set(clubName, { n: clubName, s: s || shortCode(clubName), lg: li, c1, c2, t: +g(r, 'club_team_id') || 0, p: [] });
   }
   const ovr = +g(r, 'overall'), age = +g(r, 'age'), pos = POS(g(r, 'player_positions'));
   const num = (name, fb) => { const v = +g(r, name); return Number.isFinite(v) && v > 0 ? v : fb; };
@@ -108,6 +123,7 @@ for (const r of rows.slice(1)) {
     ? ['goalkeeping_diving', 'goalkeeping_handling', 'goalkeeping_kicking', 'goalkeeping_reflexes', 'goalkeeping_speed', 'goalkeeping_positioning'].map(a => num(a, 50))
     : ['pace', 'shooting', 'passing', 'dribbling', 'defending', 'physic'].map(a => num(a, 50));
   const until = +g(r, 'club_contract_valid_until_year');
+  const face = (g(r, 'player_face_url') || '').match(/players\/(\d+\/\d+)\//);
   clubs.get(clubName).p.push([
     g(r, 'short_name'), g(r, 'nationality_name'), pos, age, ovr,
     Math.max(ovr, +g(r, 'potential') || ovr),
@@ -115,13 +131,31 @@ for (const r of rows.slice(1)) {
     num('wage_eur', 5000),
     Math.min(6, Math.max(1, (until || 2028) - 2026)),
     ...attrs,
+    face ? face[1] : null,
   ]);
   kept++;
 }
 
+// apply real summer-2026 transfers on top of the FC26 rosters
+for (const [name, fromHint, toName, years] of TRANSFER_PATCHES) {
+  let src = null, player = null;
+  const surname = name.split(' ').pop().toLowerCase();
+  for (const c of clubs.values()) {
+    if (fromHint && !c.n.toLowerCase().includes(fromHint.toLowerCase())) continue;
+    const cand = c.p.find(r => r[0] === name) || c.p.find(r => r[0].toLowerCase().includes(surname));
+    if (cand) { src = c; player = cand; break; }
+  }
+  const dst = clubs.get(toName);
+  if (!player || !dst) { console.warn('!! transfer patch miss:', name, '→', toName); continue; }
+  src.p.splice(src.p.indexOf(player), 1);
+  player[8] = years;
+  dst.p.push(player);
+  console.log(`patched: ${player[0]} (${player[4]}) ${src.n} → ${dst.n}`);
+}
+
 const data = {
-  source: 'EA Sports FC 26 (sofifa dump, update 4, Sep 2025)',
-  // player row: [name, nat, pos, age, ovr, pot, value€, wage€/wk, contractYears, a1..a6]
+  source: 'EA Sports FC 26 (update 4) + real summer 2026 transfers',
+  // player row: [name, nat, pos, age, ovr, pot, value€, wage€/wk, contractYears, a1..a6, facePath]
   // a1..a6 = pac/sho/pas/dri/def/phy for outfield, div/han/kic/ref/spe/pos for GK
   leagues: LEAGUES.map(({ name, country, flag, level, play, uefa, rich, d2 }) => ({ name, country, flag, level, play: !!play, uefa: !!uefa, rich: rich || 0, d2: d2 ?? null })),
   clubs: [...clubs.values()].sort((a, b) => a.lg - b.lg),

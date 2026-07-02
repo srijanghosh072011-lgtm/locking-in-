@@ -45,7 +45,7 @@ function genYouth(country) {
   const pos = pick(['DF', 'DF', 'MF', 'MF', 'AT', 'AT', 'GK']);
   const age = 16 + R(3);
   const base = 52 + rnd(0, 14);
-  const p = { id: nextId++, name: pick(n.f) + ' ' + pick(n.l), nat, pos, age, fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false, youth: true };
+  const p = { id: nextId++, name: pick(n.f) + ' ' + pick(n.l), nat, pos, age, img: null, fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false, youth: true };
   p.a = SHAPE[pos].map(s => Math.round(clamp(base + s + rnd(-5, 5), 25, 90)));
   p.ovr = Math.round(p.a.reduce((s, v, i) => s + v * W[pos][i], 0));
   p.pot = clamp(p.ovr + 8 + R(20), p.ovr, 95);
@@ -218,6 +218,7 @@ function simMatch(G, hc, ac, detailed) {
   const hs = strength(hc, hXI, true), as = strength(ac, aXI, false);
   let hg = 0, ag = 0;
   const ev = [], scorers = { h: [], a: [] };
+  const stats = { h: { shots: 0, sot: 0 }, a: { shots: 0, sot: 0 } };
   const pickScorer = xi => {
     const pool = xi.flatMap(p => Array(p.pos === 'AT' ? 8 : p.pos === 'MF' ? 3 : p.pos === 'DF' ? 1 : 0).fill(p));
     return pool.length ? pick(pool) : xi[0];
@@ -229,7 +230,9 @@ function simMatch(G, hc, ac, detailed) {
       const r = clamp(my / opp, 0.6, 1.7);
       if (Math.random() < 0.13 * r * r) {
         const shooter = pickScorer(xi);
+        stats[side].shots++;
         if (Math.random() < 0.105 * r) {
+          stats[side].sot++;
           side === 'h' ? hg++ : ag++;
           shooter.sg++;
           scorers[side].push(shooter.name + " " + min + "'");
@@ -237,8 +240,10 @@ function simMatch(G, hc, ac, detailed) {
           const mates = xi.filter(p => p !== shooter && p.pos !== 'GK');
           if (Math.random() < 0.65 && mates.length) { const a2 = pick(mates); a2.sa++; txt += ` (assist: ${a2.name})`; }
           ev.push({ min, txt, goal: side, score: `${hg}-${ag}` });
-        } else if (detailed && Math.random() < 0.25) {
-          ev.push({ min, txt: `${min}' ${shooter.name} (${c.s}) shoots — ${pick(['saved!', 'just wide!', 'off the bar!', 'blocked!'])}` });
+        } else {
+          if (Math.random() < 0.35) stats[side].sot++; // on target but kept out
+          if (detailed && Math.random() < 0.25)
+            ev.push({ min, txt: `${min}' ${shooter.name} (${c.s}) shoots — ${pick(['saved!', 'just wide!', 'off the bar!', 'blocked!'])}` });
         }
       }
     }
@@ -252,10 +257,12 @@ function simMatch(G, hc, ac, detailed) {
       p.fit = clamp(p.fit - rnd(8, 15), 20, 100);
       if (Math.random() < 0.035) { p.injury = 5 + R(25); if (detailed) ev.push({ min: 90, txt: `🩹 ${p.name} (${c.s}) picked up an injury (${p.injury} days).` }); }
       const g = scorers.h.concat(scorers.a).filter(s => s.startsWith(p.name + ' ')).length;
-      if (detailed) ratings.push({ club: c.id, name: p.name, pos: p.pos, r: Math.round(clamp(6.4 + g * 1.2 + res * 0.4 + rnd(-0.7, 0.7), 4, 10) * 10) / 10 });
+      if (detailed) ratings.push({ club: c.id, name: p.name, pos: p.pos, img: p.img, ovr: p.ovr, r: Math.round(clamp(6.4 + g * 1.2 + res * 0.4 + rnd(-0.7, 0.7), 4, 10) * 10) / 10 });
     }
   }
-  return { hg, ag, ev, scorers, ratings };
+  stats.h.poss = Math.round(clamp(50 + (hs - as) * 2.2, 30, 70));
+  stats.a.poss = 100 - stats.h.poss;
+  return { hg, ag, ev, scorers, ratings, stats };
 }
 
 function playDay(G) {
@@ -505,12 +512,12 @@ function newGame(managerName, clubIdx) {
     managerName, userClub: clubIdx, rep: 30, trophies: [],
     news: [], tx: [], seasonOver: false, pendingOffer: null,
     clubs: DB.clubs.map((c, i) => ({
-      id: i, n: c.n, s: c.s, lg: c.lg, c1: c.c1, c2: c.c2,
+      id: i, n: c.n, s: c.s, lg: c.lg, c1: c.c1, c2: c.c2, t: c.t || 0,
       morale: 70, formation: '4-3-3', mentality: 'balanced',
       players: c.p.map(row => ({
         id: nextId++, name: row[0], nat: row[1], pos: row[2], age: row[3],
         ovr: row[4], pot: row[5], value: row[6], wage: row[7], years: row[8],
-        a: row.slice(9, 15), fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false,
+        a: row.slice(9, 15), img: row[15] || null, fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false,
       })),
     })),
   };
