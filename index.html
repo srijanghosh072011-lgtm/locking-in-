@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Locking In FC — Career Mode</title>
+<style>
+  :root { --c1:#c8102e; --c2:#ffffff; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:system-ui,sans-serif; background:#0e1117; color:#e6e6e6; min-height:100vh; }
+  button { font:inherit; cursor:pointer; border:0; border-radius:6px; padding:8px 14px; background:#2a2f3a; color:#e6e6e6; }
+  button:hover { filter:brightness(1.2); }
+  button.primary { background:var(--c1); color:var(--c2); font-weight:700; }
+  input, select { font:inherit; background:#1a1f29; color:#e6e6e6; border:1px solid #333; border-radius:6px; padding:8px; }
+  .screen { display:none; max-width:1000px; margin:0 auto; padding:16px; }
+  .screen.on { display:block; }
+  h1 { letter-spacing:1px; } h2 { margin:10px 0; } h3 { margin:8px 0; }
+  .badge { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--c1) 50%,var(--c2) 50%); display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#0e1117; text-shadow:0 0 3px #fff; flex:none; }
+  header#top { display:flex; align-items:center; gap:12px; padding:10px 16px; background:#151a23; border-bottom:3px solid var(--c1); position:sticky; top:0; z-index:5; flex-wrap:wrap; }
+  header#top .grow { flex:1; }
+  nav { display:flex; gap:4px; margin:12px 0; flex-wrap:wrap; }
+  nav button.act { background:var(--c1); color:var(--c2); }
+  table.grid { width:100%; border-collapse:collapse; font-size:14px; }
+  table.grid th, table.grid td { padding:6px 8px; text-align:left; border-bottom:1px solid #232a36; }
+  table.grid th { color:#8b93a3; font-weight:600; cursor:default; }
+  table.grid tr.click:hover { background:#1a2130; cursor:pointer; }
+  table.grid tr.me { background:rgba(255,255,255,.06); border-left:3px solid var(--c1); }
+  .muted { color:#8b93a3; font-size:13px; }
+  .card { background:#151a23; border-radius:10px; padding:14px; margin:10px 0; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .clubcard { background:#151a23; border-radius:10px; padding:14px; cursor:pointer; width:220px; }
+  .clubcard:hover { outline:2px solid #fff3; }
+  #modal-bg { display:none; position:fixed; inset:0; background:#000a; z-index:10; align-items:center; justify-content:center; }
+  #modal-bg.on { display:flex; }
+  #modal { background:#151a23; border-radius:12px; padding:20px; max-width:520px; width:92%; max-height:85vh; overflow:auto; border-top:4px solid var(--c1); }
+  .attr { display:inline-block; width:64px; text-align:center; background:#1a2130; border-radius:6px; padding:6px 2px; margin:2px; }
+  .attr b { display:block; font-size:18px; }
+  #ticker { background:#0a0d12; border-radius:10px; padding:12px; height:300px; overflow-y:auto; font-size:14px; line-height:1.7; }
+  #score { font-size:34px; font-weight:800; text-align:center; margin:8px 0; }
+  .inj { color:#ff6b6b; } .pos-GK{color:#f2c14e} .pos-DF{color:#6bb3ff} .pos-MF{color:#7ee08a} .pos-AT{color:#ff8f6b}
+  .green { color:#7ee08a; } .red { color:#ff6b6b; }
+  #menu { text-align:center; padding-top:9vh; }
+  #menu .card { max-width:420px; margin:12px auto; text-align:left; }
+</style>
+</head>
+<body>
+
+<header id="top" style="display:none">
+  <span class="badge" id="h-badge"></span>
+  <div><b id="h-club"></b><div class="muted" id="h-mgr"></div></div>
+  <div class="grow"></div>
+  <div style="text-align:right"><b id="h-date"></b><div class="muted" id="h-money"></div></div>
+  <button id="h-save" onclick="saveGame()">💾 Save</button>
+  <button onclick="toMenu()">Menu</button>
+  <button class="primary" id="h-cont" onclick="doContinue()">Continue ▶</button>
+</header>
+
+<div id="menu" class="screen on">
+  <h1>⚽ LOCKING IN FC</h1>
+  <p class="muted">Career Mode — 20 clubs, endless seasons, one job on the line.</p>
+  <div class="card">
+    <h3>New Career</h3>
+    <div class="row"><input id="mgr-name" placeholder="Your manager name" value="Alex Ferguson Jr">
+    <button class="primary" onclick="toPick()">Start ▶</button></div>
+  </div>
+  <div class="card"><h3>Load Career</h3><div id="slots"></div></div>
+</div>
+
+<div id="pick" class="screen">
+  <h2>Choose your club</h2>
+  <p class="muted">Tier 1 = title fights and big budgets. Tier 4 = the long road up.</p>
+  <div class="row" id="clublist"></div>
+</div>
+
+<div id="hub" class="screen">
+  <nav id="tabs"></nav>
+  <div id="tabbody"></div>
+</div>
+
+<div id="match" class="screen">
+  <div id="match-pre"></div>
+  <div id="match-live" style="display:none">
+    <div id="score"></div>
+    <div id="ticker"></div>
+    <div class="row" style="margin-top:10px"><button onclick="skipTicker()">⏩ Skip</button></div>
+  </div>
+  <div id="match-post" style="display:none"></div>
+</div>
+
+<div id="modal-bg" onclick="if(event.target===this)closeModal()"><div id="modal"></div></div>
+
+<script src="engine.js"></script>
+<script>
+'use strict';
+let G = null, tab = 'squad', tickerTimer = null;
+
+const $ = id => document.getElementById(id);
+const money = n => (n < 0 ? '-' : '') + (Math.abs(n) >= 1e6 ? '£' + (Math.abs(n)/1e6).toFixed(1) + 'M' : '£' + Math.round(Math.abs(n)/1e3) + 'k');
+const fdate = t => new Date(t).toUTCString().slice(0, 16);
+const me = () => G.clubs[G.userClub];
+const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); };
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function theme(c) { document.documentElement.style.setProperty('--c1', c.c1); document.documentElement.style.setProperty('--c2', c.c2); }
+
+// ---------- menu / save / load ----------
+function slotKey(i) { return 'fcm_slot_' + i; }
+function renderSlots() {
+  let html = '';
+  for (const i of [1, 2, 3, 'auto']) {
+    const raw = localStorage.getItem(slotKey(i));
+    if (raw) {
+      const s = JSON.parse(raw);
+      html += `<div class="row" style="margin:6px 0"><button class="primary" onclick="loadGame('${i}')">Load</button>
+        <span>${i === 'auto' ? '🔄 Autosave' : 'Slot ' + i}: ${esc(s.managerName)} — ${esc(s.clubs[s.userClub].name)}, Season ${s.season}</span>
+        <button onclick="localStorage.removeItem('${slotKey(i)}');renderSlots()">🗑</button></div>`;
+    } else if (i !== 'auto') html += `<div class="row muted" style="margin:6px 0">Slot ${i}: empty</div>`;
+  }
+  $('slots').innerHTML = html || '<span class="muted">No saves yet.</span>';
+}
+function saveGame() {
+  const i = prompt('Save to slot (1, 2 or 3):', '1');
+  if (!['1','2','3'].includes(i)) return;
+  localStorage.setItem(slotKey(i), JSON.stringify(G));
+  alert('Saved to slot ' + i);
+}
+function autosave() { try { localStorage.setItem(slotKey('auto'), JSON.stringify(G)); } catch (e) {} }
+function loadGame(i) {
+  G = JSON.parse(localStorage.getItem(slotKey(i)));
+  enterHub();
+}
+function toMenu() { renderSlots(); show('menu'); $('top').style.display = 'none'; }
+
+// ---------- club pick ----------
+function toPick() {
+  const stars = t => '★'.repeat(5 - t) + '☆'.repeat(t - 1);
+  $('clublist').innerHTML = ENG.CLUB_DEFS.map(([name, short, tier, c1, c2], i) =>
+    `<div class="clubcard" onclick="startGame(${i})">
+      <span class="badge" style="background:linear-gradient(135deg,${c1} 50%,${c2} 50%)">${short}</span>
+      <h3>${name}</h3><div class="muted">Tier ${tier} ${stars(tier)} · Budget ${money(ENG.CLUB_DEFS[i] && [0,80e6,40e6,18e6,8e6][tier])}</div>
+    </div>`).join('');
+  show('pick');
+}
+function startGame(clubId) {
+  G = ENG.newGame($('mgr-name').value.trim() || 'The Boss', clubId);
+  enterHub();
+}
+
+function enterHub() {
+  theme(me());
+  $('top').style.display = 'flex';
+  tab = 'squad';
+  renderHub();
+  show('hub');
+}
+
+// ---------- hub ----------
+const TABS = { squad: 'Squad', table: 'Table', fixtures: 'Fixtures', market: 'Transfers', finance: 'Finances', club: 'Club' };
+function renderHub() {
+  const c = me();
+  $('h-badge').textContent = c.short;
+  $('h-badge').style.background = `linear-gradient(135deg,${c.c1} 50%,${c.c2} 50%)`;
+  $('h-club').textContent = c.name;
+  $('h-mgr').textContent = `${G.managerName} · Rep ${G.rep} · Season ${G.season}`;
+  $('h-date').textContent = fdate(G.time);
+  $('h-money').textContent = `Budget ${money(c.budget)} · Wages ${money(ENG.wageBill(c))}/wk` + (ENG.windowOpen(G) ? ' · 🟢 window open' : '');
+  $('tabs').innerHTML = Object.entries(TABS).map(([k, v]) =>
+    `<button class="${tab === k ? 'act' : ''}" onclick="tab='${k}';renderHub()">${v}</button>`).join('');
+  $('tabbody').innerHTML = ({ squad: rSquad, table: rTable, fixtures: rFixtures, market: rMarket, finance: rFinance, club: rClub })[tab]();
+}
+
+const posOrder = { GK: 0, DF: 1, MF: 2, AT: 3 };
+function playerRow(p, ownerId) {
+  return `<tr class="click" onclick="openPlayer(${p.id},${ownerId})">
+    <td class="pos-${p.pos}">${p.pos}</td><td>${esc(p.name)} ${p.listed ? '🏷' : ''}${p.injury ? `<span class="inj"> 🩹${p.injury}d</span>` : ''}</td>
+    <td>${p.age}</td><td><b>${p.ovr}</b></td><td>${p.fit}%</td><td>${p.sg}/${p.sa}</td>
+    <td>${money(p.value)}</td><td>${money(p.wage)}/wk · ${p.years}y</td></tr>`;
+}
+function rSquad() {
+  const ps = me().players.slice().sort((a, b) => posOrder[a.pos] - posOrder[b.pos] || b.ovr - a.ovr);
+  const xi = ENG.bestXI(me()).map(p => p.id);
+  return `<div class="card"><h3>Squad (${ps.length}) — starters in <b style="color:var(--c1)">▮</b></h3>
+    <table class="grid"><tr><th>Pos</th><th>Name</th><th>Age</th><th>OVR</th><th>Fit</th><th>G/A</th><th>Value</th><th>Contract</th></tr>
+    ${ps.map(p => playerRow(p, G.userClub).replace('<tr class="click"', xi.includes(p.id) ? '<tr class="click" style="border-left:3px solid var(--c1)"' : '<tr class="click"')).join('')}</table></div>`;
+}
+function rTable() {
+  const t = ENG.table(G);
+  const all = G.clubs.flatMap(c => c.players.map(p => ({ p, c }))).sort((a, b) => b.p.sg - a.p.sg).slice(0, 8);
+  return `<div class="card"><h3>League Table</h3><table class="grid">
+    <tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+    ${t.map((r, i) => `<tr class="${r.id === G.userClub ? 'me' : ''}"><td>${i + 1}</td><td>${r.name}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf - r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}
+    </table></div>
+    <div class="card"><h3>Top Scorers</h3><table class="grid">${all.map(x => `<tr><td>${esc(x.p.name)}</td><td>${x.c.short}</td><td><b>${x.p.sg}</b> goals, ${x.p.sa} assists</td></tr>`).join('')}</table></div>`;
+}
+function rFixtures() {
+  const mine = G.fixtures.filter(f => f.h === G.userClub || f.a === G.userClub);
+  return `<div class="card"><h3>Fixtures — Season ${G.season}</h3><table class="grid">
+    ${mine.map(f => {
+      const home = f.h === G.userClub, opp = G.clubs[home ? f.a : f.h];
+      const res = f.played ? `<b>${f.hg}–${f.ag}</b>` : '<span class="muted">' + fdate(f.t).slice(0, 11) + '</span>';
+      const wdl = !f.played ? '' : (home ? f.hg > f.ag : f.ag > f.hg) ? '<span class="green">W</span>' : f.hg === f.ag ? 'D' : '<span class="red">L</span>';
+      return `<tr><td>R${f.round}</td><td>${home ? 'vs' : '@'} ${opp.name}</td><td>${res}</td><td>${wdl}</td></tr>`;
+    }).join('')}</table></div>`;
+}
+function rMarket() {
+  const open = ENG.windowOpen(G);
+  const posF = window._mposF || 'ALL';
+  let pool = G.clubs.filter(c => c.id !== G.userClub).flatMap(c => c.players.map(p => ({ p, c })));
+  if (posF !== 'ALL') pool = pool.filter(x => x.p.pos === posF);
+  pool.sort((a, b) => b.p.ovr - a.p.ovr);
+  return `<div class="card"><h3>Transfer Market ${open ? '🟢 open' : '🔴 closed — browse only'}</h3>
+    <div class="row">Position: ${['ALL','GK','DF','MF','AT'].map(x => `<button class="${posF===x?'act':''}" style="${posF===x?'background:var(--c1);color:var(--c2)':''}" onclick="window._mposF='${x}';renderHub()">${x}</button>`).join('')}</div>
+    <table class="grid"><tr><th>Pos</th><th>Name</th><th>Age</th><th>OVR</th><th>Fit</th><th>G/A</th><th>Value</th><th>Club</th></tr>
+    ${pool.slice(0, 60).map(x => playerRow(x.p, x.c.id)).join('')}</table>
+    <p class="muted">Showing top 60. Click a player to bid.</p></div>`;
+}
+function rFinance() {
+  const c = me();
+  return `<div class="card"><h3>Finances</h3>
+    <p>Balance: <b class="${c.budget < 0 ? 'red' : 'green'}">${money(c.budget)}</b> · Weekly wage bill: <b>${money(ENG.wageBill(c))}</b></p></div>
+    <div class="card"><h3>Transactions</h3><table class="grid">
+    ${G.tx.slice(-25).reverse().map(t => `<tr><td class="muted">${fdate(t.t).slice(0,11)}</td><td>${esc(t.txt)}</td><td class="${t.amt<0?'red':'green'}">${money(t.amt)}</td></tr>`).join('') || '<tr><td class="muted">Nothing yet.</td></tr>'}</table></div>`;
+}
+function rClub() {
+  const c = me();
+  return `<div class="card"><h3>Tactics</h3><div class="row">
+      Formation <select onchange="me().formation=this.value">${Object.keys(ENG.FORMATIONS).map(f => `<option ${c.formation===f?'selected':''}>${f}</option>`).join('')}</select>
+      Mentality <select onchange="me().mentality=this.value">${['defensive','balanced','attacking'].map(m => `<option ${c.mentality===m?'selected':''}>${m}</option>`).join('')}</select>
+      <span class="muted">Team morale: ${c.morale}/100</span></div></div>
+    <div class="card"><h3>Manager: ${esc(G.managerName)}</h3>
+      <p>Reputation: <b>${G.rep}/100</b></p>
+      <p>🏆 ${G.trophies.length ? G.trophies.map(esc).join('<br>🏆 ') : '<span class="muted">Trophy cabinet is empty. For now.</span>'}</p></div>
+    <div class="card"><h3>News</h3>${G.news.map(n => `<p><span class="muted">${fdate(n.t).slice(5, 11)}</span> ${esc(n.txt)}</p>`).join('') || '<p class="muted">Quiet day.</p>'}</div>`;
+}
+
+// ---------- player modal ----------
+function findPlayer(id, clubId) { return G.clubs[clubId].players.find(p => p.id === id); }
+function openPlayer(id, clubId) {
+  const p = findPlayer(id, clubId), own = clubId === G.userClub, c = G.clubs[clubId];
+  const open = ENG.windowOpen(G);
+  const A = [['PAC', p.pac], ['SHO', p.sho], ['PAS', p.pas], ['DRI', p.dri], ['DEF', p.def], ['PHY', p.phy]];
+  let actions = '';
+  if (own) {
+    actions = `<div class="row" style="margin-top:12px">
+      <button onclick="renew(${id})">📄 Renew (3y, +20% wage)</button>
+      <button ${open ? '' : 'disabled'} onclick="askSell(${id})">💰 Sell</button>
+      <button onclick="releasePlayer(${id})">🗑 Release</button></div>
+      ${open ? '' : '<p class="muted">Selling only during a transfer window.</p>'}`;
+  } else {
+    actions = `<div class="row" style="margin-top:12px">
+      <input id="bid-amt" type="number" step="100000" value="${Math.round(p.value * 1.1)}" style="width:150px">
+      <button class="primary" ${open ? '' : 'disabled'} onclick="makeBid(${id},${clubId})">Make bid</button></div>
+      <p class="muted" id="bid-msg">${open ? 'Asking price around ' + money(p.value * 1.15) : 'Window closed — come back in summer or January.'}</p>`;
+  }
+  $('modal').innerHTML = `<h2>${esc(p.name)} <span class="pos-${p.pos}">${p.pos}</span></h2>
+    <p class="muted">${p.nat} · Age ${p.age} · ${c.name} · ${money(p.wage)}/wk, ${p.years}y left ${p.injury ? `· <span class="inj">injured ${p.injury}d</span>` : ''}</p>
+    <p><b style="font-size:22px">OVR ${p.ovr}</b> <span class="muted">(potential ~${p.pot})</span> · Value ${money(p.value)} · Fit ${p.fit}% · ${p.sg}G ${p.sa}A in ${p.apps} apps</p>
+    <div>${A.map(([k, v]) => `<span class="attr"><b>${v}</b>${k}</span>`).join('')}</div>
+    ${actions}<div class="row" style="margin-top:12px"><button onclick="closeModal()">Close</button></div>`;
+  $('modal-bg').classList.add('on');
+}
+function closeModal() { $('modal-bg').classList.remove('on'); renderHub(); }
+
+function renew(id) {
+  const p = findPlayer(id, G.userClub);
+  p.years = 3; p.wage = Math.round(p.wage * 1.2 / 100) * 100;
+  ENG.news(G, `📄 ${p.name} signed a new 3-year deal.`);
+  openPlayer(id, G.userClub);
+}
+function releasePlayer(id) {
+  const p = findPlayer(id, G.userClub);
+  if (me().players.length <= 15) return alert('Squad too small to release anyone (min 15).');
+  if (!confirm(`Release ${p.name}? You pay 6 months of wages (${money(p.wage * 26)}).`)) return;
+  me().players.splice(me().players.indexOf(p), 1);
+  me().budget -= p.wage * 26;
+  G.tx.push({ t: G.time, txt: 'Released ' + p.name, amt: -p.wage * 26 });
+  closeModal();
+}
+function askSell(id) {
+  const p = findPlayer(id, G.userClub);
+  if (me().players.length <= 15) return alert('Squad too small to sell (min 15).');
+  const { buyer, fee } = ENG.sellPlayer(G, p);
+  if (confirm(`${buyer.name} offer ${money(fee)} for ${p.name}. Accept?`)) {
+    ENG.completeSale(G, p, buyer, fee);
+    closeModal();
+  }
+}
+function makeBid(id, clubId) {
+  const p = findPlayer(id, clubId), seller = G.clubs[clubId];
+  const offer = Number($('bid-amt').value) || 0;
+  if (offer > me().budget) return $('bid-msg').textContent = 'You cannot afford that bid.';
+  const r = ENG.bid(G, p, seller, offer);
+  if (!r.ok) {
+    $('bid-amt').value = r.counter;
+    return $('bid-msg').textContent = `Bid rejected. ${seller.short} counter at ${money(r.counter)}.`;
+  }
+  if (r.fee + r.wage * 52 > me().budget + 5e6 && !confirm(`Fee ${money(r.fee)}, wage demand ${money(r.wage)}/wk. This stretches the budget. Proceed?`)) return;
+  if (!confirm(`Bid accepted! ${p.name} wants ${money(r.wage)}/wk on a 4-year deal. Sign him?`)) return;
+  ENG.signPlayer(G, p, seller, r.fee, r.wage);
+  closeModal();
+}
+
+// ---------- continue / calendar ----------
+function doContinue() {
+  for (let i = 0; i < 400; i++) {
+    const ev = ENG.advanceDay(G);
+    if (ev === 'match') return prepMatch();
+    if (ev === 'seasonEnd') return endSeasonUI();
+  }
+}
+
+// ---------- match day ----------
+function prepMatch() {
+  const f = G.fixtures.find(x => x.t === G.time && !x.played && (x.h === G.userClub || x.a === G.userClub));
+  const home = f.h === G.userClub, opp = G.clubs[home ? f.a : f.h];
+  const xi = ENG.bestXI(me());
+  $('match-pre').style.display = 'block';
+  $('match-live').style.display = 'none';
+  $('match-post').style.display = 'none';
+  $('match-pre').innerHTML = `<div class="card"><h2>Matchday — Round ${f.round}</h2>
+    <h3>${G.clubs[f.h].name} vs ${G.clubs[f.a].name} ${home ? '(home)' : '(away)'}</h3>
+    <p class="muted">Opponent: tier ${opp.tier}, morale ${opp.morale}. Your formation: ${me().formation} (${me().mentality}) — change it on the Club tab before matchday.</p>
+    <table class="grid"><tr><th>Pos</th><th>Starting XI</th><th>OVR</th><th>Fit</th></tr>
+    ${xi.map(p => `<tr><td class="pos-${p.pos}">${p.pos}</td><td>${esc(p.name)}</td><td>${p.ovr}</td><td>${p.fit}%</td></tr>`).join('')}</table>
+    <div class="row" style="margin-top:12px"><button class="primary" onclick="playMatch()">Kick off ▶</button></div></div>`;
+  $('h-date').textContent = fdate(G.time);
+  show('match');
+}
+
+let matchRes = null, tickIdx = 0;
+function playMatch() {
+  matchRes = ENG.playRound(G);
+  autosave();
+  const f = matchRes.user.f;
+  $('match-pre').style.display = 'none';
+  $('match-live').style.display = 'block';
+  $('ticker').innerHTML = '';
+  tickIdx = 0;
+  const evs = matchRes.user.ev;
+  let shownH = 0, shownA = 0;
+  updateScore(0, 0, f);
+  tickerTimer = setInterval(() => {
+    if (tickIdx >= evs.length) return finishTicker();
+    const e = evs[tickIdx++];
+    $('ticker').innerHTML += `<div>${esc(e.txt)}</div>`;
+    $('ticker').scrollTop = 1e6;
+    if (e.goal) { [shownH, shownA] = e.score.split('-').map(Number); updateScore(shownH, shownA, f); }
+  }, 500);
+}
+function updateScore(h, a, f) {
+  $('score').textContent = `${G.clubs[f.h].short} ${h} – ${a} ${G.clubs[f.a].short}`;
+}
+function skipTicker() { finishTicker(); }
+function finishTicker() {
+  clearInterval(tickerTimer);
+  const u = matchRes.user, f = u.f;
+  updateScore(f.hg, f.ag, f);
+  $('match-live').style.display = 'none';
+  $('match-post').style.display = 'block';
+  const won = (f.h === G.userClub && f.hg > f.ag) || (f.a === G.userClub && f.ag > f.hg);
+  const drew = f.hg === f.ag;
+  G.rep = Math.max(0, Math.min(100, G.rep + (won ? 1 : drew ? 0 : -1)));
+  const myRatings = u.ratings.filter(r => r.club === G.userClub).sort((a, b) => b.r - a.r);
+  $('match-post').innerHTML = `<div class="card">
+    <h2>FT: ${G.clubs[f.h].name} ${f.hg} – ${f.ag} ${G.clubs[f.a].name} ${won ? '🎉' : drew ? '' : '😞'}</h2>
+    <p class="muted">${[...u.scorers.h, ...u.scorers.a].map(esc).join(' · ') || 'No goals.'}</p>
+    <h3>Your player ratings</h3>
+    <table class="grid">${myRatings.map(r => `<tr><td class="pos-${r.pos}">${r.pos}</td><td>${esc(r.name)}</td><td><b>${r.r.toFixed(1)}</b></td></tr>`).join('')}</table>
+    <h3>Around the league</h3>
+    <table class="grid">${matchRes.others.map(o => `<tr><td>${G.clubs[o.h].short} ${o.hg}–${o.ag} ${G.clubs[o.a].short}</td></tr>`).join('')}</table>
+    <div class="row" style="margin-top:12px"><button class="primary" onclick="tab='table';enterHub()">Continue ▶</button></div></div>`;
+}
+
+// ---------- season end ----------
+function endSeasonUI() {
+  const aw = ENG.endSeason(G);
+  autosave();
+  enterHub();
+  $('modal').innerHTML = `<h2>🏆 Season ${G.season - 1} Complete</h2>
+    <p><b>${esc(aw.champion)}</b> are champions. You finished <b>${aw.userPos}${['st','nd','rd'][aw.userPos-1]||'th'}</b> and earned ${money(aw.prize)}.</p>
+    <div class="card">⚽ Golden Boot: <b>${esc(aw.topScorer.name)}</b> (${aw.topScorer.club}) — ${aw.topScorer.goals} goals<br>
+    🌟 Player of the Season: <b>${esc(aw.bestPlayer.name)}</b> (${aw.bestPlayer.club})<br>
+    🌱 Best Young Player: <b>${esc(aw.bestYoung.name)}</b> (${aw.bestYoung.club}, ${aw.bestYoung.age})</div>
+    <p class="muted">Players have aged, contracts ticked down, youth prospects arrived. Season ${G.season} starts in July.</p>
+    <div class="row"><button class="primary" onclick="closeModal()">On to Season ${G.season} ▶</button></div>`;
+  $('modal-bg').classList.add('on');
+}
+
+renderSlots();
+</script>
+</body>
+</html>
