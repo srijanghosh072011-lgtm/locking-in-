@@ -1,97 +1,61 @@
-// engine.js — pure game logic. Runs in browser (globals) and node (module.exports).
+// engine.js — pure game logic over the real FC26 dataset (data.js).
+// Runs in browser (globals) and node (module.exports).
 'use strict';
+const DB = typeof module !== 'undefined' ? require('./data.js') : DATA;
 
 const DAY = 86400000;
 const R = n => Math.floor(Math.random() * n);
 const rnd = (a, b) => a + Math.random() * (b - a);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const pick = a => a[R(a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = R(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-// ---------- names & nations ----------
+// ---------- youth name pools (academy regens only — senior players are real) ----------
 const NAMES = {
   England: { f: ['Jack', 'Harry', 'Ollie', 'George', 'Lewis', 'Callum', 'Mason', 'Reece', 'Kyle', 'Aaron', 'Ben', 'Joe'], l: ['Walker', 'Hughes', 'Baker', 'Turner', 'Clark', 'Ward', 'Foster', 'Gibson', 'Hall', 'Dawson', 'Reid', 'Cole'] },
   Spain: { f: ['Pablo', 'Sergio', 'Iker', 'Dani', 'Alvaro', 'Marco', 'Hugo', 'Adrian', 'Raul', 'Javi', 'Nico', 'Pedro'], l: ['Garcia', 'Torres', 'Navarro', 'Moreno', 'Vazquez', 'Serrano', 'Ortega', 'Ramos', 'Gil', 'Castro', 'Rubio', 'Molina'] },
-  Brazil: { f: ['Gabriel', 'Lucas', 'Matheus', 'Vinicius', 'Thiago', 'Rafael', 'Caio', 'Joao', 'Pedro', 'Eduardo', 'Felipe', 'Igor'], l: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Pereira', 'Almeida', 'Ferreira', 'Ribeiro', 'Barbosa', 'Rocha', 'Dias'] },
-  France: { f: ['Kylian', 'Antoine', 'Theo', 'Hugo', 'Lucas', 'Jules', 'Enzo', 'Mathis', 'Noah', 'Leo', 'Rayan', 'Malo'], l: ['Martin', 'Bernard', 'Dubois', 'Moreau', 'Laurent', 'Girard', 'Lambert', 'Fontaine', 'Rousseau', 'Mercier', 'Blanc', 'Renard'] },
   Germany: { f: ['Leon', 'Finn', 'Jonas', 'Lukas', 'Felix', 'Niklas', 'Tim', 'Moritz', 'Jan', 'Erik', 'Til', 'Kai'], l: ['Muller', 'Schmidt', 'Weber', 'Wagner', 'Becker', 'Hoffmann', 'Schulz', 'Koch', 'Richter', 'Klein', 'Wolf', 'Braun'] },
+  Italy: { f: ['Luca', 'Marco', 'Matteo', 'Alessandro', 'Davide', 'Federico', 'Gabriele', 'Lorenzo', 'Nicolo', 'Riccardo', 'Simone', 'Tommaso'], l: ['Rossi', 'Russo', 'Ferrari', 'Esposito', 'Bianchi', 'Romano', 'Colombo', 'Ricci', 'Greco', 'Conti', 'Gallo', 'Mancini'] },
+  France: { f: ['Kylian', 'Antoine', 'Theo', 'Hugo', 'Lucas', 'Jules', 'Enzo', 'Mathis', 'Noah', 'Leo', 'Rayan', 'Malo'], l: ['Martin', 'Bernard', 'Dubois', 'Moreau', 'Laurent', 'Girard', 'Lambert', 'Fontaine', 'Rousseau', 'Mercier', 'Blanc', 'Renard'] },
+  Portugal: { f: ['Joao', 'Diogo', 'Tiago', 'Goncalo', 'Rui', 'Andre', 'Bruno', 'Rafael', 'Miguel', 'Vasco', 'Duarte', 'Afonso'], l: ['Silva', 'Santos', 'Ferreira', 'Pereira', 'Costa', 'Rodrigues', 'Martins', 'Sousa', 'Fernandes', 'Gomes', 'Lopes', 'Carvalho'] },
+  'Saudi Arabia': { f: ['Salem', 'Fahad', 'Abdullah', 'Saud', 'Khalid', 'Nawaf', 'Turki', 'Faisal', 'Majed', 'Sultan', 'Yasser', 'Hattan'], l: ['Al-Dawsari', 'Al-Shehri', 'Al-Ghannam', 'Al-Bulaihi', 'Al-Najei', 'Al-Amri', 'Al-Harbi', 'Al-Otaibi', 'Al-Mutairi', 'Al-Qahtani', 'Al-Faraj', 'Al-Buraikan'] },
+  USA: { f: ['Tyler', 'Brandon', 'Austin', 'Jordan', 'Caleb', 'Ethan', 'Logan', 'Dylan', 'Chase', 'Cole', 'Blake', 'Trey'], l: ['Johnson', 'Williams', 'Miller', 'Davis', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris'] },
+  'Türkiye': { f: ['Emre', 'Mert', 'Burak', 'Cenk', 'Arda', 'Kerem', 'Ozan', 'Halil', 'Yusuf', 'Kaan', 'Baris', 'Umut'], l: ['Yilmaz', 'Kaya', 'Demir', 'Celik', 'Sahin', 'Aydin', 'Ozturk', 'Arslan', 'Dogan', 'Kilic', 'Aslan', 'Polat'] },
+  Brazil: { f: ['Gabriel', 'Lucas', 'Matheus', 'Vinicius', 'Thiago', 'Rafael', 'Caio', 'Joao', 'Pedro', 'Eduardo', 'Felipe', 'Igor'], l: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Pereira', 'Almeida', 'Ferreira', 'Ribeiro', 'Barbosa', 'Rocha', 'Dias'] },
+  Argentina: { f: ['Julian', 'Lautaro', 'Emiliano', 'Nicolas', 'Rodrigo', 'Facundo', 'Thiago', 'Franco', 'Mateo', 'Bruno', 'Tomas', 'Valentin'], l: ['Fernandez', 'Rodriguez', 'Gonzalez', 'Lopez', 'Martinez', 'Diaz', 'Alvarez', 'Romero', 'Sosa', 'Acosta', 'Medina', 'Rojas'] },
   Nigeria: { f: ['Chidi', 'Emeka', 'Kelechi', 'Obinna', 'Sola', 'Tunde', 'Ifeanyi', 'Uche', 'Femi', 'Sam', 'David', 'Victor'], l: ['Okafor', 'Adeyemi', 'Eze', 'Okonkwo', 'Balogun', 'Ibe', 'Nwosu', 'Adebayo', 'Chukwu', 'Obi', 'Musa', 'Lawal'] },
-  Argentina: { f: ['Lionel', 'Julian', 'Lautaro', 'Emiliano', 'Nicolas', 'Rodrigo', 'Facundo', 'Thiago', 'Franco', 'Mateo', 'Bruno', 'Tomas'], l: ['Fernandez', 'Rodriguez', 'Gonzalez', 'Lopez', 'Martinez', 'Diaz', 'Alvarez', 'Romero', 'Sosa', 'Acosta', 'Medina', 'Rojas'] },
-  Netherlands: { f: ['Daan', 'Sem', 'Luuk', 'Jesse', 'Thijs', 'Lars', 'Ruben', 'Bram', 'Sven', 'Koen', 'Milan', 'Teun'], l: ['de Jong', 'Bakker', 'Visser', 'Smit', 'Meijer', 'Mulder', 'Bos', 'Vos', 'Peters', 'Hendriks', 'Dekker', 'Brouwer'] },
 };
-const NATIONS = Object.keys(NAMES);
-
-// ---------- clubs: [name, short, tier, color1, color2] ----------
-const CLUB_DEFS = [
-  ['Kingsport United', 'KSU', 1, '#c8102e', '#ffffff'],
-  ['Blackmoor City', 'BMC', 1, '#6caddf', '#1c2c5b'],
-  ['Redhaven FC', 'RHV', 1, '#d00027', '#ffd700'],
-  ['Northgate Albion', 'NGA', 1, '#034694', '#ffffff'],
-  ['Silverton Rovers', 'SLV', 2, '#7f8c9b', '#101820'],
-  ['Eastcliff Town', 'ECT', 2, '#0057b8', '#ffd700'],
-  ['Harborview FC', 'HBV', 2, '#00a398', '#132257'],
-  ['Westbrook Wanderers', 'WBW', 2, '#fdb913', '#231f20'],
-  ['Ironfield Athletic', 'IFA', 2, '#e03a3e', '#000000'],
-  ['Oakhurst County', 'OAK', 3, '#046a38', '#f2a900'],
-  ['Stonebridge FC', 'STB', 3, '#5e2750', '#9c9c9c'],
-  ['Marston Villa', 'MSV', 3, '#95bfe5', '#670e36'],
-  ['Greyfriars Rangers', 'GFR', 3, '#4a4f55', '#c00'],
-  ['Lakemoor Town', 'LMT', 3, '#0f4d92', '#87ceeb'],
-  ['Ashford City', 'AFC', 3, '#9b0000', '#f5f5f5'],
-  ['Dunmere FC', 'DUN', 4, '#2f5233', '#e8e8e8'],
-  ['Foxhill United', 'FOX', 4, '#e87722', '#1d1d1b'],
-  ['Cindermill FC', 'CIN', 4, '#7a263a', '#a5acaf'],
-  ['Wolverdale', 'WLV', 4, '#101820', '#fdb913'],
-  ['Port Bramble', 'PBR', 4, '#00b2a9', '#003087'],
-];
-const TIER_BUDGET = [0, 80e6, 40e6, 18e6, 8e6];
 
 // ---------- players ----------
-// OVR weights per position: [pac, sho, pas, dri, def, phy]
-const W = {
-  GK: [.05, .10, .10, .05, .50, .20],
-  DF: [.10, .05, .10, .05, .45, .25],
-  MF: [.10, .15, .30, .20, .10, .15],
-  AT: [.20, .35, .10, .20, .02, .13],
-};
-const SHAPE = { GK: [-15, -30, -8, -15, 6, 2], DF: [-2, -18, -5, -8, 6, 4], MF: [-3, -4, 6, 4, -8, -2], AT: [5, 6, -4, 4, -25, -1] };
-const ATTRS = ['pac', 'sho', 'pas', 'dri', 'def', 'phy'];
+// attr slots a[0..5]: pac/sho/pas/dri/def/phy outfield, div/han/kic/ref/spe/pos for GK
+const W = { GK: [.1, .2, .1, .35, .05, .2], DF: [.10, .05, .10, .05, .45, .25], MF: [.10, .15, .30, .20, .10, .15], AT: [.20, .35, .10, .20, .02, .13] };
+const SHAPE = { GK: [0, 0, -8, 4, -10, 0], DF: [-2, -18, -5, -8, 6, 4], MF: [-3, -4, 6, 4, -8, -2], AT: [5, 6, -4, 4, -25, -1] };
 let nextId = 1;
 
-function calcOvr(p) {
-  const w = W[p.pos];
-  return Math.round(ATTRS.reduce((s, a, i) => s + p[a] * w[i], 0));
-}
 function calcValue(p) {
   if (p.ovr <= 55) return 100e3;
   const ageF = p.age <= 23 ? 1.3 : p.age <= 27 ? 1.1 : p.age <= 30 ? 1.0 : p.age <= 32 ? 0.6 : 0.3;
   const potF = 1 + (p.pot - p.ovr) * 0.02;
   return Math.max(100e3, Math.round(Math.pow(p.ovr - 55, 2.9) * 3000 * ageF * potF / 1e5) * 1e5);
 }
-function refresh(p) { p.ovr = calcOvr(p); p.value = calcValue(p); }
 
-function genPlayer(tier, age, pos) {
-  const nat = pick(NATIONS), n = NAMES[nat];
-  age = age || 16 + Math.round((R(19) + R(19)) / 2);
-  pos = pos || pick(['DF', 'DF', 'MF', 'MF', 'AT', 'AT', 'GK']);
-  let base = 76 - (tier - 1) * 3 + rnd(-6, 6);
-  if (Math.random() < 0.15) base += rnd(3, 8); // the odd star
-  if (age < 21) base -= (21 - age) * 1.5;
-  const p = { id: nextId++, name: pick(n.f) + ' ' + pick(n.l), nat, pos, age, fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false };
-  ATTRS.forEach((a, i) => p[a] = Math.round(clamp(base + SHAPE[pos][i] + rnd(-5, 5), 30, 99)));
-  p.ovr = calcOvr(p);
-  p.pot = clamp(p.ovr + Math.max(0, Math.round((27 - age) * rnd(0.5, 2.0))), p.ovr, 97);
+function genYouth(country) {
+  const nat = Math.random() < 0.6 && NAMES[country] ? country : pick(Object.keys(NAMES));
+  const n = NAMES[nat] || NAMES.England;
+  const pos = pick(['DF', 'DF', 'MF', 'MF', 'AT', 'AT', 'GK']);
+  const age = 16 + R(3);
+  const base = 52 + rnd(0, 14);
+  const p = { id: nextId++, name: pick(n.f) + ' ' + pick(n.l), nat, pos, age, fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false, youth: true };
+  p.a = SHAPE[pos].map(s => Math.round(clamp(base + s + rnd(-5, 5), 25, 90)));
+  p.ovr = Math.round(p.a.reduce((s, v, i) => s + v * W[pos][i], 0));
+  p.pot = clamp(p.ovr + 8 + R(20), p.ovr, 95);
   p.value = calcValue(p);
-  p.wage = clamp(Math.round(p.value / 2500 / 100) * 100, 500, 400e3);
-  p.years = 1 + R(4);
+  p.wage = Math.max(500, Math.round(p.value / 2500 / 100) * 100);
+  p.years = 3;
   return p;
 }
-function genSquad(tier) {
-  const tmpl = ['GK', 'GK', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'MF', 'MF', 'MF', 'AT', 'AT', 'AT', 'AT', 'AT', 'AT'];
-  return tmpl.map(pos => genPlayer(tier, 0, pos));
-}
-const wageBill = c => c.players.reduce((s, p) => s + p.wage, 0);
 
-// ---------- fixtures ----------
+// ---------- fixtures & dates ----------
 function roundRobin(ids) {
   const t = ids.slice(), n = t.length, rounds = [];
   for (let r = 0; r < n - 1; r++) {
@@ -102,46 +66,159 @@ function roundRobin(ids) {
   }
   return rounds;
 }
-function genFixtures(G) {
-  const ids = G.clubs.map(c => c.id);
-  const half = roundRobin(ids);
-  const rounds = half.concat(half.map(rd => rd.map(([h, a]) => [a, h])));
-  const start = Date.UTC(G.year, 7, 15); // Aug 15
-  G.fixtures = [];
-  rounds.forEach((rd, i) => rd.forEach(([h, a]) =>
-    G.fixtures.push({ round: i + 1, t: start + i * 7 * DAY, h, a, hg: 0, ag: 0, played: false })));
+function nthWeekday(y, m, wd, n) { // n>=1; m 0-11
+  const d = new Date(Date.UTC(y, m, 1));
+  let day = 1 + (7 + wd - d.getUTCDay()) % 7 + (n - 1) * 7;
+  return Date.UTC(y, m, day);
+}
+function leagueDates(n, s0) { // Saturdays, spilling onto Mondays for 40+ round leagues
+  const sats = Array.from({ length: 39 }, (_, k) => s0 + k * 7 * DAY);
+  if (n <= 39) return sats.slice(0, n);
+  const mons = [];
+  for (let i = 1; i <= n - 39; i++) mons.push(s0 + Math.floor(i * 39 / (n - 38)) * 7 * DAY + 2 * DAY);
+  return sats.concat(mons).sort((a, b) => a - b).slice(0, n);
+}
+const seasonMonth = (Y, m) => m >= 6 ? Y : Y + 1; // season Aug Y – May Y+1
+
+const CUP_NAMES = { England: 'FA Cup', Spain: 'Copa del Rey', Germany: 'DFB-Pokal', Italy: 'Coppa Italia', France: 'Coupe de France', Portugal: 'Taça de Portugal' };
+const STAGE = n => ({ 32: 'Round of 32', 16: 'Round of 16', 8: 'Quarter-final', 4: 'Semi-final', 2: 'FINAL' })[n] || 'Round';
+
+const power = c => { // squad strength = avg of best 18 OVRs
+  const t = c.players.map(p => p.ovr).sort((a, b) => b - a).slice(0, 18);
+  return t.reduce((s, v) => s + v, 0) / Math.max(1, t.length);
+};
+const leagueClubs = (G, li) => G.clubs.filter(c => c.lg === li);
+
+// ---------- season generation ----------
+function genSeason(G) {
+  const Y = G.year;
+  G.fixtures = []; G.knock = {}; G.groups = {};
+  const s0 = nthWeekday(Y, 7, 6, 3); // 3rd Saturday of Aug
+  // leagues (MLS 30 clubs: single round-robin, everyone else double)
+  DB.leagues.forEach((L, li) => {
+    const ids = leagueClubs(G, li).map(c => c.id);
+    let rounds = roundRobin(shuffle(ids));
+    if (ids.length < 26) rounds = rounds.concat(rounds.map(rd => rd.map(([h, a]) => [a, h]))); // MLS (30 clubs) plays single round-robin
+    const dates = leagueDates(rounds.length, s0);
+    rounds.forEach((rd, r) => rd.forEach(([h, a]) =>
+      G.fixtures.push({ c: 'L' + li, r: r + 1, t: dates[r], h, a, hg: 0, ag: 0, pl: false })));
+  });
+  // domestic cups: 32 entrants (all D1 + best of D2), Wednesdays
+  const cupWeds = [[8, 2], [9, 2], [10, 2], [2, 2], [4, 3]].map(([m, n]) => nthWeekday(seasonMonth(Y, m), m, 3, n));
+  G.cupCountries = DB.leagues.map((L, li) => L.play && L.level === 1 ? li : -1).filter(li => li >= 0);
+  for (const li of G.cupCountries) {
+    const L = DB.leagues[li];
+    let entrants = leagueClubs(G, li);
+    if (L.d2 != null) entrants = entrants.concat(leagueClubs(G, L.d2).sort((a, b) => power(b) - power(a)).slice(0, 32 - entrants.length));
+    const size = entrants.length >= 32 ? 32 : 16;
+    entrants = entrants.sort((a, b) => power(b) - power(a)).slice(0, size);
+    G.knock['C' + li] = { name: CUP_NAMES[L.country], flag: L.flag, alive: entrants.map(c => c.id), dates: cupWeds.slice(5 - Math.log2(size)), round: 0 };
+    drawRound(G, 'C' + li);
+  }
+  // Europe: UCL + UEL groups (Tue / Thu), knockout later
+  const slots = { 'Premier League': 4, 'La Liga': 4, 'Bundesliga': 4, 'Serie A': 4, 'Ligue 1': 3, 'Primeira Liga': 2, 'Süper Lig': 2 };
+  const ranked = li => (G.lastTables && G.lastTables[li] || leagueClubs(G, li).sort((a, b) => power(b) - power(a)).map(c => c.id))
+    .filter(id => DB.leagues[G.clubs[id].lg].level === 1); // relegated clubs don't play in Europe
+  let ucl = [], uel = [];
+  for (const [li, L] of DB.leagues.entries()) {
+    if (!L.uefa) continue;
+    const ids = ranked(li), n = slots[L.name] || 2;
+    ucl.push(...ids.slice(0, n));
+    uel.push(...ids.slice(n, n + 3));
+  }
+  const rest = DB.leagues.flatMap((L, li) => L.uefa ? ranked(li) : []).filter(id => !ucl.includes(id) && !uel.includes(id))
+    .sort((a, b) => power(G.clubs[b]) - power(G.clubs[a]));
+  while (ucl.length < 32) ucl.push(uel.length ? uel.shift() : rest.shift());
+  while (uel.length < 32) uel.push(rest.shift());
+  const groupDays = wd => [[8, 3], [9, 1], [9, 4], [10, 2], [11, 1], [11, 2]].map(([m, n]) => nthWeekday(seasonMonth(Y, m), m, wd, n));
+  const koDays = wd => [[1, 3], [3, 2], [3, 4]].map(([m, n]) => nthWeekday(seasonMonth(Y, m), m, wd, n));
+  for (const [comp, teams, wd] of [['UCL', ucl, 2], ['UEL', uel, 4]]) {
+    const pots = [0, 1, 2, 3].map(i => shuffle(teams.slice().sort((a, b) => power(G.clubs[b]) - power(G.clubs[a])).slice(i * 8, i * 8 + 8)));
+    G.groups[comp] = Array.from({ length: 8 }, (_, g) => pots.map(pot => pot[g]));
+    const dates = groupDays(wd);
+    G.groups[comp].forEach((grp, gi) => {
+      const rr = roundRobin(grp);
+      rr.concat(rr.map(rd => rd.map(([h, a]) => [a, h]))).forEach((rd, r) =>
+        rd.forEach(([h, a]) => G.fixtures.push({ c: comp + 'g', g: gi, r: r + 1, t: dates[r], h, a, hg: 0, ag: 0, pl: false })));
+    });
+    G.knock[comp] = { name: comp === 'UCL' ? 'Champions League' : 'Europa League', flag: '⭐', alive: null, // seeded after groups
+      dates: koDays(wd).concat(nthWeekday(Y + 1, 4, 6, 4) + (comp === 'UEL' ? -2 * DAY : 0)), round: 0 };
+  }
+  G.seasonOver = false;
 }
 
-// ---------- selection & strength ----------
-const FORMATIONS = { '4-4-2': [4, 4, 2], '4-3-3': [4, 3, 3], '3-5-2': [3, 5, 2], '4-5-1': [4, 5, 1], '5-3-2': [5, 3, 2] };
+function drawRound(G, comp) {
+  const K = G.knock[comp];
+  const t = K.dates[K.round];
+  const order = shuffle(K.alive);
+  for (let i = 0; i < order.length; i += 2)
+    G.fixtures.push({ c: comp, r: K.round + 1, stage: STAGE(order.length), t, h: order[i], a: order[i + 1], hg: 0, ag: 0, pl: false });
+}
 
+// knockout ties can't end level: penalties, slightly biased to the stronger side
+function settleTie(G, f) {
+  if (f.hg !== f.ag) return f.hg > f.ag ? f.h : f.a;
+  f.pen = Math.random() < 0.5 + (power(G.clubs[f.h]) - power(G.clubs[f.a])) * 0.02 ? f.h : f.a;
+  return f.pen;
+}
+
+const EURO_PRIZE = { UCL: [10e6, 12e6, 15e6, 25e6], UEL: [4e6, 5e6, 6e6, 10e6] };
+function progressComps(G) {
+  // group stages done → seed knockouts
+  for (const comp of ['UCL', 'UEL']) {
+    const K = G.knock[comp];
+    if (!K.alive && G.fixtures.filter(f => f.c === comp + 'g').every(f => f.pl)) {
+      K.alive = G.groups[comp].flatMap((grp, gi) => table(G, comp + 'g', grp, gi).slice(0, 2).map(r => r.id));
+      drawRound(G, comp);
+      news(G, `⭐ ${K.name} group stage complete — knockout rounds drawn.`);
+    }
+  }
+  // knockout rounds done → next round or champion
+  for (const [comp, K] of Object.entries(G.knock)) {
+    if (!K.alive || K.alive.length < 2) continue;
+    const cur = G.fixtures.filter(f => f.c === comp && f.r === K.round + 1);
+    if (!cur.length || !cur.every(f => f.pl)) continue;
+    K.alive = cur.map(f => settleTie(G, f));
+    K.round++;
+    const prize = EURO_PRIZE[comp];
+    if (prize) for (const id of K.alive) G.clubs[id].budget += prize[Math.min(K.round - 1, 3)];
+    if (K.alive.length === 1) {
+      const winner = G.clubs[K.alive[0]];
+      winner.budget += prize ? prize[3] : 5e6;
+      winner.morale = clamp(winner.morale + 10, 30, 99);
+      news(G, `🏆 ${winner.n} win the ${K.name}!`);
+      if (winner.id === G.userClub) {
+        G.trophies.push(`${K.name} — ${G.year}/${(G.year + 1) % 100}`);
+        G.rep = clamp(G.rep + (comp === 'UCL' ? 15 : comp === 'UEL' ? 8 : 5), 0, 100);
+      }
+    } else drawRound(G, comp);
+  }
+}
+
+// ---------- selection & match sim ----------
+const FORMATIONS = { '4-4-2': [4, 4, 2], '4-3-3': [4, 3, 3], '3-5-2': [3, 5, 2], '4-5-1': [4, 5, 1], '5-3-2': [5, 3, 2] };
 function bestXI(c) {
-  const need = { GK: 1 };
   const [d, m, a] = FORMATIONS[c.formation] || [4, 3, 3];
-  need.DF = d; need.MF = m; need.AT = a;
+  const need = { GK: 1, DF: d, MF: m, AT: a };
   const fit = c.players.filter(p => !p.injury).sort((x, y) => y.ovr * y.fit - x.ovr * x.fit);
   const xi = [];
   for (const pos of ['GK', 'DF', 'MF', 'AT'])
     xi.push(...fit.filter(p => p.pos === pos && !xi.includes(p)).slice(0, need[pos]));
-  // short in a position: pad with best remaining bodies (even injured, last resort)
   for (const p of fit.concat(c.players)) { if (xi.length >= 11) break; if (!xi.includes(p)) xi.push(p); }
   return xi;
 }
 function strength(c, xi, home) {
   const avgOvr = xi.reduce((s, p) => s + p.ovr, 0) / xi.length;
   const avgFit = xi.reduce((s, p) => s + p.fit, 0) / xi.length;
-  return avgOvr + (c.morale - 70) / 10 + (avgFit - 85) / 10 + (home ? 2.5 : 0);
+  const ment = c.mentality === 'attacking' ? 2 : c.mentality === 'defensive' ? -2 : 0;
+  return avgOvr + (c.morale - 70) / 10 + (avgFit - 85) / 10 + (home ? 2.5 : 0) + ment;
 }
-
-// ---------- match sim ----------
 function simMatch(G, hc, ac, detailed) {
   const hXI = bestXI(hc), aXI = bestXI(ac);
-  const ment = m => m === 'attacking' ? 2 : m === 'defensive' ? -2 : 0;
-  const hs = strength(hc, hXI, true) + ment(hc.mentality);
-  const as = strength(ac, aXI, false) + ment(ac.mentality);
+  const hs = strength(hc, hXI, true), as = strength(ac, aXI, false);
   let hg = 0, ag = 0;
   const ev = [], scorers = { h: [], a: [] };
-  const pickScorer = xi => { // attackers score most
+  const pickScorer = xi => {
     const pool = xi.flatMap(p => Array(p.pos === 'AT' ? 8 : p.pos === 'MF' ? 3 : p.pos === 'DF' ? 1 : 0).fill(p));
     return pool.length ? pick(pool) : xi[0];
   };
@@ -150,23 +227,22 @@ function simMatch(G, hc, ac, detailed) {
       const my = side === 'h' ? hs : as, opp = side === 'h' ? as : hs;
       const c = side === 'h' ? hc : ac, xi = side === 'h' ? hXI : aXI;
       const r = clamp(my / opp, 0.6, 1.7);
-      if (Math.random() < 0.13 * r * r) { // chance created
+      if (Math.random() < 0.13 * r * r) {
         const shooter = pickScorer(xi);
         if (Math.random() < 0.105 * r) {
           side === 'h' ? hg++ : ag++;
           shooter.sg++;
           scorers[side].push(shooter.name + " " + min + "'");
-          let txt = `⚽ ${min}' GOAL! ${shooter.name} scores for ${c.short}!`;
+          let txt = `⚽ ${min}' GOAL! ${shooter.name} scores for ${c.s}!`;
           const mates = xi.filter(p => p !== shooter && p.pos !== 'GK');
           if (Math.random() < 0.65 && mates.length) { const a2 = pick(mates); a2.sa++; txt += ` (assist: ${a2.name})`; }
           ev.push({ min, txt, goal: side, score: `${hg}-${ag}` });
         } else if (detailed && Math.random() < 0.25) {
-          ev.push({ min, txt: `${min}' ${shooter.name} (${c.short}) shoots — ${pick(['saved!', 'just wide!', 'off the bar!', 'blocked!'])}` });
+          ev.push({ min, txt: `${min}' ${shooter.name} (${c.s}) shoots — ${pick(['saved!', 'just wide!', 'off the bar!', 'blocked!'])}` });
         }
       }
     }
   }
-  // post-match effects
   const ratings = [];
   for (const [c, xi, gf, ga] of [[hc, hXI, hg, ag], [ac, aXI, ag, hg]]) {
     const res = gf > ga ? 1 : gf < ga ? -1 : 0;
@@ -174,52 +250,57 @@ function simMatch(G, hc, ac, detailed) {
     for (const p of xi) {
       p.apps++;
       p.fit = clamp(p.fit - rnd(8, 15), 20, 100);
-      if (Math.random() < 0.035) { p.injury = 5 + R(25); ev.push({ min: 90, txt: `🩹 ${p.name} (${c.short}) picked up an injury (${p.injury} days).` }); }
+      if (Math.random() < 0.035) { p.injury = 5 + R(25); if (detailed) ev.push({ min: 90, txt: `🩹 ${p.name} (${c.s}) picked up an injury (${p.injury} days).` }); }
       const g = scorers.h.concat(scorers.a).filter(s => s.startsWith(p.name + ' ')).length;
-      ratings.push({ club: c.id, name: p.name, pos: p.pos, r: Math.round(clamp(6.4 + g * 1.2 + res * 0.4 + rnd(-0.7, 0.7), 4, 10) * 10) / 10 });
+      if (detailed) ratings.push({ club: c.id, name: p.name, pos: p.pos, r: Math.round(clamp(6.4 + g * 1.2 + res * 0.4 + rnd(-0.7, 0.7), 4, 10) * 10) / 10 });
     }
   }
   return { hg, ag, ev, scorers, ratings };
 }
 
-function playRound(G) {
-  const todays = G.fixtures.filter(f => f.t === G.time && !f.played);
+function playDay(G) {
+  const todays = G.fixtures.filter(f => f.t === G.time && !f.pl);
   const out = { others: [], user: null };
   for (const f of todays) {
     const hc = G.clubs[f.h], ac = G.clubs[f.a];
     const isUser = f.h === G.userClub || f.a === G.userClub;
     const res = simMatch(G, hc, ac, isUser);
-    f.hg = res.hg; f.ag = res.ag; f.played = true;
+    f.hg = res.hg; f.ag = res.ag; f.pl = true;
     if (isUser) {
       out.user = { f, ...res };
       const me = G.clubs[G.userClub];
-      if (f.h === G.userClub) { // gate receipts
-        const gate = (35000 - me.tier * 5000) * 30;
+      if (f.h === G.userClub) {
+        const gate = Math.round(clamp(initialBudget(me) * 0.03, 50e3, 5e6) / 1e4) * 1e4;
         me.budget += gate;
         G.tx.push({ t: G.time, txt: 'Matchday gate receipts', amt: gate });
       }
     } else out.others.push(f);
   }
-  if (G.fixtures.every(f => f.played)) G.seasonOver = true;
+  if (todays.length) progressComps(G);
+  if (G.fixtures.every(f => f.pl)) G.seasonOver = true;
   return out;
 }
 
-// ---------- table ----------
-function table(G) {
-  const rows = G.clubs.map(c => ({ id: c.id, name: c.name, short: c.short, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }));
+// ---------- tables ----------
+function table(G, comp, subset, group) {
+  const clubs = subset ? subset.map(id => G.clubs[id]) : leagueClubs(G, +comp.slice(1));
+  const rows = new Map(clubs.map(c => [c.id, { id: c.id, name: c.n, short: c.s, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 }]));
   for (const f of G.fixtures) {
-    if (!f.played) continue;
-    const h = rows[f.h], a = rows[f.a];
+    if (f.c !== comp || !f.pl || (group !== undefined && f.g !== group)) continue;
+    const h = rows.get(f.h), a = rows.get(f.a);
+    if (!h || !a) continue;
     h.p++; a.p++; h.gf += f.hg; h.ga += f.ag; a.gf += f.ag; a.ga += f.hg;
     if (f.hg > f.ag) { h.w++; h.pts += 3; a.l++; }
     else if (f.hg < f.ag) { a.w++; a.pts += 3; h.l++; }
     else { h.d++; a.d++; h.pts++; a.pts++; }
   }
-  return rows.sort((x, y) => y.pts - x.pts || (y.gf - y.ga) - (x.gf - x.ga) || y.gf - x.gf);
+  return [...rows.values()].sort((x, y) => y.pts - x.pts || (y.gf - y.ga) - (x.gf - x.ga) || y.gf - x.gf);
 }
 
 // ---------- calendar ----------
 const windowOpen = G => [0, 5, 6, 7].includes(new Date(G.time).getUTCMonth()); // Jan + Jun–Aug
+const wageBill = c => c.players.reduce((s, p) => s + p.wage, 0);
+function news(G, txt) { G.news.unshift({ t: G.time, txt }); if (G.news.length > 80) G.news.length = 80; }
 
 function advanceDay(G) {
   G.time += DAY;
@@ -228,35 +309,81 @@ function advanceDay(G) {
     if (p.injury > 0) p.injury--;
     p.fit = clamp(p.fit + 3, 20, 100);
   }
-  G.clubs[G.userClub].budget -= wageBill(G.clubs[G.userClub]) / 7;
-  if ((d.getUTCMonth() === 8 || d.getUTCMonth() === 1) && d.getUTCDate() === 1) {
-    aiTransfers(G);
-    news(G, '🚪 The transfer window has closed.');
+  const me = G.clubs[G.userClub];
+  me.budget -= wageBill(me) / 7;
+  if (d.getUTCDate() === 1) { // monthly broadcast money keeps real wage bills payable
+    const TV = { 'Premier League': 12e6, 'La Liga': 8e6, 'Bundesliga': 7e6, 'Serie A': 6.5e6, 'Ligue 1': 5e6, 'Primeira Liga': 2.5e6, 'Saudi Pro League': 6e6, 'MLS': 3e6, 'Süper Lig': 2e6 };
+    const tv = TV[DB.leagues[me.lg].name] || 1e6;
+    me.budget += tv;
+    G.tx.push({ t: G.time, txt: 'Broadcast revenue', amt: tv });
   }
+  if ((d.getUTCMonth() === 8 || d.getUTCMonth() === 1) && d.getUTCDate() === 1) news(G, '🚪 The transfer window has closed.');
   if (G.seasonOver) return 'seasonEnd';
-  if (G.fixtures.some(f => f.t === G.time && !f.played)) return 'match';
+  if (G.fixtures.some(f => f.t === G.time && !f.pl)) {
+    if (G.fixtures.some(f => f.t === G.time && !f.pl && (f.h === G.userClub || f.a === G.userClub))) return 'match';
+    playDay(G); // world plays on without you
+  }
+  if (windowOpen(G)) { // after fixtures so an offer never swallows a match day
+    if (R(3) === 0) aiTransfers(G, 4);
+    if (Math.random() < 0.05 && makeOffer(G)) return 'offer';
+  }
   return null;
 }
 
-function news(G, txt) { G.news.unshift({ t: G.time, txt }); G.news.length = Math.min(G.news.length, 60); }
-
-// ---------- AI transfers (window close shuffle) ----------
-function aiTransfers(G) {
-  for (let i = 0; i < 20; i++) {
-    const seller = pick(G.clubs), buyer = pick(G.clubs);
-    if (seller.id === buyer.id || seller.id === G.userClub || buyer.id === G.userClub) continue;
-    if (seller.players.length <= 18 || buyer.players.length >= 30) continue;
-    const p = pick(seller.players);
-    const fee = Math.round(p.value * rnd(0.9, 1.2));
-    if (buyer.budget < fee || p.ovr > 72 + (5 - buyer.tier) * 6) continue;
+// ---------- AI transfers ----------
+function aiTransfers(G, n) {
+  for (let i = 0; i < n; i++) {
+    const buyer = pick(G.clubs);
+    if (buyer.id === G.userClub || buyer.players.length >= 32) continue;
+    const L = DB.leagues[buyer.lg];
+    const pw = power(buyer);
+    const cands = [];
+    for (const seller of G.clubs) {
+      if (seller.id === buyer.id || seller.id === G.userClub || seller.players.length <= 19) continue;
+      for (const p of seller.players) {
+        if (p.value > buyer.budget * (L.rich ? 1 : 0.7)) continue;
+        if (L.rich ? (p.ovr < 80 || p.age < 25) : L.name === 'MLS' ? p.age < 30 && p.ovr > pw + 4 : Math.abs(p.ovr - pw) > 6) continue;
+        cands.push([p, seller]);
+      }
+    }
+    if (!cands.length) continue;
+    const [p, seller] = pick(cands);
+    const fee = Math.round(p.value * (L.rich ? rnd(1.3, 1.8) : rnd(0.95, 1.3)));
+    if (fee > buyer.budget) continue;
     seller.players.splice(seller.players.indexOf(p), 1);
     buyer.players.push(p);
     buyer.budget -= fee; seller.budget += fee;
-    if (p.ovr >= 74) news(G, `🔁 ${p.name} (${p.ovr}) joins ${buyer.name} from ${seller.name} for £${(fee / 1e6).toFixed(1)}M.`);
+    p.years = 2 + R(3); p.listed = false;
+    if (p.ovr >= 82 || fee >= 40e6) news(G, `🔁 ${p.name} (${p.ovr}) joins ${buyer.n} from ${seller.n} for €${(fee / 1e6).toFixed(1)}M.`);
   }
 }
+function makeOffer(G) { // AI bids for the user's stars during windows
+  const me = G.clubs[G.userClub];
+  const stars = me.players.slice().sort((a, b) => b.value - a.value).slice(0, 4);
+  const p = pick(stars);
+  if (!p || p.value < 2e6) return false;
+  const rich = Math.random() < 0.4;
+  const pool = G.clubs.filter(c => c.id !== G.userClub && (rich ? DB.leagues[c.lg].rich : power(c) >= p.ovr - 4) && c.budget > p.value);
+  if (!pool.length) return false;
+  const buyer = pick(pool);
+  const fee = Math.round(p.value * (DB.leagues[buyer.lg].rich ? rnd(1.3, 2.0) : rnd(0.9, 1.2)) / 1e5) * 1e5;
+  G.pendingOffer = { cid: buyer.id, pid: p.id, fee };
+  return true;
+}
+function acceptOffer(G) {
+  const { cid, pid, fee } = G.pendingOffer;
+  const me = G.clubs[G.userClub], buyer = G.clubs[cid];
+  const p = me.players.find(p => p.id === pid);
+  G.pendingOffer = null;
+  if (!p) return;
+  me.players.splice(me.players.indexOf(p), 1);
+  buyer.players.push(p);
+  me.budget += fee; buyer.budget -= fee;
+  G.tx.push({ t: G.time, txt: `Sold ${p.name} to ${buyer.n}`, amt: fee });
+  news(G, `💰 ${p.name} sold to ${buyer.n} for €${(fee / 1e6).toFixed(1)}M.`);
+}
 
-// ---------- user transfer helpers ----------
+// ---------- user transfers ----------
 function bid(G, p, seller, offer) {
   if (offer >= p.value * rnd(0.95, 1.25)) return { ok: true, fee: offer, wage: Math.round(p.wage * 1.25 / 100) * 100 };
   return { ok: false, counter: Math.round(p.value * 1.25 / 1e5) * 1e5 };
@@ -268,10 +395,9 @@ function signPlayer(G, p, seller, fee, wage) {
   me.budget -= fee; seller.budget += fee;
   p.wage = wage; p.years = 4; p.listed = false;
   G.tx.push({ t: G.time, txt: 'Signed ' + p.name, amt: -fee });
-  news(G, `✍️ ${p.name} signs for ${me.name} for £${(fee / 1e6).toFixed(1)}M!`);
+  news(G, `✍️ ${p.name} signs for ${me.n} for €${(fee / 1e6).toFixed(1)}M!`);
 }
 function sellPlayer(G, p) {
-  const me = G.clubs[G.userClub];
   const buyer = pick(G.clubs.filter(c => c.id !== G.userClub));
   const fee = Math.round(p.value * rnd(0.8, 1.05) / 1e5) * 1e5;
   return { buyer, fee };
@@ -281,8 +407,8 @@ function completeSale(G, p, buyer, fee) {
   me.players.splice(me.players.indexOf(p), 1);
   buyer.players.push(p);
   me.budget += fee;
-  G.tx.push({ t: G.time, txt: 'Sold ' + p.name + ' to ' + buyer.name, amt: fee });
-  news(G, `💰 ${p.name} sold to ${buyer.name} for £${(fee / 1e6).toFixed(1)}M.`);
+  G.tx.push({ t: G.time, txt: 'Sold ' + p.name + ' to ' + buyer.n, amt: fee });
+  news(G, `💰 ${p.name} sold to ${buyer.n} for €${(fee / 1e6).toFixed(1)}M.`);
 }
 
 // ---------- season end ----------
@@ -291,34 +417,53 @@ function developPlayer(p) {
   if (p.age <= 21) d = rnd(1, 4); else if (p.age <= 27) d = rnd(0, 2);
   else if (p.age >= 33) d = -rnd(2, 4); else if (p.age >= 31) d = -rnd(0, 2);
   if (d > 0) d = Math.min(d, p.pot - p.ovr);
-  ATTRS.forEach(a => p[a] = Math.round(clamp(p[a] + d * rnd(0.6, 1.4), 30, 99)));
-  refresh(p);
+  d = Math.round(d);
+  p.ovr = clamp(p.ovr + d, 30, 99);
+  p.a = p.a.map(v => Math.round(clamp(v + d * rnd(0.7, 1.3), 20, 99)));
+  p.value = calcValue(p);
 }
 
 function endSeason(G) {
-  const tab = table(G);
-  const champion = G.clubs[tab[0].id];
-  const userPos = tab.findIndex(r => r.id === G.userClub) + 1;
   const me = G.clubs[G.userClub];
-  // prize money
-  const prize = Math.round((21 - userPos) * 1.2e6);
+  const userLg = me.lg, L = DB.leagues[userLg];
+  G.lastTables = {};
+  const champions = [];
+  DB.leagues.forEach((LL, li) => {
+    const tab = table(G, 'L' + li);
+    G.lastTables[li] = tab.map(r => r.id);
+    if (LL.level === 1) champions.push(`${LL.flag} ${LL.name}: ${tab[0].name}`);
+    if (li === userLg) {
+      G.userPos = tab.findIndex(r => r.id === G.userClub) + 1;
+      if (G.userPos === 1) {
+        G.trophies.push(`${LL.name} Champions — ${G.year}/${(G.year + 1) % 100}`);
+        G.rep = clamp(G.rep + (LL.level === 1 ? 10 : 5), 0, 100);
+      }
+    }
+  });
+  const prize = Math.round((leagueClubs(G, userLg).length - G.userPos + 1) * (L.level === 1 ? 2e6 : 0.5e6) * (L.name === 'Premier League' ? 2 : 1));
   me.budget += prize;
-  G.tx.push({ t: G.time, txt: `Season ${G.season} prize money (finished ${userPos})`, amt: prize });
-  // awards
-  const all = G.clubs.flatMap(c => c.players.map(p => ({ p, c })));
-  const top = k => all.slice().sort((x, y) => k(y.p) - k(x.p))[0];
-  const snap = x => ({ name: x.p.name, club: x.c.short, goals: x.p.sg, assists: x.p.sa, age: x.p.age });
-  const awards = { // snapshot now: stats reset below
-    userPos, prize, champion: champion.name,
-    topScorer: snap(top(p => p.sg)), bestPlayer: snap(top(p => p.sg + p.sa)),
-    bestYoung: snap(all.filter(x => x.p.age <= 21).sort((x, y) => y.p.ovr - x.p.ovr)[0]),
+  G.tx.push({ t: G.time, txt: `Season ${G.season} prize money (finished ${G.userPos})`, amt: prize });
+  G.rep = clamp(G.rep + (G.userPos <= 4 ? 3 : G.userPos <= 10 ? 1 : -2), 0, 100);
+  // promotion & relegation (bottom 3 ↔ top 3; nobody drops out of D2)
+  const proms = [];
+  DB.leagues.forEach((LL, li) => {
+    if (LL.d2 == null) return;
+    const down = G.lastTables[li].slice(-3), up = G.lastTables[LL.d2].slice(0, 3);
+    for (const id of down) G.clubs[id].lg = LL.d2;
+    for (const id of up) G.clubs[id].lg = li;
+    proms.push(`${LL.flag} Promoted: ${up.map(id => G.clubs[id].n).join(', ')} — Relegated: ${down.map(id => G.clubs[id].n).join(', ')}`);
+  });
+  // awards from the user's league (all-competition stats)
+  const lgPlayers = leagueClubs(G, userLg).flatMap(c => c.players.map(p => ({ p, c })));
+  const snap = x => x ? { name: x.p.name, club: x.c.s, goals: x.p.sg, assists: x.p.sa, age: x.p.age } : null;
+  const awards = {
+    topScorer: snap(lgPlayers.slice().sort((a, b) => b.p.sg - a.p.sg)[0]),
+    bestPlayer: snap(lgPlayers.slice().sort((a, b) => (b.p.sg + b.p.sa) - (a.p.sg + a.p.sa))[0]),
+    bestYoung: snap(lgPlayers.filter(x => x.p.age <= 21).sort((a, b) => b.p.ovr - a.p.ovr)[0]),
   };
-  // manager rep + trophies
-  G.rep = clamp(G.rep + (userPos <= 4 ? 5 : userPos <= 10 ? 2 : -3) + (userPos === 1 ? 10 : 0), 0, 100);
-  if (userPos === 1) G.trophies.push(`League Champions — Season ${G.season} (${G.year}/${G.year + 1 - 2000})`);
-  news(G, `🏆 ${champion.name} are champions! You finished ${userPos}.`);
-  // aging, growth, retirement, contracts
+  // aging, growth, retirement, contracts, youth intake
   for (const c of G.clubs) {
+    const country = DB.leagues[c.lg].country;
     for (const p of c.players.slice()) {
       p.age++;
       developPlayer(p);
@@ -326,51 +471,58 @@ function endSeason(G) {
       p.years--;
       if (p.age >= 35 && Math.random() < (p.age - 34) * 0.35) {
         c.players.splice(c.players.indexOf(p), 1);
-        if (c.id === G.userClub || p.ovr >= 80) news(G, `👋 ${p.name} (${p.age}) has retired.`);
+        if (c.id === G.userClub || p.ovr >= 84) news(G, `👋 ${p.name} (${p.age}) has retired.`);
         continue;
       }
       if (p.years <= 0) {
-        if (c.id !== G.userClub && Math.random() < 0.8) { p.years = 1 + R(3); continue; } // AI auto-renews
+        if (c.id !== G.userClub && Math.random() < 0.8) { p.years = 1 + R(3); continue; }
         c.players.splice(c.players.indexOf(p), 1);
         if (c.id === G.userClub) news(G, `📄 ${p.name} left on a free — contract expired.`);
       }
     }
-    // youth intake: 3 kids, quality tied to club tier (ponytail: no academy facility levels yet)
-    for (let i = 0; i < 3; i++) c.players.push(genPlayer(c.tier, 16 + R(3)));
-    c.budget = Math.max(c.budget, TIER_BUDGET[c.tier] * 0.6); // board tops up AI + floor for user
+    for (let i = 0; i < 3; i++) c.players.push(genYouth(country));
+    c.budget = Math.max(c.budget, initialBudget(c));
     c.morale = 70;
   }
-  news(G, `🌱 Youth academy: 3 new prospects joined the academy.`);
-  // next season
+  news(G, `🌱 Youth academy: 3 new prospects joined every academy.`);
   G.season++; G.year++;
-  G.seasonOver = false;
-  G.time = Date.UTC(G.year, 6, 15); // Jul 15
-  genFixtures(G);
-  return awards;
+  G.time = Date.UTC(G.year, 6, 10);
+  genSeason(G);
+  return { userPos: G.userPos, prize, champions, proms, awards };
 }
 
 // ---------- new game ----------
-function newGame(managerName, clubId) {
+function initialBudget(c) {
+  const L = DB.leagues[c.lg];
+  const sv = c.players.map(p => p.value).sort((a, b) => b - a).slice(0, 18).reduce((s, v) => s + v, 0);
+  const mult = (L.rich ? 2.5 : 1) * (L.name === 'Premier League' ? 1.4 : 1) * (L.level === 2 ? 0.8 : 1);
+  return Math.max(2e6, Math.round(sv * 0.12 * mult / 1e5) * 1e5);
+}
+function newGame(managerName, clubIdx) {
   nextId = 1;
   const G = {
-    season: 1, year: 2026, time: Date.UTC(2026, 6, 15),
-    managerName, userClub: clubId, rep: 30, trophies: [],
-    news: [], tx: [], seasonOver: false,
-    clubs: CLUB_DEFS.map(([name, short, tier, c1, c2], i) => ({
-      id: i, name, short, tier, c1, c2,
-      budget: TIER_BUDGET[tier], morale: 70,
-      formation: '4-3-3', mentality: 'balanced',
-      players: genSquad(tier),
+    season: 1, year: 2026, time: Date.UTC(2026, 6, 10),
+    managerName, userClub: clubIdx, rep: 30, trophies: [],
+    news: [], tx: [], seasonOver: false, pendingOffer: null,
+    clubs: DB.clubs.map((c, i) => ({
+      id: i, n: c.n, s: c.s, lg: c.lg, c1: c.c1, c2: c.c2,
+      morale: 70, formation: '4-3-3', mentality: 'balanced',
+      players: c.p.map(row => ({
+        id: nextId++, name: row[0], nat: row[1], pos: row[2], age: row[3],
+        ovr: row[4], pot: row[5], value: row[6], wage: row[7], years: row[8],
+        a: row.slice(9, 15), fit: 100, injury: 0, apps: 0, sg: 0, sa: 0, listed: false,
+      })),
     })),
   };
-  genFixtures(G);
-  news(G, `👔 ${managerName} appointed manager of ${G.clubs[clubId].name}. Welcome!`);
+  for (const c of G.clubs) c.budget = initialBudget(c);
+  genSeason(G);
+  news(G, `👔 ${managerName} appointed manager of ${G.clubs[clubIdx].n}. Welcome!`);
   return G;
 }
 
 const ENG = {
-  DAY, FORMATIONS, CLUB_DEFS, newGame, advanceDay, playRound, table, bestXI,
-  windowOpen, bid, signPlayer, sellPlayer, completeSale, endSeason, wageBill,
-  genPlayer, calcOvr, calcValue, refresh, news,
+  DAY, FORMATIONS, newGame, advanceDay, playDay, table, bestXI, power, leagueClubs,
+  windowOpen, bid, signPlayer, sellPlayer, completeSale, acceptOffer, endSeason, wageBill,
+  genYouth, calcValue, news,
 };
 if (typeof module !== 'undefined') module.exports = ENG;

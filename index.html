@@ -12,7 +12,7 @@
   button:hover { filter:brightness(1.2); }
   button.primary { background:var(--c1); color:var(--c2); font-weight:700; }
   input, select { font:inherit; background:#1a1f29; color:#e6e6e6; border:1px solid #333; border-radius:6px; padding:8px; }
-  .screen { display:none; max-width:1000px; margin:0 auto; padding:16px; }
+  .screen { display:none; max-width:1080px; margin:0 auto; padding:16px; }
   .screen.on { display:block; }
   h1 { letter-spacing:1px; } h2 { margin:10px 0; } h3 { margin:8px 0; }
   .badge { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--c1) 50%,var(--c2) 50%); display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#0e1117; text-shadow:0 0 3px #fff; flex:none; }
@@ -22,17 +22,18 @@
   nav button.act { background:var(--c1); color:var(--c2); }
   table.grid { width:100%; border-collapse:collapse; font-size:14px; }
   table.grid th, table.grid td { padding:6px 8px; text-align:left; border-bottom:1px solid #232a36; }
-  table.grid th { color:#8b93a3; font-weight:600; cursor:default; }
+  table.grid th { color:#8b93a3; font-weight:600; }
   table.grid tr.click:hover { background:#1a2130; cursor:pointer; }
   table.grid tr.me { background:rgba(255,255,255,.06); border-left:3px solid var(--c1); }
   .muted { color:#8b93a3; font-size:13px; }
   .card { background:#151a23; border-radius:10px; padding:14px; margin:10px 0; }
   .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .clubcard { background:#151a23; border-radius:10px; padding:14px; cursor:pointer; width:220px; }
+  .clubcard { background:#151a23; border-radius:10px; padding:14px; cursor:pointer; width:230px; }
   .clubcard:hover { outline:2px solid #fff3; }
+  .groups { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
   #modal-bg { display:none; position:fixed; inset:0; background:#000a; z-index:10; align-items:center; justify-content:center; }
   #modal-bg.on { display:flex; }
-  #modal { background:#151a23; border-radius:12px; padding:20px; max-width:520px; width:92%; max-height:85vh; overflow:auto; border-top:4px solid var(--c1); }
+  #modal { background:#151a23; border-radius:12px; padding:20px; max-width:560px; width:92%; max-height:85vh; overflow:auto; border-top:4px solid var(--c1); }
   .attr { display:inline-block; width:64px; text-align:center; background:#1a2130; border-radius:6px; padding:6px 2px; margin:2px; }
   .attr b { display:block; font-size:18px; }
   #ticker { background:#0a0d12; border-radius:10px; padding:12px; height:300px; overflow-y:auto; font-size:14px; line-height:1.7; }
@@ -40,7 +41,7 @@
   .inj { color:#ff6b6b; } .pos-GK{color:#f2c14e} .pos-DF{color:#6bb3ff} .pos-MF{color:#7ee08a} .pos-AT{color:#ff8f6b}
   .green { color:#7ee08a; } .red { color:#ff6b6b; }
   #menu { text-align:center; padding-top:9vh; }
-  #menu .card { max-width:420px; margin:12px auto; text-align:left; }
+  #menu .card { max-width:440px; margin:12px auto; text-align:left; }
 </style>
 </head>
 <body>
@@ -57,19 +58,19 @@
 
 <div id="menu" class="screen on">
   <h1>⚽ LOCKING IN FC</h1>
-  <p class="muted">Career Mode — 20 clubs, endless seasons, one job on the line.</p>
+  <p class="muted">Career Mode — real clubs, real players, real ratings.<br><span id="src"></span></p>
   <div class="card">
     <h3>New Career</h3>
-    <div class="row"><input id="mgr-name" placeholder="Your manager name" value="Alex Ferguson Jr">
+    <div class="row"><input id="mgr-name" placeholder="Your manager name" value="The Boss">
     <button class="primary" onclick="toPick()">Start ▶</button></div>
   </div>
   <div class="card"><h3>Load Career</h3><div id="slots"></div></div>
 </div>
 
 <div id="pick" class="screen">
-  <h2>Choose your club</h2>
-  <p class="muted">Tier 1 = title fights and big budgets. Tier 4 = the long road up.</p>
-  <div class="row" id="clublist"></div>
+  <h2>Choose a league</h2>
+  <div class="row" id="leaguelist"></div>
+  <div id="clubpick"></div>
 </div>
 
 <div id="hub" class="screen">
@@ -80,6 +81,7 @@
 <div id="match" class="screen">
   <div id="match-pre"></div>
   <div id="match-live" style="display:none">
+    <p class="muted" id="match-comp" style="text-align:center"></p>
     <div id="score"></div>
     <div id="ticker"></div>
     <div class="row" style="margin-top:10px"><button onclick="skipTicker()">⏩ Skip</button></div>
@@ -89,22 +91,32 @@
 
 <div id="modal-bg" onclick="if(event.target===this)closeModal()"><div id="modal"></div></div>
 
+<script src="data.js"></script>
 <script src="engine.js"></script>
 <script>
 'use strict';
 let G = null, tab = 'squad', tickerTimer = null;
 
 const $ = id => document.getElementById(id);
-const money = n => (n < 0 ? '-' : '') + (Math.abs(n) >= 1e6 ? '£' + (Math.abs(n)/1e6).toFixed(1) + 'M' : '£' + Math.round(Math.abs(n)/1e3) + 'k');
+const money = n => (n < 0 ? '-' : '') + (Math.abs(n) >= 1e6 ? '€' + (Math.abs(n) / 1e6).toFixed(1) + 'M' : '€' + Math.round(Math.abs(n) / 1e3) + 'k');
 const fdate = t => new Date(t).toUTCString().slice(0, 16);
 const me = () => G.clubs[G.userClub];
+const myLeague = () => DATA.leagues[me().lg];
 const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); };
-const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const badge = c => `<span class="badge" style="background:linear-gradient(135deg,${c.c1} 50%,${c.c2} 50%)">${esc(c.s)}</span>`;
 
 function theme(c) { document.documentElement.style.setProperty('--c1', c.c1); document.documentElement.style.setProperty('--c2', c.c2); }
 
-// ---------- menu / save / load ----------
-function slotKey(i) { return 'fcm_slot_' + i; }
+function compLabel(f) {
+  if (f.c[0] === 'L') return DATA.leagues[+f.c.slice(1)].name + ' · R' + f.r;
+  if (f.c === 'UCLg') return 'Champions League · Group ' + 'ABCDEFGH'[f.g] + ' MD' + f.r;
+  if (f.c === 'UELg') return 'Europa League · Group ' + 'ABCDEFGH'[f.g] + ' MD' + f.r;
+  return (G.knock[f.c] ? G.knock[f.c].name : f.c) + ' · ' + (f.stage || '');
+}
+
+// ---------- save / load ----------
+const slotKey = i => 'fcm_slot_' + i;
 function renderSlots() {
   let html = '';
   for (const i of [1, 2, 3, 'auto']) {
@@ -112,7 +124,7 @@ function renderSlots() {
     if (raw) {
       const s = JSON.parse(raw);
       html += `<div class="row" style="margin:6px 0"><button class="primary" onclick="loadGame('${i}')">Load</button>
-        <span>${i === 'auto' ? '🔄 Autosave' : 'Slot ' + i}: ${esc(s.managerName)} — ${esc(s.clubs[s.userClub].name)}, Season ${s.season}</span>
+        <span>${i === 'auto' ? '🔄 Autosave' : 'Slot ' + i}: ${esc(s.managerName)} — ${esc(s.clubs[s.userClub].n)}, Season ${s.season}</span>
         <button onclick="localStorage.removeItem('${slotKey(i)}');renderSlots()">🗑</button></div>`;
     } else if (i !== 'auto') html += `<div class="row muted" style="margin:6px 0">Slot ${i}: empty</div>`;
   }
@@ -120,112 +132,149 @@ function renderSlots() {
 }
 function saveGame() {
   const i = prompt('Save to slot (1, 2 or 3):', '1');
-  if (!['1','2','3'].includes(i)) return;
-  localStorage.setItem(slotKey(i), JSON.stringify(G));
-  alert('Saved to slot ' + i);
+  if (!['1', '2', '3'].includes(i)) return;
+  try { localStorage.setItem(slotKey(i), JSON.stringify(G)); alert('Saved to slot ' + i); }
+  catch (e) { alert('Storage full — delete another save slot first (browser limit).'); }
 }
 function autosave() { try { localStorage.setItem(slotKey('auto'), JSON.stringify(G)); } catch (e) {} }
-function loadGame(i) {
-  G = JSON.parse(localStorage.getItem(slotKey(i)));
-  enterHub();
-}
+function loadGame(i) { G = JSON.parse(localStorage.getItem(slotKey(i))); enterHub(); }
 function toMenu() { renderSlots(); show('menu'); $('top').style.display = 'none'; }
 
 // ---------- club pick ----------
 function toPick() {
-  const stars = t => '★'.repeat(5 - t) + '☆'.repeat(t - 1);
-  $('clublist').innerHTML = ENG.CLUB_DEFS.map(([name, short, tier, c1, c2], i) =>
-    `<div class="clubcard" onclick="startGame(${i})">
-      <span class="badge" style="background:linear-gradient(135deg,${c1} 50%,${c2} 50%)">${short}</span>
-      <h3>${name}</h3><div class="muted">Tier ${tier} ${stars(tier)} · Budget ${money(ENG.CLUB_DEFS[i] && [0,80e6,40e6,18e6,8e6][tier])}</div>
-    </div>`).join('');
+  $('leaguelist').innerHTML = DATA.leagues.map((L, li) => L.play ?
+    `<button onclick="pickLeague(${li})" style="font-size:15px">${L.flag} ${esc(L.name)}</button>` : '').join('');
+  $('clubpick').innerHTML = '<p class="muted" style="margin-top:14px">You can manage in any of the 11 leagues above. Saudi, MLS and Süper Lig clubs exist in the world to buy from and sell to (and they will come shopping).</p>';
   show('pick');
+}
+function pickLeague(li) {
+  const tmp = ENG.newGame('x', 0); // throwaway world to rank squads honestly
+  const clubs = ENG.leagueClubs(tmp, li).sort((a, b) => ENG.power(b) - ENG.power(a));
+  $('clubpick').innerHTML = `<h3 style="margin-top:14px">${DATA.leagues[li].flag} ${esc(DATA.leagues[li].name)}</h3><div class="row">` +
+    clubs.map(c => `<div class="clubcard" onclick="startGame(${c.id})">${badge(c)} <h3>${esc(c.n)}</h3>
+      <div class="muted">Squad ${ENG.power(c).toFixed(0)} OVR · Budget ${money(c.budget)}</div></div>`).join('') + '</div>';
 }
 function startGame(clubId) {
   G = ENG.newGame($('mgr-name').value.trim() || 'The Boss', clubId);
   enterHub();
 }
-
 function enterHub() {
   theme(me());
   $('top').style.display = 'flex';
-  tab = 'squad';
+  if (!Object.keys(TABS).includes(tab)) tab = 'squad';
   renderHub();
   show('hub');
 }
 
 // ---------- hub ----------
-const TABS = { squad: 'Squad', table: 'Table', fixtures: 'Fixtures', market: 'Transfers', finance: 'Finances', club: 'Club' };
+const TABS = { squad: 'Squad', table: 'Table', cups: 'Cups & Europe', fixtures: 'Fixtures', market: 'Transfers', finance: 'Finances', club: 'Club' };
 function renderHub() {
   const c = me();
-  $('h-badge').textContent = c.short;
+  $('h-badge').textContent = c.s;
   $('h-badge').style.background = `linear-gradient(135deg,${c.c1} 50%,${c.c2} 50%)`;
-  $('h-club').textContent = c.name;
-  $('h-mgr').textContent = `${G.managerName} · Rep ${G.rep} · Season ${G.season}`;
+  $('h-club').textContent = c.n;
+  $('h-mgr').textContent = `${myLeague().flag} ${myLeague().name} · ${G.managerName} · Rep ${G.rep} · Season ${G.season}`;
   $('h-date').textContent = fdate(G.time);
   $('h-money').textContent = `Budget ${money(c.budget)} · Wages ${money(ENG.wageBill(c))}/wk` + (ENG.windowOpen(G) ? ' · 🟢 window open' : '');
   $('tabs').innerHTML = Object.entries(TABS).map(([k, v]) =>
     `<button class="${tab === k ? 'act' : ''}" onclick="tab='${k}';renderHub()">${v}</button>`).join('');
-  $('tabbody').innerHTML = ({ squad: rSquad, table: rTable, fixtures: rFixtures, market: rMarket, finance: rFinance, club: rClub })[tab]();
+  $('tabbody').innerHTML = ({ squad: rSquad, table: rTable, cups: rCups, fixtures: rFixtures, market: rMarket, finance: rFinance, club: rClub })[tab]();
 }
 
 const posOrder = { GK: 0, DF: 1, MF: 2, AT: 3 };
-function playerRow(p, ownerId) {
+function playerRow(p, ownerId, showClub) {
+  const c = G.clubs[ownerId];
   return `<tr class="click" onclick="openPlayer(${p.id},${ownerId})">
     <td class="pos-${p.pos}">${p.pos}</td><td>${esc(p.name)} ${p.listed ? '🏷' : ''}${p.injury ? `<span class="inj"> 🩹${p.injury}d</span>` : ''}</td>
     <td>${p.age}</td><td><b>${p.ovr}</b></td><td>${p.fit}%</td><td>${p.sg}/${p.sa}</td>
-    <td>${money(p.value)}</td><td>${money(p.wage)}/wk · ${p.years}y</td></tr>`;
+    <td>${money(p.value)}</td><td>${showClub ? esc(c.s) + ' · ' + DATA.leagues[c.lg].flag : money(p.wage) + '/wk · ' + p.years + 'y'}</td></tr>`;
 }
 function rSquad() {
   const ps = me().players.slice().sort((a, b) => posOrder[a.pos] - posOrder[b.pos] || b.ovr - a.ovr);
   const xi = ENG.bestXI(me()).map(p => p.id);
-  return `<div class="card"><h3>Squad (${ps.length}) — starters in <b style="color:var(--c1)">▮</b></h3>
+  return `<div class="card"><h3>Squad (${ps.length}) — starting XI marked <b style="color:var(--c1)">▮</b></h3>
     <table class="grid"><tr><th>Pos</th><th>Name</th><th>Age</th><th>OVR</th><th>Fit</th><th>G/A</th><th>Value</th><th>Contract</th></tr>
     ${ps.map(p => playerRow(p, G.userClub).replace('<tr class="click"', xi.includes(p.id) ? '<tr class="click" style="border-left:3px solid var(--c1)"' : '<tr class="click"')).join('')}</table></div>`;
 }
 function rTable() {
-  const t = ENG.table(G);
-  const all = G.clubs.flatMap(c => c.players.map(p => ({ p, c }))).sort((a, b) => b.p.sg - a.p.sg).slice(0, 8);
-  return `<div class="card"><h3>League Table</h3><table class="grid">
-    <tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
-    ${t.map((r, i) => `<tr class="${r.id === G.userClub ? 'me' : ''}"><td>${i + 1}</td><td>${r.name}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf - r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}
+  const li = window._tblLg ?? me().lg;
+  const t = ENG.table(G, 'L' + li);
+  const scorers = ENG.leagueClubs(G, li).flatMap(c => c.players.map(p => ({ p, c }))).sort((a, b) => b.p.sg - a.p.sg).slice(0, 8);
+  return `<div class="card"><div class="row"><h3>League Table</h3>
+    <select onchange="window._tblLg=+this.value;renderHub()">${DATA.leagues.map((L, i) => `<option value="${i}" ${i === li ? 'selected' : ''}>${L.flag} ${esc(L.name)}</option>`).join('')}</select></div>
+    <table class="grid"><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+    ${t.map((r, i) => `<tr class="${r.id === G.userClub ? 'me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf - r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}
     </table></div>
-    <div class="card"><h3>Top Scorers</h3><table class="grid">${all.map(x => `<tr><td>${esc(x.p.name)}</td><td>${x.c.short}</td><td><b>${x.p.sg}</b> goals, ${x.p.sa} assists</td></tr>`).join('')}</table></div>`;
+    <div class="card"><h3>Top Scorers <span class="muted">(all competitions)</span></h3>
+    <table class="grid">${scorers.map(x => `<tr><td>${esc(x.p.name)}</td><td>${esc(x.c.s)}</td><td><b>${x.p.sg}</b> goals, ${x.p.sa} assists</td></tr>`).join('')}</table></div>`;
+}
+function rCups() {
+  const myCup = 'C' + (DATA.leagues[me().lg].level === 2 ? DATA.leagues.findIndex(L => L.d2 === me().lg) : me().lg);
+  const sel = window._cupSel || (G.knock[myCup] ? myCup : 'UCL');
+  const opts = [...G.cupCountries.map(li => 'C' + li), 'UCL', 'UEL'];
+  let html = `<div class="card"><div class="row"><h3>Competition</h3>
+    <select onchange="window._cupSel=this.value;renderHub()">${opts.map(k => `<option value="${k}" ${k === sel ? 'selected' : ''}>${G.knock[k].flag} ${esc(G.knock[k].name)}</option>`).join('')}</select></div></div>`;
+  if (sel === 'UCL' || sel === 'UEL') {
+    html += `<div class="card"><h3>Group Stage</h3><div class="groups">` + G.groups[sel].map((grp, gi) =>
+      `<div><b class="muted">Group ${'ABCDEFGH'[gi]}</b><table class="grid">` +
+      ENG.table(G, sel + 'g', grp, gi).map(r => `<tr class="${r.id === G.userClub ? 'me' : ''}"><td>${esc(r.short)}</td><td>${r.p}</td><td><b>${r.pts}</b></td></tr>`).join('') + '</table></div>').join('') + '</div></div>';
+  }
+  const ko = G.fixtures.filter(f => f.c === sel);
+  if (ko.length) {
+    const rounds = [...new Set(ko.map(f => f.r))];
+    html += '<div class="card"><h3>Knockout</h3>' + rounds.map(r => {
+      const fs = ko.filter(f => f.r === r);
+      return `<b class="muted">${esc(fs[0].stage)}</b><table class="grid">` + fs.map(f =>
+        `<tr class="${f.h === G.userClub || f.a === G.userClub ? 'me' : ''}"><td>${esc(G.clubs[f.h].n)}</td>
+        <td>${f.pl ? `<b>${f.hg}–${f.ag}</b>${f.pen !== undefined ? ' <span class="muted">(' + esc(G.clubs[f.pen].s) + ' win on pens)</span>' : ''}` : '<span class="muted">' + fdate(f.t).slice(0, 11) + '</span>'}</td>
+        <td>${esc(G.clubs[f.a].n)}</td></tr>`).join('') + '</table>';
+    }).join('') + '</div>';
+  } else if (!(sel === 'UCL' || sel === 'UEL')) html += '<p class="muted">Draw not made yet.</p>';
+  const K = G.knock[sel];
+  if (K.alive && K.alive.length === 1) html += `<div class="card">🏆 <b>${esc(G.clubs[K.alive[0]].n)}</b> are ${esc(K.name)} champions!</div>`;
+  return html;
 }
 function rFixtures() {
-  const mine = G.fixtures.filter(f => f.h === G.userClub || f.a === G.userClub);
-  return `<div class="card"><h3>Fixtures — Season ${G.season}</h3><table class="grid">
+  const mine = G.fixtures.filter(f => f.h === G.userClub || f.a === G.userClub).sort((a, b) => a.t - b.t);
+  return `<div class="card"><h3>My Fixtures — Season ${G.season}</h3><table class="grid">
     ${mine.map(f => {
       const home = f.h === G.userClub, opp = G.clubs[home ? f.a : f.h];
-      const res = f.played ? `<b>${f.hg}–${f.ag}</b>` : '<span class="muted">' + fdate(f.t).slice(0, 11) + '</span>';
-      const wdl = !f.played ? '' : (home ? f.hg > f.ag : f.ag > f.hg) ? '<span class="green">W</span>' : f.hg === f.ag ? 'D' : '<span class="red">L</span>';
-      return `<tr><td>R${f.round}</td><td>${home ? 'vs' : '@'} ${opp.name}</td><td>${res}</td><td>${wdl}</td></tr>`;
+      const res = f.pl ? `<b>${f.hg}–${f.ag}</b>` : '<span class="muted">' + fdate(f.t).slice(0, 11) + '</span>';
+      const wdl = !f.pl ? '' : (home ? f.hg > f.ag : f.ag > f.hg) ? '<span class="green">W</span>' : f.hg === f.ag ? 'D' : '<span class="red">L</span>';
+      return `<tr><td class="muted">${esc(compLabel(f))}</td><td>${home ? 'vs' : '@'} ${esc(opp.n)}</td><td>${res}</td><td>${wdl}</td></tr>`;
     }).join('')}</table></div>`;
 }
 function rMarket() {
   const open = ENG.windowOpen(G);
-  const posF = window._mposF || 'ALL';
+  const posF = window._mpos || 'ALL', lgF = window._mlg ?? -1, q = (window._mq || '').toLowerCase();
   let pool = G.clubs.filter(c => c.id !== G.userClub).flatMap(c => c.players.map(p => ({ p, c })));
   if (posF !== 'ALL') pool = pool.filter(x => x.p.pos === posF);
+  if (lgF >= 0) pool = pool.filter(x => x.c.lg === lgF);
+  if (q) pool = pool.filter(x => x.p.name.toLowerCase().includes(q));
   pool.sort((a, b) => b.p.ovr - a.p.ovr);
   return `<div class="card"><h3>Transfer Market ${open ? '🟢 open' : '🔴 closed — browse only'}</h3>
-    <div class="row">Position: ${['ALL','GK','DF','MF','AT'].map(x => `<button class="${posF===x?'act':''}" style="${posF===x?'background:var(--c1);color:var(--c2)':''}" onclick="window._mposF='${x}';renderHub()">${x}</button>`).join('')}</div>
+    <div class="row">
+      <input placeholder="Search player…" value="${esc(window._mq || '')}" oninput="window._mq=this.value;renderHub()" style="width:180px">
+      <select onchange="window._mlg=+this.value;renderHub()"><option value="-1">All leagues</option>${DATA.leagues.map((L, i) => `<option value="${i}" ${i === lgF ? 'selected' : ''}>${L.flag} ${esc(L.name)}</option>`).join('')}</select>
+      ${['ALL', 'GK', 'DF', 'MF', 'AT'].map(x => `<button style="${posF === x ? 'background:var(--c1);color:var(--c2)' : ''}" onclick="window._mpos='${x}';renderHub()">${x}</button>`).join('')}
+    </div>
     <table class="grid"><tr><th>Pos</th><th>Name</th><th>Age</th><th>OVR</th><th>Fit</th><th>G/A</th><th>Value</th><th>Club</th></tr>
-    ${pool.slice(0, 60).map(x => playerRow(x.p, x.c.id)).join('')}</table>
-    <p class="muted">Showing top 60. Click a player to bid.</p></div>`;
+    ${pool.slice(0, 80).map(x => playerRow(x.p, x.c.id, true)).join('')}</table>
+    <p class="muted">Showing ${Math.min(80, pool.length)} of ${pool.length}. Click a player to bid.</p></div>`;
 }
 function rFinance() {
   const c = me();
   return `<div class="card"><h3>Finances</h3>
-    <p>Balance: <b class="${c.budget < 0 ? 'red' : 'green'}">${money(c.budget)}</b> · Weekly wage bill: <b>${money(ENG.wageBill(c))}</b></p></div>
+    <p>Balance: <b class="${c.budget < 0 ? 'red' : 'green'}">${money(c.budget)}</b> · Weekly wage bill: <b>${money(ENG.wageBill(c))}</b></p>
+    <p class="muted">Income: monthly broadcast money, matchday gates, prize money, player sales. Outgoings: wages (daily), transfers.</p></div>
     <div class="card"><h3>Transactions</h3><table class="grid">
-    ${G.tx.slice(-25).reverse().map(t => `<tr><td class="muted">${fdate(t.t).slice(0,11)}</td><td>${esc(t.txt)}</td><td class="${t.amt<0?'red':'green'}">${money(t.amt)}</td></tr>`).join('') || '<tr><td class="muted">Nothing yet.</td></tr>'}</table></div>`;
+    ${G.tx.slice(-30).reverse().map(t => `<tr><td class="muted">${fdate(t.t).slice(0, 11)}</td><td>${esc(t.txt)}</td><td class="${t.amt < 0 ? 'red' : 'green'}">${money(t.amt)}</td></tr>`).join('') || '<tr><td class="muted">Nothing yet.</td></tr>'}</table></div>`;
 }
 function rClub() {
   const c = me();
   return `<div class="card"><h3>Tactics</h3><div class="row">
-      Formation <select onchange="me().formation=this.value">${Object.keys(ENG.FORMATIONS).map(f => `<option ${c.formation===f?'selected':''}>${f}</option>`).join('')}</select>
-      Mentality <select onchange="me().mentality=this.value">${['defensive','balanced','attacking'].map(m => `<option ${c.mentality===m?'selected':''}>${m}</option>`).join('')}</select>
+      Formation <select onchange="me().formation=this.value">${Object.keys(ENG.FORMATIONS).map(f => `<option ${c.formation === f ? 'selected' : ''}>${f}</option>`).join('')}</select>
+      Mentality <select onchange="me().mentality=this.value">${['defensive', 'balanced', 'attacking'].map(m => `<option ${c.mentality === m ? 'selected' : ''}>${m}</option>`).join('')}</select>
       <span class="muted">Team morale: ${c.morale}/100</span></div></div>
     <div class="card"><h3>Manager: ${esc(G.managerName)}</h3>
       <p>Reputation: <b>${G.rep}/100</b></p>
@@ -238,8 +287,8 @@ function findPlayer(id, clubId) { return G.clubs[clubId].players.find(p => p.id 
 function openPlayer(id, clubId) {
   const p = findPlayer(id, clubId), own = clubId === G.userClub, c = G.clubs[clubId];
   const open = ENG.windowOpen(G);
-  const A = [['PAC', p.pac], ['SHO', p.sho], ['PAS', p.pas], ['DRI', p.dri], ['DEF', p.def], ['PHY', p.phy]];
-  let actions = '';
+  const labels = p.pos === 'GK' ? ['DIV', 'HAN', 'KIC', 'REF', 'SPE', 'POS'] : ['PAC', 'SHO', 'PAS', 'DRI', 'DEF', 'PHY'];
+  let actions;
   if (own) {
     actions = `<div class="row" style="margin-top:12px">
       <button onclick="renew(${id})">📄 Renew (3y, +20% wage)</button>
@@ -248,19 +297,18 @@ function openPlayer(id, clubId) {
       ${open ? '' : '<p class="muted">Selling only during a transfer window.</p>'}`;
   } else {
     actions = `<div class="row" style="margin-top:12px">
-      <input id="bid-amt" type="number" step="100000" value="${Math.round(p.value * 1.1)}" style="width:150px">
+      <input id="bid-amt" type="number" step="100000" value="${Math.round(p.value * 1.1)}" style="width:160px">
       <button class="primary" ${open ? '' : 'disabled'} onclick="makeBid(${id},${clubId})">Make bid</button></div>
       <p class="muted" id="bid-msg">${open ? 'Asking price around ' + money(p.value * 1.15) : 'Window closed — come back in summer or January.'}</p>`;
   }
-  $('modal').innerHTML = `<h2>${esc(p.name)} <span class="pos-${p.pos}">${p.pos}</span></h2>
-    <p class="muted">${p.nat} · Age ${p.age} · ${c.name} · ${money(p.wage)}/wk, ${p.years}y left ${p.injury ? `· <span class="inj">injured ${p.injury}d</span>` : ''}</p>
+  $('modal').innerHTML = `<h2>${esc(p.name)} <span class="pos-${p.pos}">${p.pos}</span> ${p.youth ? '🌱' : ''}</h2>
+    <p class="muted">${esc(p.nat)} · Age ${p.age} · ${esc(c.n)} (${DATA.leagues[c.lg].flag} ${esc(DATA.leagues[c.lg].name)}) · ${money(p.wage)}/wk, ${p.years}y left ${p.injury ? `· <span class="inj">injured ${p.injury}d</span>` : ''}</p>
     <p><b style="font-size:22px">OVR ${p.ovr}</b> <span class="muted">(potential ~${p.pot})</span> · Value ${money(p.value)} · Fit ${p.fit}% · ${p.sg}G ${p.sa}A in ${p.apps} apps</p>
-    <div>${A.map(([k, v]) => `<span class="attr"><b>${v}</b>${k}</span>`).join('')}</div>
+    <div>${p.a.map((v, i) => `<span class="attr"><b>${v}</b>${labels[i]}</span>`).join('')}</div>
     ${actions}<div class="row" style="margin-top:12px"><button onclick="closeModal()">Close</button></div>`;
   $('modal-bg').classList.add('on');
 }
 function closeModal() { $('modal-bg').classList.remove('on'); renderHub(); }
-
 function renew(id) {
   const p = findPlayer(id, G.userClub);
   p.years = 3; p.wage = Math.round(p.wage * 1.2 / 100) * 100;
@@ -269,7 +317,7 @@ function renew(id) {
 }
 function releasePlayer(id) {
   const p = findPlayer(id, G.userClub);
-  if (me().players.length <= 15) return alert('Squad too small to release anyone (min 15).');
+  if (me().players.length <= 16) return alert('Squad too small to release anyone (min 16).');
   if (!confirm(`Release ${p.name}? You pay 6 months of wages (${money(p.wage * 26)}).`)) return;
   me().players.splice(me().players.indexOf(p), 1);
   me().budget -= p.wage * 26;
@@ -278,9 +326,9 @@ function releasePlayer(id) {
 }
 function askSell(id) {
   const p = findPlayer(id, G.userClub);
-  if (me().players.length <= 15) return alert('Squad too small to sell (min 15).');
+  if (me().players.length <= 16) return alert('Squad too small to sell (min 16).');
   const { buyer, fee } = ENG.sellPlayer(G, p);
-  if (confirm(`${buyer.name} offer ${money(fee)} for ${p.name}. Accept?`)) {
+  if (confirm(`${buyer.n} offer ${money(fee)} for ${p.name}. Accept?`)) {
     ENG.completeSale(G, p, buyer, fee);
     closeModal();
   }
@@ -292,34 +340,40 @@ function makeBid(id, clubId) {
   const r = ENG.bid(G, p, seller, offer);
   if (!r.ok) {
     $('bid-amt').value = r.counter;
-    return $('bid-msg').textContent = `Bid rejected. ${seller.short} counter at ${money(r.counter)}.`;
+    return $('bid-msg').textContent = `Bid rejected. ${seller.s} counter at ${money(r.counter)}.`;
   }
-  if (r.fee + r.wage * 52 > me().budget + 5e6 && !confirm(`Fee ${money(r.fee)}, wage demand ${money(r.wage)}/wk. This stretches the budget. Proceed?`)) return;
-  if (!confirm(`Bid accepted! ${p.name} wants ${money(r.wage)}/wk on a 4-year deal. Sign him?`)) return;
+  if (!confirm(`Bid accepted! ${p.name} wants ${money(r.wage)}/wk on a 4-year deal (${money(r.wage * 208)} total wages). Sign him?`)) return;
   ENG.signPlayer(G, p, seller, r.fee, r.wage);
   closeModal();
 }
 
 // ---------- continue / calendar ----------
 function doContinue() {
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 500; i++) {
     const ev = ENG.advanceDay(G);
     if (ev === 'match') return prepMatch();
     if (ev === 'seasonEnd') return endSeasonUI();
+    if (ev === 'offer') {
+      const { cid, pid, fee } = G.pendingOffer;
+      const buyer = G.clubs[cid], p = me().players.find(p => p.id === pid);
+      if (p && confirm(`💰 ${buyer.n} (${DATA.leagues[buyer.lg].flag} ${DATA.leagues[buyer.lg].name}) bid ${money(fee)} for ${p.name} (value ${money(p.value)}). Accept?`)) {
+        ENG.acceptOffer(G);
+      } else G.pendingOffer = null;
+    }
   }
 }
 
 // ---------- match day ----------
 function prepMatch() {
-  const f = G.fixtures.find(x => x.t === G.time && !x.played && (x.h === G.userClub || x.a === G.userClub));
+  const f = G.fixtures.find(x => x.t === G.time && !x.pl && (x.h === G.userClub || x.a === G.userClub));
   const home = f.h === G.userClub, opp = G.clubs[home ? f.a : f.h];
   const xi = ENG.bestXI(me());
   $('match-pre').style.display = 'block';
   $('match-live').style.display = 'none';
   $('match-post').style.display = 'none';
-  $('match-pre').innerHTML = `<div class="card"><h2>Matchday — Round ${f.round}</h2>
-    <h3>${G.clubs[f.h].name} vs ${G.clubs[f.a].name} ${home ? '(home)' : '(away)'}</h3>
-    <p class="muted">Opponent: tier ${opp.tier}, morale ${opp.morale}. Your formation: ${me().formation} (${me().mentality}) — change it on the Club tab before matchday.</p>
+  $('match-pre').innerHTML = `<div class="card"><h2>${esc(compLabel(f))}</h2>
+    <h3>${esc(G.clubs[f.h].n)} vs ${esc(G.clubs[f.a].n)} ${home ? '(home)' : '(away)'}</h3>
+    <p class="muted">Opponent squad ${ENG.power(opp).toFixed(0)} OVR, morale ${opp.morale}. Your shape: ${me().formation} (${me().mentality}) — change it on the Club tab.</p>
     <table class="grid"><tr><th>Pos</th><th>Starting XI</th><th>OVR</th><th>Fit</th></tr>
     ${xi.map(p => `<tr><td class="pos-${p.pos}">${p.pos}</td><td>${esc(p.name)}</td><td>${p.ovr}</td><td>${p.fit}%</td></tr>`).join('')}</table>
     <div class="row" style="margin-top:12px"><button class="primary" onclick="playMatch()">Kick off ▶</button></div></div>`;
@@ -329,27 +383,25 @@ function prepMatch() {
 
 let matchRes = null, tickIdx = 0;
 function playMatch() {
-  matchRes = ENG.playRound(G);
+  matchRes = ENG.playDay(G);
   autosave();
   const f = matchRes.user.f;
   $('match-pre').style.display = 'none';
   $('match-live').style.display = 'block';
+  $('match-comp').textContent = compLabel(f);
   $('ticker').innerHTML = '';
   tickIdx = 0;
-  const evs = matchRes.user.ev;
-  let shownH = 0, shownA = 0;
   updateScore(0, 0, f);
   tickerTimer = setInterval(() => {
+    const evs = matchRes.user.ev;
     if (tickIdx >= evs.length) return finishTicker();
     const e = evs[tickIdx++];
     $('ticker').innerHTML += `<div>${esc(e.txt)}</div>`;
     $('ticker').scrollTop = 1e6;
-    if (e.goal) { [shownH, shownA] = e.score.split('-').map(Number); updateScore(shownH, shownA, f); }
+    if (e.goal) { const [h, a] = e.score.split('-').map(Number); updateScore(h, a, f); }
   }, 500);
 }
-function updateScore(h, a, f) {
-  $('score').textContent = `${G.clubs[f.h].short} ${h} – ${a} ${G.clubs[f.a].short}`;
-}
+function updateScore(h, a, f) { $('score').textContent = `${G.clubs[f.h].s} ${h} – ${a} ${G.clubs[f.a].s}`; }
 function skipTicker() { finishTicker(); }
 function finishTicker() {
   clearInterval(tickerTimer);
@@ -361,31 +413,36 @@ function finishTicker() {
   const drew = f.hg === f.ag;
   G.rep = Math.max(0, Math.min(100, G.rep + (won ? 1 : drew ? 0 : -1)));
   const myRatings = u.ratings.filter(r => r.club === G.userClub).sort((a, b) => b.r - a.r);
+  const sameComp = matchRes.others.filter(o => o.c === f.c);
   $('match-post').innerHTML = `<div class="card">
-    <h2>FT: ${G.clubs[f.h].name} ${f.hg} – ${f.ag} ${G.clubs[f.a].name} ${won ? '🎉' : drew ? '' : '😞'}</h2>
+    <p class="muted">${esc(compLabel(f))}</p>
+    <h2>FT: ${esc(G.clubs[f.h].n)} ${f.hg} – ${f.ag} ${esc(G.clubs[f.a].n)} ${won ? '🎉' : drew ? '' : '😞'}</h2>
     <p class="muted">${[...u.scorers.h, ...u.scorers.a].map(esc).join(' · ') || 'No goals.'}</p>
     <h3>Your player ratings</h3>
     <table class="grid">${myRatings.map(r => `<tr><td class="pos-${r.pos}">${r.pos}</td><td>${esc(r.name)}</td><td><b>${r.r.toFixed(1)}</b></td></tr>`).join('')}</table>
-    <h3>Around the league</h3>
-    <table class="grid">${matchRes.others.map(o => `<tr><td>${G.clubs[o.h].short} ${o.hg}–${o.ag} ${G.clubs[o.a].short}</td></tr>`).join('')}</table>
+    ${sameComp.length ? `<h3>Elsewhere</h3><table class="grid">${sameComp.slice(0, 12).map(o => `<tr><td>${esc(G.clubs[o.h].s)} ${o.hg}–${o.ag} ${esc(G.clubs[o.a].s)}</td></tr>`).join('')}</table>` : ''}
     <div class="row" style="margin-top:12px"><button class="primary" onclick="tab='table';enterHub()">Continue ▶</button></div></div>`;
 }
 
 // ---------- season end ----------
 function endSeasonUI() {
-  const aw = ENG.endSeason(G);
+  const s = ENG.endSeason(G);
   autosave();
   enterHub();
   $('modal').innerHTML = `<h2>🏆 Season ${G.season - 1} Complete</h2>
-    <p><b>${esc(aw.champion)}</b> are champions. You finished <b>${aw.userPos}${['st','nd','rd'][aw.userPos-1]||'th'}</b> and earned ${money(aw.prize)}.</p>
-    <div class="card">⚽ Golden Boot: <b>${esc(aw.topScorer.name)}</b> (${aw.topScorer.club}) — ${aw.topScorer.goals} goals<br>
-    🌟 Player of the Season: <b>${esc(aw.bestPlayer.name)}</b> (${aw.bestPlayer.club})<br>
-    🌱 Best Young Player: <b>${esc(aw.bestYoung.name)}</b> (${aw.bestYoung.club}, ${aw.bestYoung.age})</div>
-    <p class="muted">Players have aged, contracts ticked down, youth prospects arrived. Season ${G.season} starts in July.</p>
+    <p>You finished <b>${s.userPos}${['st', 'nd', 'rd'][s.userPos - 1] || 'th'}</b> and earned ${money(s.prize)}.</p>
+    <div class="card"><b>Champions</b><br>${s.champions.map(esc).join('<br>')}</div>
+    <div class="card"><b>Up & down</b><br>${s.proms.map(esc).join('<br>')}</div>
+    <div class="card"><b>${esc(myLeague().name)} awards</b><br>
+    ⚽ Golden Boot: <b>${esc(s.awards.topScorer.name)}</b> (${esc(s.awards.topScorer.club)}) — ${s.awards.topScorer.goals} goals<br>
+    🌟 Player of the Season: <b>${esc(s.awards.bestPlayer.name)}</b> (${esc(s.awards.bestPlayer.club)})<br>
+    🌱 Best Young Player: <b>${esc(s.awards.bestYoung.name)}</b> (${esc(s.awards.bestYoung.club)}, ${s.awards.bestYoung.age})</div>
+    <p class="muted">Players aged, contracts ticked down, youth prospects arrived. Season ${G.season} starts in July.</p>
     <div class="row"><button class="primary" onclick="closeModal()">On to Season ${G.season} ▶</button></div>`;
   $('modal-bg').classList.add('on');
 }
 
+$('src').textContent = 'Data: ' + DATA.source;
 renderSlots();
 </script>
 </body>
