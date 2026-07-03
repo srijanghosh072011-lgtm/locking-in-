@@ -44,6 +44,7 @@ A full custom-tactics board modelled on EA FC 26:
 
 - **Drag any player anywhere** — pull your striker into midfield, invert a full-back, build a 5-3-1 or a diamond, whatever shape you want. The pitch is free-form, and where you put players actually changes the match (push everyone up and you make more chances *and* concede more).
 - **12 formations** as starting points (4-3-3, 4-2-3-1, 4-3-2-1, 4-1-2-1-2, 3-5-2, 3-4-3, 5-3-2, 5-4-1, and more)
+- **Pick who plays where** — tap any position to choose the exact player for that slot from your whole squad, or leave it on auto. Pins survive until you change formation.
 - **Player Roles & Focuses** per position — Poacher, False 9, Inside Forward, Deep-Lying Playmaker, Box Crasher, Ball-Playing Defender, Inverted Wingback, Sweeper Keeper and the rest. Tap a player to set them.
 - **Build-up style** (Balanced / Counter / Slow), **defensive approach** (Deep / Balanced / High / Aggressive) and **width** (Narrow / Balanced / Wide)
 - Live tactical feedback: attacking-threat / solidity / line-height / width meters plus strength & weakness read-outs — all of which feed the simulation. AI clubs pick their own shapes and styles too.

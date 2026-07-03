@@ -306,6 +306,7 @@ function applyFormation(c, key) {
   c.formation = key;
   c.shape = FORMATION_DEF[key].map(s => ({ x: s.x, y: s.y, kind: s.kind, line: s.line }));
   c.roles = c.shape.map(s => defRole(s.kind));
+  c.picks = new Array(11).fill(null);
 }
 function ensureTactics(c) {
   if (!FORMATION_DEF[c.formation]) c.formation = '4-3-3';
@@ -314,6 +315,7 @@ function ensureTactics(c) {
   if (!['deep', 'balanced', 'high', 'aggressive'].includes(c.defApproach))
     c.defApproach = ['deep', 'aggressive'].includes(c.defAppr) ? c.defAppr : 'balanced';
   if (!['narrow', 'balanced', 'wide'].includes(c.width)) c.width = 'balanced';
+  if (!Array.isArray(c.picks) || c.picks.length !== 11) c.picks = new Array(11).fill(null);
 }
 // How well a player's attributes [pac,sho,pas,dri,def,phy] suit a slot kind — used to
 // arrange the chosen XI so wide players go wide and defenders stay central.
@@ -332,13 +334,20 @@ function kindScore(p, kind) {
   }
 }
 // Assemble the XI aligned to the formation slots (so the pitch draws each man at his spot).
+// c.picks[i] pins a specific player to slot i (manual selection); the rest auto-fill by fit.
 function lineup(c) {
   ensureTactics(c);
   const fit = c.players.filter(p => !p.injury).sort((x, y) => y.ovr * y.fit - x.ovr * x.fit);
+  const byId = new Map(c.players.map(p => [p.id, p]));
   const used = new Set(), assigned = new Array(11).fill(null);
   const slots = c.shape.map((s, i) => ({ x: s.x, y: s.y, kind: s.kind, line: s.line, idx: i }));
+  c.picks.forEach((pid, i) => { // honour manual picks first
+    if (pid == null) return;
+    const p = byId.get(pid);
+    if (p && !p.injury && !used.has(p.id)) { assigned[i] = p; used.add(p.id); }
+  });
   for (const line of ['GK', 'DF', 'MF', 'AT']) {
-    const lineSlots = slots.filter(s => s.line === line);
+    const lineSlots = slots.filter(s => s.line === line && !assigned[s.idx]);
     const picks = [];
     for (const p of fit) { if (picks.length >= lineSlots.length) break; if (!used.has(p.id) && p.pos === line) { picks.push(p); used.add(p.id); } }
     for (const s of lineSlots) { // greedily give each slot its best-fitting available pick
@@ -361,7 +370,7 @@ function strength(c, xi, home) {
 }
 // Team profile derived from roles + shape + build-up + defensive approach.
 // attack = own chance-creation multiplier; openness = chances conceded multiplier.
-const REF_ATK = 33, REF_DEF = 39, REF_ADV = 49; // a balanced 4-3-3 sits at these; profile centers on 1.0
+const REF_ATK = 28, REF_DEF = 48, REF_ADV = 46; // calibrated so a default-role team centers on 1.0/1.0
 const BUILD = { balanced: { atk: 0, open: 0 }, counter: { atk: -0.05, open: -0.04 }, slow: { atk: -0.02, open: -0.06 } };
 const APPR = { deep: { atk: -0.02, open: -0.10 }, balanced: { atk: 0, open: 0 }, high: { atk: 0.04, open: 0.08 }, aggressive: { atk: 0.06, open: 0.12 } };
 const WIDTHS = { narrow: { atk: 0, open: -0.02 }, balanced: { atk: 0, open: 0 }, wide: { atk: 0.03, open: 0.02 } };
@@ -396,8 +405,8 @@ function simMatch(G, hc, ac, detailed) {
     for (const side of ['h', 'a']) {
       const my = side === 'h' ? hs : as, opp = side === 'h' ? as : hs;
       const c = side === 'h' ? hc : ac, xi = side === 'h' ? hXI : aXI;
-      const r = clamp(my / opp, 0.6, 1.7);
-      if (Math.random() < 0.13 * r * r * (side === 'h' ? hMult : aMult)) {
+      const r = clamp((my - 50) / (opp - 50), 0.5, 2.0); // subtract a floor so OVR gaps actually separate teams
+      if (Math.random() < 0.125 * r * r * (side === 'h' ? hMult : aMult)) {
         const shooter = pickScorer(side === 'h' ? hL : aL);
         stats[side].shots++;
         if (Math.random() < 0.105 * r) {
