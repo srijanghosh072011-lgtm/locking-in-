@@ -45,7 +45,7 @@
     encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">' +
         '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#261D15"/><stop offset="1" stop-color="#3A2C1F"/>' +
+        '<stop offset="0" stop-color="#14232E"/><stop offset="1" stop-color="#244050"/>' +
         '</linearGradient></defs>' +
         '<rect width="800" height="600" fill="url(#g)"/>' +
         '<g transform="translate(340,240)" stroke="#F4520B" stroke-width="10" fill="none" stroke-linecap="round">' +
