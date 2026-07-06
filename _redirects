@@ -1,0 +1,2 @@
+# Netlify / Cloudflare Pages redirects. Serve the branded 404 for unknown paths.
+/*    /404.html   404

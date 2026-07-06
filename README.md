@@ -43,12 +43,18 @@ crew photos outperform stock for local trust AND local SEO).
 
 ## Making the forms actually send
 
-Forms currently validate client-side (with a spam honeypot) and show a demo confirmation.
-Pick one (all have free tiers, no backend needed):
+The forms are **pre-wired to [Web3Forms](https://web3forms.com)** (free, no server, no account
+beyond an email). Until a key is set they show a demo confirmation; once set they email every
+lead. To go live:
 
-1. **Netlify Forms** — if hosting on Netlify, add `data-netlify="true"` to each `<form>` and set `action=""`.
-2. **Formspree / Web3Forms** — set `action="https://formspree.io/f/YOUR_ID"` and `method="POST"`.
-3. Add **Cloudflare Turnstile** (free CAPTCHA) once a real endpoint is wired — the honeypot handles casual bots only.
+1. Go to web3forms.com, enter the client's email, and copy the **Access Key** they send.
+2. Find-and-replace `YOUR_WEB3FORMS_ACCESS_KEY` with that key across all `.html` files.
+3. Done — the "Request Service" and newsletter forms now email leads. Submissions happen inline
+   via `fetch` (no page reload), with a spam honeypot and client-side validation already in place.
+
+Prefer a different service? The forms POST standard fields, so Formspree works by swapping the
+`action` URL; Netlify Forms works by adding `data-netlify="true"` and clearing `action`.
+For extra spam protection add **Cloudflare Turnstile** (free CAPTCHA) once live.
 
 ## Deploying
 

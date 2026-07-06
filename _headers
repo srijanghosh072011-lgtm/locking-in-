@@ -1,0 +1,17 @@
+# Security + caching headers (Netlify / Cloudflare Pages read this file).
+# GitHub Pages ignores it — see LAUNCH.md for the GitHub Pages note.
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; img-src 'self' https://images.unsplash.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.web3forms.com; frame-src https://www.openstreetmap.org; form-action https://api.web3forms.com; base-uri 'self'
+
+# Long-cache static assets (they're versioned by content anyway)
+/css/*
+  Cache-Control: public, max-age=31536000
+/js/*
+  Cache-Control: public, max-age=31536000
+/og-image.png
+  Cache-Control: public, max-age=604800

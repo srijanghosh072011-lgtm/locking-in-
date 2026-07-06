@@ -147,17 +147,60 @@
         return;
       }
 
-      /* No backend wired yet: show confirmation instead of navigating to "#".
-         Remove this block once the form action points at a real endpoint
-         (Netlify Forms, Formspree, Web3Forms, etc. — see README). */
-      if (form.getAttribute('action') === '#') {
-        e.preventDefault();
+      /* We always take over submission so we can show inline feedback. */
+      e.preventDefault();
+
+      var keyField = form.querySelector('input[name="access_key"]');
+      var key = keyField ? keyField.value : '';
+
+      /* Access key not set yet: show a demo confirmation instead of POSTing
+         to a broken endpoint. Paste a real Web3Forms key to go live (README). */
+      if (!key || key.indexOf('YOUR_') === 0) {
         if (status) {
           status.className = 'form-status ok';
-          status.textContent = 'Thanks! Your request is saved locally for demo purposes — connect a form service to receive it by email (see README).';
+          status.textContent = 'Thanks — your request looks good! (Demo mode: add a Web3Forms key to start receiving these by email — see README.)';
         }
         form.reset();
+        return;
       }
+
+      /* Real submission via Web3Forms (no page reload). */
+      var btn = form.querySelector('button[type="submit"]');
+      var btnLabel = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      if (status) { status.className = 'form-status'; status.textContent = ''; }
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(function (r) {
+          return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, data: j }; });
+        })
+        .then(function (res) {
+          if (res.ok) {
+            if (status) {
+              status.className = 'form-status ok';
+              status.textContent = "Thanks! Your request is in — we'll call you back shortly.";
+            }
+            form.reset();
+          } else {
+            if (status) {
+              status.className = 'form-status fail';
+              status.textContent = (res.data && res.data.message) || 'Something went wrong — please call us instead.';
+            }
+          }
+        })
+        .catch(function () {
+          if (status) {
+            status.className = 'form-status fail';
+            status.textContent = 'Network error — please call us or try again in a moment.';
+          }
+        })
+        .then(function () {
+          if (btn) { btn.disabled = false; btn.textContent = btnLabel; }
+        });
     });
   });
 
