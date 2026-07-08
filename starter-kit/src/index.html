@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<link rel="canonical" href="{{SITE_URL}}/index.html">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="{{THEME_COLOR}}">
+<meta name="geo.region" content="{{GEO_REGION}}">
+<meta name="geo.placename" content="{{CITY}}">
+<meta name="geo.position" content="{{GEO_LAT}};{{GEO_LNG}}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{BUSINESS_NAME}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:url" content="{{SITE_URL}}/index.html">
+<meta property="og:image" content="{{SITE_URL}}/og-image.png">
+<meta property="og:locale" content="{{OG_LOCALE}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23F4520B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+<!-- LocalBusiness. Fill areaServed with towns you ACTUALLY serve. Do NOT add
+     aggregateRating/review here until you have real, verifiable reviews. -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"{{SCHEMA_TYPE}}","@id":"{{SITE_URL}}/#business","name":"{{BUSINESS_NAME}}","url":"{{SITE_URL}}/","telephone":"{{PHONE_E164}}","email":"{{EMAIL}}","priceRange":"{{PRICE_RANGE}}","address":{"@type":"PostalAddress","streetAddress":"{{STREET}}","addressLocality":"{{CITY}}","addressRegion":"{{REGION}}","postalCode":"{{POSTAL_CODE}}","addressCountry":"{{COUNTRY}}"},"geo":{"@type":"GeoCoordinates","latitude":{{GEO_LAT}},"longitude":{{GEO_LNG}}},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"08:00","closes":"18:00"}],"areaServed":[{"@type":"City","name":"{{CITY}}"}],"foundingDate":"{{FOUNDING_YEAR}}","slogan":"{{SLOGAN}}"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"{{FAQ1_Q}}","acceptedAnswer":{"@type":"Answer","text":"{{FAQ1_A}}"}},{"@type":"Question","name":"{{FAQ2_Q}}","acceptedAnswer":{"@type":"Answer","text":"{{FAQ2_A}}"}}]}</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><strong>{{BUSINESS_NAME}}</strong></a>
+    <button class="nav-toggle" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="about.html">About</a>
+      <a href="services.html">Services</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a class="header-emergency" href="tel:{{PHONE_E164}}">
+      <small>Available today</small>
+      <strong>{{PHONE_DISPLAY}}</strong>
+    </a>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="eyebrow">{{EYEBROW}}</span>
+      <h1>{{H1}}</h1>
+      <ul class="hero-checks">
+        <li>{{USP1}}</li>
+        <li>{{USP2}}</li>
+        <li>{{USP3}}</li>
+      </ul>
+      <div class="hero-actions">
+        <a class="btn btn-orange" href="contact.html">Book now</a>
+        <a class="btn btn-outline" href="reviews.html">Read reviews</a>
+      </div>
+    </div>
+
+    <div class="form-card reveal">
+      <h2>Request service</h2>
+      <p>Fill this in and we'll call you back within the hour.</p>
+      <form action="https://api.web3forms.com/submit" method="POST" data-validate>
+        <input type="hidden" name="access_key" value="{{WEB3FORMS_KEY}}">
+        <input type="hidden" name="subject" value="New service request — {{BUSINESS_NAME}}">
+        <input type="hidden" name="from_name" value="{{BUSINESS_NAME}} website">
+        <label class="hp-field"><span>Leave this field empty</span><input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+        <div class="field">
+          <label for="f-name">Name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+          <span class="err">Please enter your name.</span>
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required>
+          <span class="err">Please enter a valid phone number.</span>
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+          <span class="err">Please enter a valid email.</span>
+        </div>
+        <button class="btn btn-orange btn-block" type="submit">Submit</button>
+        <p class="form-note">By submitting you consent to be contacted about your request. <a href="privacy-policy.html">Privacy policy</a>.</p>
+        <div class="form-status" role="status"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Good to know</span>
+      <h2>Questions {{CITY}} homeowners ask</h2>
+    </div>
+    <div class="faq-list reveal">
+      <details>
+        <summary>{{FAQ1_Q}}</summary>
+        <div class="faq-a">{{FAQ1_A}}</div>
+      </details>
+      <details>
+        <summary>{{FAQ2_Q}}</summary>
+        <div class="faq-a">{{FAQ2_A}}</div>
+      </details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>{{BUSINESS_NAME}}</strong> · {{STREET}}, {{CITY}}, {{REGION}} {{POSTAL_CODE}}</p>
+    <p>Phone: <a href="tel:{{PHONE_E164}}">{{PHONE_DISPLAY}}</a> · {{EMAIL}}</p>
+    <nav aria-label="Legal">
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+    </nav>
+    <p class="copyright">&copy; <span data-year>{{YEAR}}</span> {{BUSINESS_NAME}}. All rights reserved.</p>
+  </div>
+</footer>
+
+<a class="call-fab" href="tel:{{PHONE_E164}}" aria-label="Call {{BUSINESS_NAME}} now">Call</a>
+
+<div class="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <p>We use essential cookies to make this site work. See our <a href="privacy-policy.html">privacy policy</a>.</p>
+  <div class="cookie-actions">
+    <button class="btn btn-orange" data-cookie="accept" type="button">Accept</button>
+    <button class="btn btn-outline" data-cookie="decline" type="button">Decline</button>
+  </div>
+</div>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

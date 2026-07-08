@@ -1,0 +1,20 @@
+# {{BUSINESS_NAME}} — robots.txt
+User-agent: *
+Allow: /
+
+# AI / answer-engine crawlers (so the business can be cited in ChatGPT,
+# Claude, Perplexity, Google AI Overviews). Remove any you don't want.
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: {{SITE_URL}}/sitemap.xml

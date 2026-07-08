@@ -1,0 +1,18 @@
+# Security + caching headers.
+# READ ME: Netlify and Cloudflare Pages apply this file. GitHub Pages IGNORES
+# it — if you deploy to GitHub Pages you get NONE of these headers. Deploy to
+# Cloudflare/Netlify Pages (or put Cloudflare in front) for this to do anything.
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # No 'unsafe-inline' in script-src: there are zero inline <script> tags.
+  # style-src still needs 'unsafe-inline' only if you add inline style="".
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' https://images.unsplash.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self' https://api.web3forms.com; frame-src https://www.openstreetmap.org; form-action https://api.web3forms.com
+
+/css/*
+  Cache-Control: public, max-age=31536000
+/js/*
+  Cache-Control: public, max-age=31536000
