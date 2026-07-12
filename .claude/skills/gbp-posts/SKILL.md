@@ -55,9 +55,9 @@ If you find yourself about to output `type: update` — STOP. The correct output
 > Make.com routes it to the right GBP using `GBP_LOCATION_NAME`.
 
 ```yaml
-MAKE_WEBHOOK_URL: https://hook.us2.make.com/uww8m1lhwrc4plnjc1wyqf27vtp65kn2
-GBP_ACCOUNT_NAME: accounts/[ACCOUNT_ID]
-GBP_LOCATION_NAME: locations/[LOCATION_ID]
+MAKE_WEBHOOK_URL: https://hook.us2.make.com/uww8m1lhwrc4plnjc1wyqf27vtp65kn2   # webhook "gmb-posting", hook 2313632
+GBP_ACCOUNT_NAME: accounts/106000043317271680047                                # Jonathan Catliff
+GBP_LOCATION_NAME: locations/7507144406014431820                                # The Brotherhood - Therapy for Men
 DEFAULT_CTA_URL: https://www.thebrotherhood.ca
 ```
 
@@ -67,6 +67,20 @@ DEFAULT_CTA_URL: https://www.thebrotherhood.ca
 2. **GBP_ACCOUNT_NAME** — In Make.com: add "Google Business Profile · List Accounts" → run once → copy the `name` (format: `accounts/12345678`)
 3. **GBP_LOCATION_NAME** — In Make.com: add "Google Business Profile · List Locations" → run once → copy the `name` (format: `locations/87654321`)
 4. **DEFAULT_CTA_URL** — The client's main domain · fallback when the post doesn't specify a deeper page
+
+---
+
+## ⚠️ Live scenario notes (`GBP posting` · The Brotherhood)
+
+> Reconciled against the actual Make.com blueprint (`GBP posting`, zone `us2.make.com`).
+> These describe how the **current** scenario behaves — until the scenario is fixed,
+> generate posts with these constraints in mind.
+
+- **Account + location are hardcoded** in every router branch. The payload's `account_name` / `location_name` are ignored — you can still send them (harmless), but the real routing is baked into the scenario (values above).
+- **CTA button is always `LEARN_MORE`.** The Call-to-action branch hardcodes `actionType: LEARN_MORE` instead of mapping `{{1.cta_action}}`. So `cta_action: BOOK / CALL / SIGN_UP …` is currently **ignored** — every CTA post renders a "Learn more" button. To honor the payload, the mapper needs `actionType: {{1.cta_action}}`. Still send `cta_action` so it works once fixed.
+- **Event posts are broken.** The `Event` branch is a copy-paste of the Offer branch (`select: offer`, maps `couponCode` + `redeemOnlineUrl`, which the module marks **required**). An `"Event"` payload therefore either posts as an Offer or errors on the missing coupon fields. **Do not queue `post_type: "Event"` posts until the branch is fixed** (`select` → `event`, remove the coupon mappings). Prefer `"Call to action"` or `"Offer"`.
+- **`terms_conditions` is not mapped** in the Offer branch — it's fine to generate it, but it won't reach GBP until the mapper adds `termsConditions: {{1.terms_conditions}}`.
+- **`media_items` is 1-indexed** in Make (`{{1.media_items[1]}}` = first image). Send it as an array; the scenario uses only the first item, format `PHOTO`.
 
 ---
 
