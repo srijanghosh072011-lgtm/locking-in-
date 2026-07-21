@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" role="img" aria-label="Illustration: scales of justice representing contracts and risk">
+  <defs>
+    <linearGradient id="i2bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#17130b"/><stop offset="100%" stop-color="#0a0805"/>
+    </linearGradient>
+    <linearGradient id="i2g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e7c878"/><stop offset="100%" stop-color="#a67c2e"/>
+    </linearGradient>
+    <radialGradient id="i2glow" cx="50%" cy="14%" r="70%">
+      <stop offset="0%" stop-color="#c9a24a" stop-opacity="0.22"/><stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="i2grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55 0 0 0 0 0.47 0 0 0 0 0.28 0 0 0 0.5 0"/></filter>
+  </defs>
+  <rect width="640" height="400" fill="url(#i2bg)"/>
+  <rect width="640" height="400" fill="url(#i2glow)"/>
+  <g stroke="url(#i2g)" stroke-opacity="0.9" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- central post -->
+    <line x1="320" y1="86" x2="320" y2="316"/>
+    <circle cx="320" cy="80" r="7" fill="url(#i2g)" stroke="none"/>
+    <!-- beam -->
+    <line x1="176" y1="120" x2="464" y2="120"/>
+    <!-- hangers -->
+    <line x1="176" y1="120" x2="140" y2="196"/><line x1="176" y1="120" x2="212" y2="196"/>
+    <line x1="464" y1="120" x2="428" y2="196"/><line x1="464" y1="120" x2="500" y2="196"/>
+    <!-- pans -->
+    <path d="M132 196 A44 44 0 0 0 220 196 Z"/>
+    <path d="M420 196 A44 44 0 0 0 508 196 Z"/>
+    <!-- base -->
+    <line x1="272" y1="316" x2="368" y2="316"/>
+    <path d="M286 316 C286 338 354 338 354 316"/>
+    <line x1="256" y1="344" x2="384" y2="344"/>
+  </g>
+  <rect width="640" height="400" filter="url(#i2grain)" opacity="0.05"/>
+  <rect x="1" y="1" width="638" height="398" fill="none" stroke="#c9a24a" stroke-opacity="0.12"/>
+</svg>

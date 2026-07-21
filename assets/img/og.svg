@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Adrian Vale — Corporate & Commercial Counsel">
+  <defs>
+    <radialGradient id="obg" cx="72%" cy="18%" r="90%">
+      <stop offset="0%" stop-color="#1a150c"/><stop offset="55%" stop-color="#0f0b07"/><stop offset="100%" stop-color="#080604"/>
+    </radialGradient>
+    <linearGradient id="og" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e7c878"/><stop offset="100%" stop-color="#b98a30"/>
+    </linearGradient>
+    <radialGradient id="oglow" cx="78%" cy="16%" r="46%">
+      <stop offset="0%" stop-color="#c9a24a" stop-opacity="0.28"/><stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#obg)"/>
+  <rect width="1200" height="630" fill="url(#oglow)"/>
+  <text x="88" y="150" font-family="Cormorant Garamond, Georgia, serif" font-size="200" font-weight="600" fill="#ffffff" fill-opacity="0.04">VALE</text>
+
+  <g font-family="Lato, Arial, sans-serif">
+    <text x="90" y="250" font-size="20" letter-spacing="7" fill="url(#og)">CORPORATE &amp; COMMERCIAL COUNSEL</text>
+  </g>
+  <text x="86" y="360" font-family="Cormorant Garamond, Georgia, serif" font-size="92" font-weight="600" fill="#f4efe4">Adrian Vale</text>
+  <text x="90" y="430" font-family="Cormorant Garamond, Georgia, serif" font-size="44" font-weight="500" fill="#a69c88" font-style="italic">Trusted legal counsel for growing businesses.</text>
+  <line x1="92" y1="486" x2="360" y2="486" stroke="url(#og)" stroke-width="2"/>
+
+  <!-- monogram badge -->
+  <g transform="translate(1010 470)">
+    <circle r="86" fill="none" stroke="url(#og)" stroke-opacity="0.5" stroke-width="2"/>
+    <circle r="70" fill="#0d0a06"/>
+    <text x="0" y="26" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="74" font-weight="600" fill="url(#og)">V</text>
+  </g>
+  <rect x="10" y="10" width="1180" height="610" fill="none" stroke="#c9a24a" stroke-opacity="0.16" stroke-width="2"/>
+</svg>

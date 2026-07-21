@@ -1,0 +1,21 @@
+# Vale Legal — allow everything, including search + AI answer crawlers.
+# (Per the pre-launch playbook: a local business wants maximum visibility;
+#  blocking retrieval bots removes you from AI answers.)
+User-agent: *
+Allow: /
+
+# Explicitly welcome AI retrieval/search crawlers
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://www.valelegal.example/sitemap.xml
