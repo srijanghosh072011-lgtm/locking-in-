@@ -1,71 +1,97 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="Portrait of the attorney — placeholder duotone illustration">
   <!--
-    PLACEHOLDER PORTRAIT (duotone, gold-on-black editorial treatment).
-    Swap for a real photo: replace this file, or change the <img src> in index.html
-    to your own portrait.jpg. Recommended: 800x1000 (4:5), warm/neutral suit,
-    dark or neutral background. See PHOTO-GUIDE.md for sources + AI prompts.
+    PLACEHOLDER HERO PORTRAIT — detailed gold-on-black duotone illustration
+    of a suited figure (arms crossed). Swap for a real photo: replace this file
+    or change the <img src> in index.html. Target 800x1000 (4:5). See PHOTO-GUIDE.md.
   -->
   <defs>
-    <radialGradient id="pbg" cx="50%" cy="34%" r="85%">
-      <stop offset="0%" stop-color="#1a150c"/>
-      <stop offset="55%" stop-color="#100c07"/>
-      <stop offset="100%" stop-color="#080604"/>
+    <radialGradient id="bg" cx="52%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#1b160d"/><stop offset="55%" stop-color="#100c07"/><stop offset="100%" stop-color="#070503"/>
     </radialGradient>
-    <radialGradient id="pglow" cx="50%" cy="30%" r="42%">
-      <stop offset="0%" stop-color="#c9a24a" stop-opacity="0.34"/>
-      <stop offset="55%" stop-color="#c9a24a" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/>
+    <radialGradient id="glow" cx="72%" cy="24%" r="55%">
+      <stop offset="0%" stop-color="#c9a24a" stop-opacity="0.34"/><stop offset="60%" stop-color="#c9a24a" stop-opacity="0.06"/><stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="pfill" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a2318"/>
-      <stop offset="55%" stop-color="#171208"/>
-      <stop offset="100%" stop-color="#0c0905"/>
+    <linearGradient id="suit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2216"/><stop offset="55%" stop-color="#171106"/><stop offset="100%" stop-color="#0b0804"/>
     </linearGradient>
-    <linearGradient id="prim" x1="0" y1="0" x2="1" y2="0.2">
-      <stop offset="0%" stop-color="#e7c878"/>
-      <stop offset="45%" stop-color="#c9a24a"/>
-      <stop offset="100%" stop-color="#8a6a26"/>
+    <linearGradient id="suit2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0d0a05"/><stop offset="70%" stop-color="#1d1710"/><stop offset="100%" stop-color="#2c2416"/>
     </linearGradient>
-    <radialGradient id="pvig" cx="50%" cy="46%" r="72%">
-      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="0%" stop-color="#171009"/><stop offset="60%" stop-color="#2b1f12"/><stop offset="100%" stop-color="#5a4222"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#120d07"/><stop offset="100%" stop-color="#2b2013"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0%" stop-color="#f0d38a"/><stop offset="45%" stop-color="#c9a24a"/><stop offset="100%" stop-color="#7d5f22"/>
+    </linearGradient>
+    <radialGradient id="cheek" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e7c878" stop-opacity="0.5"/><stop offset="100%" stop-color="#e7c878" stop-opacity="0"/>
     </radialGradient>
-    <filter id="prlblur" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4"/>
-    </filter>
-    <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/>
-      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.47  0 0 0 0 0.28  0 0 0 0.5 0"/>
-    </filter>
+    <radialGradient id="vig" cx="50%" cy="44%" r="72%">
+      <stop offset="58%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.6"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.55 0 0 0 0 0.47 0 0 0 0 0.28 0 0 0 0.5 0"/></filter>
   </defs>
 
-  <rect width="800" height="1000" fill="url(#pbg)"/>
-  <rect width="800" height="1000" fill="url(#pglow)"/>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <!-- backdrop: faint office blinds -->
+  <g stroke="#c9a24a" stroke-opacity="0.05" stroke-width="2">
+    <line x1="120" y1="0" x2="120" y2="1000"/><line x1="240" y1="0" x2="240" y2="1000"/><line x1="560" y1="0" x2="560" y2="1000"/><line x1="680" y1="0" x2="680" y2="1000"/>
+  </g>
+  <rect width="800" height="1000" fill="url(#glow)"/>
 
-  <!-- figure -->
+  <!-- FIGURE -->
   <g>
+    <!-- torso / suit -->
+    <path d="M96 1000 C96 720 210 604 400 604 C590 604 704 720 704 1000 Z" fill="url(#suit)"/>
+    <path d="M400 604 C512 604 596 648 648 726 L556 1000 L400 1000 Z" fill="url(#suit2)" opacity="0.85"/>
+
     <!-- neck -->
-    <path d="M356 452 L444 452 L470 624 L330 624 Z" fill="url(#pfill)"/>
-    <!-- shoulders / torso -->
-    <path d="M104 1000 C104 742 214 598 400 598 C586 598 696 742 696 1000 Z" fill="url(#pfill)"/>
+    <path d="M356 470 L444 470 L462 604 L338 604 Z" fill="#150f08"/>
+    <path d="M444 470 L462 604 L410 604 Z" fill="#241a0f" opacity="0.7"/>
+
+    <!-- shirt collar + tie -->
+    <path d="M360 600 L400 660 L440 600 L470 616 L452 760 L348 760 L330 616 Z" fill="#0e0a06"/>
+    <path d="M372 606 L400 660 L428 606" fill="none" stroke="#c9a24a" stroke-opacity="0.45" stroke-width="2.4"/>
+    <path d="M400 660 L416 690 L406 872 L400 892 L394 872 L384 690 Z" fill="#100b06" stroke="#c9a24a" stroke-opacity="0.4" stroke-width="1.6"/>
+
     <!-- head -->
-    <ellipse cx="400" cy="330" rx="120" ry="152" fill="url(#pfill)"/>
+    <ellipse cx="400" cy="332" rx="108" ry="134" fill="url(#face)"/>
+    <ellipse cx="452" cy="352" rx="46" ry="70" fill="url(#cheek)"/>
+    <!-- ear hint -->
+    <ellipse cx="300" cy="344" rx="15" ry="26" fill="#1c140b"/>
+    <!-- hair -->
+    <path d="M298 300 C300 214 360 188 404 190 C452 192 508 220 506 306 C506 276 486 250 470 244 C486 268 484 300 480 318 C470 276 442 256 430 252 C438 268 438 286 436 296 C412 258 356 258 330 292 C322 306 316 322 316 340 C306 320 296 310 298 300 Z" fill="url(#hair)"/>
+    <!-- brow/jaw rim light -->
+    <path d="M506 306 C508 372 470 452 404 462" fill="none" stroke="url(#rim)" stroke-width="4" stroke-linecap="round" opacity="0.55" filter="url(#soft)"/>
 
-    <!-- suit + collar hairlines -->
-    <path d="M360 616 L300 1000 M440 616 L500 1000" fill="none" stroke="#c9a24a" stroke-opacity="0.5" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M372 620 L400 690 L428 620" fill="none" stroke="#c9a24a" stroke-opacity="0.32" stroke-width="2"/>
-    <!-- tie -->
-    <path d="M400 690 L414 720 L406 880 L400 900 L394 880 L386 720 Z" fill="#0d0a06" stroke="#c9a24a" stroke-opacity="0.4" stroke-width="1.6"/>
+    <!-- lapels -->
+    <path d="M400 610 L300 780 L332 1000 M400 610 L500 780 L468 1000" fill="none" stroke="#c9a24a" stroke-opacity="0.28" stroke-width="2.4"/>
+    <path d="M362 636 L250 700 M438 636 L550 700" fill="none" stroke="#c9a24a" stroke-opacity="0.2" stroke-width="2"/>
 
-    <!-- rim light (right edge) -->
-    <g filter="url(#prlblur)" opacity="0.9">
-      <path d="M400 598 C586 598 696 742 696 1000" fill="none" stroke="url(#prim)" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
-      <path d="M520 330 C520 246 470 178 400 178" fill="none" stroke="url(#prim)" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+    <!-- CROSSED ARMS -->
+    <g>
+      <path d="M232 968 C214 872 250 792 330 754 C388 726 470 724 520 706 C556 694 584 706 596 730 C606 752 596 776 566 788 C500 812 440 812 396 834 C346 858 322 902 328 968 Z" fill="url(#suit2)"/>
+      <path d="M568 968 C586 872 550 792 470 754 C412 726 330 724 280 706 C244 694 216 706 204 730 C194 752 204 776 234 788 C300 812 360 812 404 834 C454 858 478 902 472 968 Z" fill="url(#suit)"/>
+      <!-- arm rim highlights -->
+      <path d="M520 706 C556 694 584 706 596 730" fill="none" stroke="url(#rim)" stroke-width="3.4" stroke-linecap="round" opacity="0.5"/>
+      <path d="M470 754 C412 726 330 724 280 706" fill="none" stroke="#c9a24a" stroke-opacity="0.16" stroke-width="2"/>
+      <!-- hands -->
+      <path d="M204 730 c-16 6 -26 22 -22 40 c4 16 22 22 40 16 c14 -5 22 -18 20 -30 Z" fill="#2a1f12"/>
+      <path d="M596 730 c16 6 26 22 22 40 c-4 16 -22 22 -40 16 c-14 -5 -22 -18 -20 -30 Z" fill="#241a0f"/>
+    </g>
+
+    <!-- body/shoulder rim light (right) -->
+    <g filter="url(#soft)" opacity="0.9">
+      <path d="M400 604 C590 604 704 720 704 1000" fill="none" stroke="url(#rim)" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+      <path d="M506 300 C508 232 462 190 404 190" fill="none" stroke="url(#rim)" stroke-width="4.5" stroke-linecap="round" opacity="0.6"/>
     </g>
   </g>
 
-  <rect width="800" height="1000" fill="url(#pvig)"/>
+  <rect width="800" height="1000" fill="url(#vig)"/>
   <rect width="800" height="1000" filter="url(#grain)" opacity="0.06"/>
-  <!-- thin inner keyline -->
   <rect x="1" y="1" width="798" height="998" fill="none" stroke="#c9a24a" stroke-opacity="0.12" stroke-width="1.5"/>
 </svg>

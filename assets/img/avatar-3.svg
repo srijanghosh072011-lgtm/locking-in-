@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Client avatar — placeholder illustration">
+  <defs>
+    <clipPath id="c3"><circle cx="100" cy="100" r="100"/></clipPath>
+    <radialGradient id="b3" cx="58%" cy="32%" r="80%"><stop offset="0%" stop-color="#1d160c"/><stop offset="100%" stop-color="#090604"/></radialGradient>
+    <radialGradient id="g3" cx="70%" cy="22%" r="66%"><stop offset="0%" stop-color="#c9a24a" stop-opacity="0.56"/><stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="f3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1a130a"/><stop offset="100%" stop-color="#4d391e"/></linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#221a10"/><stop offset="100%" stop-color="#0c0904"/></linearGradient>
+    <linearGradient id="r3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f0d38a"/><stop offset="100%" stop-color="#8a6a26"/></linearGradient>
+  </defs>
+  <g clip-path="url(#c3)">
+    <rect width="200" height="200" fill="url(#b3)"/>
+    <rect width="200" height="200" fill="url(#g3)"/>
+    <path d="M16 200 C16 148 52 122 100 122 C148 122 184 148 184 200 Z" fill="url(#s3)"/>
+    <path d="M84 148 L100 166 L116 148 L126 154 L120 200 L80 200 L74 154 Z" fill="#0d0a06"/>
+    <path d="M100 166 L106 176 L102 200 L98 200 L94 176 Z" fill="#100b06" stroke="#c9a24a" stroke-opacity="0.4" stroke-width="1"/>
+    <ellipse cx="100" cy="86" rx="42" ry="50" fill="url(#f3)"/>
+    <ellipse cx="120" cy="90" rx="17" ry="24" fill="#e7c878" fill-opacity="0.16"/>
+    <!-- receding short hair -->
+    <path d="M62 74 C66 48 86 40 100 40 C116 40 138 50 140 76 C136 62 126 56 116 56 C122 66 122 74 120 80 C112 62 96 60 88 60 C74 60 66 66 62 80 C60 80 60 78 62 74 Z" fill="#171009"/>
+    <path d="M141 80 C142 114 122 148 100 152" fill="none" stroke="url(#r3)" stroke-width="2.4" stroke-linecap="round" opacity="0.55"/>
+    <path d="M100 122 C148 122 184 148 184 200" fill="none" stroke="url(#r3)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  </g>
+  <circle cx="100" cy="100" r="99" fill="none" stroke="#c9a24a" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>

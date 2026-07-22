@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Client avatar — placeholder illustration">
+  <defs>
+    <clipPath id="c2"><circle cx="100" cy="100" r="100"/></clipPath>
+    <radialGradient id="b2" cx="40%" cy="30%" r="80%"><stop offset="0%" stop-color="#1c160d"/><stop offset="100%" stop-color="#0a0705"/></radialGradient>
+    <radialGradient id="g2" cx="26%" cy="24%" r="60%"><stop offset="0%" stop-color="#c9a24a" stop-opacity="0.4"/><stop offset="100%" stop-color="#c9a24a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="f2" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#1a130a"/><stop offset="100%" stop-color="#573f22"/></linearGradient>
+    <linearGradient id="s2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#241c11"/><stop offset="100%" stop-color="#0c0904"/></linearGradient>
+    <linearGradient id="h2" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#130e08"/><stop offset="100%" stop-color="#2a1f12"/></linearGradient>
+    <linearGradient id="r2" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#f0d38a"/><stop offset="100%" stop-color="#8a6a26"/></linearGradient>
+  </defs>
+  <g clip-path="url(#c2)">
+    <rect width="200" height="200" fill="url(#b2)"/>
+    <rect width="200" height="200" fill="url(#g2)"/>
+    <path d="M20 200 C20 152 54 126 100 126 C146 126 180 152 180 200 Z" fill="url(#s2)"/>
+    <!-- hair behind shoulders -->
+    <path d="M58 60 C58 150 40 170 46 200 L74 200 C66 168 78 150 80 120 Z" fill="url(#h2)"/>
+    <path d="M142 60 C142 150 160 170 154 200 L126 200 C134 168 122 150 120 120 Z" fill="url(#h2)"/>
+    <ellipse cx="100" cy="88" rx="41" ry="50" fill="url(#f2)"/>
+    <ellipse cx="80" cy="94" rx="17" ry="24" fill="#e7c878" fill-opacity="0.18"/>
+    <!-- hair top -->
+    <path d="M56 84 C54 44 82 30 100 30 C120 30 148 46 146 88 C144 66 132 54 120 50 C120 60 120 66 118 72 C104 52 74 54 66 78 C62 66 60 74 58 86 C56 88 56 86 56 84 Z" fill="url(#h2)"/>
+    <path d="M57 86 C56 120 76 152 100 156" fill="none" stroke="url(#r2)" stroke-width="2.4" stroke-linecap="round" opacity="0.55"/>
+    <path d="M100 126 C54 126 20 152 20 200" fill="none" stroke="url(#r2)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  </g>
+  <circle cx="100" cy="100" r="99" fill="none" stroke="#c9a24a" stroke-opacity="0.45" stroke-width="1.5"/>
+</svg>
