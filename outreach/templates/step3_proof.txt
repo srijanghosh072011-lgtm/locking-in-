@@ -14,9 +14,11 @@ Most plumbing sites I look at lose work in the same three places:
      around you where you'd happily drive.
 
 That's what I'd build into {{business}}'s site. Not a prettier brochure — a
-thing that turns searches into calls.
+thing that turns searches into calls. All three are already working on the demo
+I sent: {{demo_link}}
 
 If that's worth ten minutes: {{booking_link}}
 
 {{sender_name}}
-{{company}}
+{{company}} · {{sender_city}}, {{sender_province}}
+{{sender_phone}}

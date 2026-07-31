@@ -30,8 +30,9 @@ pip install -r requirements.txt          # only needed for mockups
 cp .env.example .env                     # then add your Gmail App Password
 ```
 
-Edit `config.toml` — at minimum `mailing_address`, `booking_link`, `website`.
-**The campaign will send with a placeholder address if you don't.** See Legal.
+Edit `config.toml` — `mailing_address`, `phone`, `demo_link`, `booking_link`,
+`website`. `send` **refuses to run** while any of them still says `TODO`;
+`--dry-run` still works so you can read the copy first.
 
 The mockup step needs the demo template served locally:
 
@@ -87,6 +88,26 @@ burned sending reputation is not something you can undo by slowing down later.
 A free Gmail account also has a hard ~500 recipients/day limit, so 50 is fine on
 paper — the risk is reputational, not numeric. If this starts working, move to a
 dedicated domain with SPF/DKIM/DMARC and keep this inbox for replies.
+
+## Trust
+
+Cold email from an unknown name is a trust problem before it's a design problem.
+Three things in the copy carry it, and all three are verifiable rather than
+claimed:
+
+- **A clickable demo.** `demo_link` turns "some guy emailed me" into "I just
+  used a site he built". It is the strongest signal in the message — make sure
+  the URL actually serves the good build before sending.
+- **Local.** "I'm based in Regina, SK" plus a real phone number. A tradesperson
+  who can phone you is far likelier to believe you exist.
+- **Risk reversal.** "You don't pay anything until the site is live and you're
+  happy with it." Change this in `templates/step1_preview.txt` if your terms
+  differ — it is a commercial promise, so it should be one you'll honour.
+
+Deliberately absent: testimonials, client counts, logos, "trusted by N
+businesses". Invented social proof is the fastest way to lose a deal on the
+call, and it is trivially checkable. Once you have real clients, a single named
+one with a link beats all of it.
 
 ## Legal — read this once
 

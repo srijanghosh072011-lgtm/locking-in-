@@ -15,5 +15,6 @@ straight back up.
 Good luck out there.
 
 {{sender_name}}
-{{company}}
+{{company}} · {{sender_city}}, {{sender_province}}
+{{sender_phone}}
 {{website}}

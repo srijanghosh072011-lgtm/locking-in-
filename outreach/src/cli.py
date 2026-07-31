@@ -185,8 +185,30 @@ def eligible(cfg, con) -> list[tuple[dict, int]]:
     return out
 
 
+def unfilled(cfg: dict) -> list[str]:
+    """Config values still carrying a TODO placeholder.
+
+    A placeholder mailing address is a CASL violation and a TODO phone number
+    destroys the trust the email is trying to build, so a real send is blocked
+    until these are filled. Dry runs still work, so the copy can be read first.
+    """
+    return [
+        f"sender.{k}"
+        for k, v in cfg["sender"].items()
+        if isinstance(v, str) and "TODO" in v
+    ]
+
+
 def cmd_send(args, cfg, con) -> int:
     steps = {s["n"]: s for s in cfg["sequence"]["steps"]}
+    if not args.dry_run:
+        todo = unfilled(cfg)
+        if todo:
+            print("not sending — config.toml still has placeholders:")
+            for k in todo:
+                print(f"  {k}")
+            print("fill these in, or use --dry-run to preview the copy.")
+            return 1
     ok, why = send_mod.within_window(cfg)
     if not ok and not args.ignore_window and not args.dry_run:
         print(f"not sending: {why}")

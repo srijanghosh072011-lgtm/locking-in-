@@ -2,15 +2,17 @@ Subject: re: built a homepage for {{business}}
 ---
 Hi {{first_name}},
 
-Following up on the homepage mockup I sent for {{business}} — it's still sitting
-in my folder with your name on it.
+Following up on the homepage I sent for {{business}} — it's still sitting in my
+folder with your name on it.
 
 One question and I'll leave it there: when someone finds you on their phone at
 9pm with water on the floor, what do you want them to see?
 
-If the answer isn't what's there now, I can fix that.
+If the answer isn't what's there now, I can fix that — and you don't pay until
+it's live.
 
-{{booking_link}}
+The working version again, if you didn't get to it: {{demo_link}}
 
 {{sender_name}}
-{{company}}
+{{company}} · {{sender_city}}, {{sender_province}}
+{{sender_phone}}

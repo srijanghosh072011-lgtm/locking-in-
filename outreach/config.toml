@@ -6,14 +6,24 @@ name            = "Srijan Ghosh"
 email           = "srijan.ghosh201107@gmail.com"
 reply_to        = ""                       # blank = replies go to sender.email
 company         = "Ghosh Designs"
-website         = "https://ghoshdesigns.ca"          # TODO: your real site
-booking_link    = "https://cal.com/ghoshdesigns/10min"  # TODO: your real booking link
-city            = "Toronto"                # used in "I'm a web designer in {city}"
+website         = "TODO https://ghoshdesigns.ca"        # your real site
+booking_link    = "TODO https://cal.com/..."            # your real booking link
+city            = "Regina"                 # "I'm based in {city}"
+province        = "SK"
+
+# A real, reachable phone number does more for trust than any line of copy —
+# a tradesperson who can call you is far likelier to believe you exist.
+phone           = "TODO your phone number"
+
+# A working demo they can click through and poke at. This is the single
+# strongest trust signal in the email: it turns "some guy emailed me" into
+# "I just used a site he built."
+demo_link       = "TODO https://srijanghosh072011-lgtm.github.io/plumbing-Templates-/"
 
 # CASL (Canada's anti-spam law) requires a real mailing address in every
 # commercial email. A PO box or registered business address is fine.
-# Do not ship this campaign with a placeholder here — see README "Legal".
-mailing_address = "TODO — your business mailing address, City, Province, Postal Code"
+# `send` refuses to run while any value here still says TODO.
+mailing_address = "TODO — your mailing address, Regina, SK, Postal Code"
 
 [smtp]
 host = "smtp.gmail.com"

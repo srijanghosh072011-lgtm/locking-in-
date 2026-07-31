@@ -2,25 +2,31 @@ Subject: built a homepage for {{business}}
 ---
 Hi {{first_name}},
 
-I'm a web designer in {{sender_city}}. I build sites for plumbing and heating
-companies, and I put together a homepage concept for {{business}} — your name,
-your city, your number on it. It's attached above.
+I'm {{sender_name}} — I design websites for plumbing and heating companies, and
+I'm based in {{sender_city}}, {{sender_province}}.
+
+I put together a homepage for {{business}} — your name, your city, your number
+on it. It's at the top of this email.
 
 {{audit_line}}
 
-To be straight with you: this is a mockup, not a live site. I built it from a
-template I use for plumbing companies and dropped your details in, so it took me
-about twenty minutes. I'm showing it to you because it's easier to react to
-something real than to a sales pitch.
+You can click through a full working version here — every page, desktop and
+mobile, real quote form:
 
-If you like the direction, the full build — every page, mobile, quote form,
-hooked up to your Google listing — runs about two weeks. If you don't, delete
-this and we're square. Either way the mockup is yours.
+{{demo_link}}
 
-Worth ten minutes on a call?
+Straight up: that's a design concept, not a live site. Nothing has been
+published under your name. If you like the direction, I'd build the real
+thing — every page, mobile, quote form, wired into your Google listing — in
+about two weeks.
 
-{{booking_link}}
+How I work: you don't pay anything until the site is live and you're happy with
+it. If it's not for you, keep the mockup and I'll leave you alone.
+
+Worth ten minutes on a call? {{booking_link}}
+
+Or just reply here, or call me at {{sender_phone}}.
 
 {{sender_name}}
-{{company}}
+{{company}} · {{sender_city}}, {{sender_province}}
 {{website}}
