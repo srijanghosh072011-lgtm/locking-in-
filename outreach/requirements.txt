@@ -1,0 +1,5 @@
+# Core pipeline (import/audit/render/send) is stdlib-only and needs none of these.
+# These two are only for generating the mockup screenshots:
+playwright>=1.40    # drives Chromium; do NOT run `playwright install` on a box
+                    # that already ships one — point CHROMIUM_PATH at it instead
+pillow>=10.0        # downscales the 3 MB retina PNG to a ~110 KB email JPEG

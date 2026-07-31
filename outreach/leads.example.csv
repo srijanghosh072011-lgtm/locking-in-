@@ -1,0 +1,5 @@
+business,contact_name,email,domain,phone,city,province,review_count
+Fraser Valley Plumbing & Heating Ltd.,Dave,dave@example-fvplumbing.ca,example-fvplumbing.ca,(604) 555-0199,Abbotsford,BC,84
+Ackland Plumbing Inc.,Marie,marie@example-ackland.ca,,(306) 555-0142,Saskatoon,SK,131
+Northline Mechanical Services,,info@example-northline.ca,example-northline.ca,(807) 555-0110,Thunder Bay,ON,46
+Copperhead Plumbing,Sam,sam@example-copperhead.ca,example-copperhead.ca,(902) 555-0177,Halifax,NS,9

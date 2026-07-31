@@ -1,0 +1,61 @@
+# Ghosh Designs — cold outreach config
+# Anything secret lives in .env, never here. This file is committed.
+
+[sender]
+name            = "Srijan Ghosh"
+email           = "srijan.ghosh201107@gmail.com"
+reply_to        = ""                       # blank = replies go to sender.email
+company         = "Ghosh Designs"
+website         = "https://ghoshdesigns.ca"          # TODO: your real site
+booking_link    = "https://cal.com/ghoshdesigns/10min"  # TODO: your real booking link
+city            = "Toronto"                # used in "I'm a web designer in {city}"
+
+# CASL (Canada's anti-spam law) requires a real mailing address in every
+# commercial email. A PO box or registered business address is fine.
+# Do not ship this campaign with a placeholder here — see README "Legal".
+mailing_address = "TODO — your business mailing address, City, Province, Postal Code"
+
+[smtp]
+host = "smtp.gmail.com"
+port = 587
+user = "srijan.ghosh201107@gmail.com"
+# Password comes from the GMAIL_APP_PASSWORD env var (see .env.example).
+
+[sending]
+# Hard ceiling on messages per calendar day, across all sequence steps.
+daily_cap = 50
+
+# Warm-up ramp. Day 1 of sending uses warmup[0], day 2 warmup[1], and so on.
+# Once the ramp is exhausted you sit at daily_cap. A brand-new Gmail account
+# blasting 50 cold emails on day one is the fastest way to get filtered.
+warmup = [5, 5, 8, 8, 12, 15, 18, 22, 26, 30, 34, 38, 42, 46, 50]
+
+# Random gap between individual sends, in seconds. Human-ish pacing.
+min_gap_seconds = 240
+max_gap_seconds = 900
+
+# Only send inside this local window, on these weekdays (1=Mon ... 7=Sun).
+timezone          = "America/Toronto"
+send_window_start = 8
+send_window_end   = 16
+send_days         = [2, 3, 4]   # Tue/Wed/Thu land best for B2B
+
+# Embed the mockup screenshot inline in step 1. Turning this off sends a link
+# instead, which is marginally better for deliverability but much weaker copy.
+embed_image    = true
+max_image_kb   = 250
+
+[qualifying]
+# A lead must clear BOTH bars to enter the sequence.
+min_audit_score  = 40   # how badly they need a new site (0-100, higher = worse site)
+min_review_count = 15   # proxy for "decent-sized business"
+
+[sequence]
+# Days to wait after the previous step before this one is eligible.
+# Step 1 goes out as soon as the lead is queued.
+steps = [
+  { n = 1, template = "step1_preview", delay_days = 0 },
+  { n = 2, template = "step2_bump",    delay_days = 3 },
+  { n = 3, template = "step3_proof",   delay_days = 4 },
+  { n = 4, template = "step4_close",   delay_days = 5 },
+]

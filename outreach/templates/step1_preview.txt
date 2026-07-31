@@ -1,0 +1,26 @@
+Subject: built a homepage for {{business}}
+---
+Hi {{first_name}},
+
+I'm a web designer in {{sender_city}}. I build sites for plumbing and heating
+companies, and I put together a homepage concept for {{business}} — your name,
+your city, your number on it. It's attached above.
+
+{{audit_line}}
+
+To be straight with you: this is a mockup, not a live site. I built it from a
+template I use for plumbing companies and dropped your details in, so it took me
+about twenty minutes. I'm showing it to you because it's easier to react to
+something real than to a sales pitch.
+
+If you like the direction, the full build — every page, mobile, quote form,
+hooked up to your Google listing — runs about two weeks. If you don't, delete
+this and we're square. Either way the mockup is yours.
+
+Worth ten minutes on a call?
+
+{{booking_link}}
+
+{{sender_name}}
+{{company}}
+{{website}}

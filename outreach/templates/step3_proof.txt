@@ -1,0 +1,22 @@
+Subject: the part that actually makes you money
+
+---
+Hi {{first_name}},
+
+Last note on the design, then something more useful.
+
+Most plumbing sites I look at lose work in the same three places:
+
+  1. The phone number isn't tappable on mobile. People give up.
+  2. No emergency/24-hour messaging above the fold, so the urgent
+     jobs — the profitable ones — go to whoever says it first.
+  3. No service-area pages, so you don't show up for the towns
+     around you where you'd happily drive.
+
+That's what I'd build into {{business}}'s site. Not a prettier brochure — a
+thing that turns searches into calls.
+
+If that's worth ten minutes: {{booking_link}}
+
+{{sender_name}}
+{{company}}

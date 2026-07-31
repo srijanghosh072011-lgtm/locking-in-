@@ -1,0 +1,16 @@
+Subject: re: built a homepage for {{business}}
+---
+Hi {{first_name}},
+
+Following up on the homepage mockup I sent for {{business}} — it's still sitting
+in my folder with your name on it.
+
+One question and I'll leave it there: when someone finds you on their phone at
+9pm with water on the floor, what do you want them to see?
+
+If the answer isn't what's there now, I can fix that.
+
+{{booking_link}}
+
+{{sender_name}}
+{{company}}

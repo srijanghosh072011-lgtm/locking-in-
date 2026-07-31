@@ -1,0 +1,19 @@
+Subject: closing the file on this
+
+---
+Hi {{first_name}},
+
+I've sent a few notes about a new site for {{business}} and haven't heard back,
+which is a perfectly good answer — you're busy running a trade.
+
+I'll stop here. I'm not going to keep emailing you.
+
+The mockup stays yours. If it ever becomes relevant — a slow winter, a
+competitor's site showing up above yours — reply to this and I'll pick it
+straight back up.
+
+Good luck out there.
+
+{{sender_name}}
+{{company}}
+{{website}}
