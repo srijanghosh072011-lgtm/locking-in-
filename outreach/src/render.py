@@ -66,8 +66,24 @@ def casl_footer(cfg: dict, unsubscribe_mailto: str) -> str:
 
 
 def to_html(body: str, footer: str, image_cid: str | None) -> str:
-    def esc_para(p: str) -> str:
+    def hard(p: str) -> str:
         return html.escape(p).replace("\n", "<br>")
+
+    def esc_para(p: str) -> str:
+        """Reflow prose, but keep real line breaks.
+
+        Templates are hard-wrapped at ~78 chars for the plain-text part. Turning
+        every one of those newlines into <br> freezes desktop line lengths into
+        the HTML, which reads badly on a phone. Blocks whose lines are all short
+        (signatures, addresses, numbered lists) are intentional breaks and keep
+        them; anything else is wrapped prose and gets joined back together.
+        """
+        lines = [ln.strip() for ln in p.split("\n")]
+        intentional = all(len(ln) < 45 for ln in lines) or any(
+            ln.lstrip().startswith(("1.", "2.", "3.", "-", "*", "•"))
+            for ln in p.split("\n")
+        )
+        return hard(p) if intentional else html.escape(" ".join(lines))
 
     blocks = []
     if image_cid:
@@ -81,7 +97,7 @@ def to_html(body: str, footer: str, image_cid: str | None) -> str:
     blocks.append(
         '<hr style="border:none;border-top:1px solid #e5e5e5;margin:24px 0 12px">'
         f'<p style="margin:0;color:#777;font-size:12px;line-height:1.5">'
-        f'{esc_para(footer)}</p>'
+        f'{hard(footer)}</p>'
     )
     return (
         '<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;'
