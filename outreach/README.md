@@ -134,8 +134,18 @@ Three things in the copy carry it, and all three are verifiable rather than
 claimed:
 
 - **A clickable demo.** `demo_link` turns "some guy emailed me" into "I just
-  used a site he built". It is the strongest signal in the message — make sure
-  the URL actually serves the good build before sending.
+  used a site he built". It is the strongest signal in the message.
+
+  **Host it on your own domain.** Not the `github.io` URL. That URL contains
+  the word "Templates", which contradicts an email saying you put a homepage
+  together for them — a prospect clocks that without having to steal anything.
+  The repo behind it is also public, so the whole project is cloneable.
+
+  On copying generally: every website's front end is copyable and always has
+  been. A plumber who can deploy a Next.js export was never going to pay you.
+  What you sell is the build, their content and photos, hosting, the Google
+  Business Profile wiring, and someone to call when the quote form breaks.
+  Showing work is the job — just don't hand over the repo name while you do it.
 - **Local.** "I'm based in Regina, SK" plus a real phone number. A tradesperson
   who can phone you is far likelier to believe you exist.
 - **Risk reversal.** "You don't pay anything until the site is live and you're

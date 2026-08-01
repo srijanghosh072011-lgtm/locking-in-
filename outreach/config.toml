@@ -18,7 +18,14 @@ phone           = "TODO your phone number"
 # A working demo they can click through and poke at. This is the single
 # strongest trust signal in the email: it turns "some guy emailed me" into
 # "I just used a site he built."
-demo_link       = "TODO https://srijanghosh072011-lgtm.github.io/plumbing-Templates-/"
+#
+# Host this on YOUR OWN domain (demo.ghoshdesigns.ca, or ghoshdesigns.ca/demo).
+# Do not use the raw github.io URL. Two reasons, the second mattering more:
+#   1. The repo behind it is public, so the whole project is cloneable.
+#   2. That URL contains the word "Templates", which contradicts an email saying
+#      you put a homepage together for them. A prospect notices that without
+#      having to steal anything.
+demo_link       = "TODO https://demo.ghoshdesigns.ca"
 
 # CASL (Canada's anti-spam law) requires a real mailing address in every
 # commercial email. A PO box or registered business address is fine.
