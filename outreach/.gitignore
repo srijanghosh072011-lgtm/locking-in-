@@ -6,3 +6,4 @@ mockups/*.jpg
 !mockups/.gitkeep
 __pycache__/
 *.pyc
+logs/

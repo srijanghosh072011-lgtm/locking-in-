@@ -34,28 +34,57 @@ Edit `config.toml` — `mailing_address`, `phone`, `demo_link`, `booking_link`,
 `website`. `send` **refuses to run** while any of them still says `TODO`;
 `--dry-run` still works so you can read the copy first.
 
-The mockup step needs the demo template served locally:
-
-```bash
-# from a checkout of the plumbing template's built site
-ln -s /path/to/site /tmp/siteroot/plumbing-Templates-
-cd /tmp/siteroot && python3 -m http.server 8899
-```
+`mockups` serves the demo template itself on a random free port — set
+`[template] dir` to the folder containing the built site's `index.html`.
+No second terminal, which is what makes cron possible.
 
 ## Daily run
 
 ```bash
-python3 src/cli.py import leads.csv
-python3 src/cli.py audit
-python3 src/cli.py mockups
-python3 src/cli.py send --dry-run    # ALWAYS read these first
-python3 src/cli.py send
-python3 src/cli.py replies           # run before the next send
+python3 src/cli.py import leads.csv   # whenever you have new prospects
+python3 src/cli.py daily --dry-run    # read the copy, send nothing
+python3 src/cli.py daily              # audit + mockups + replies + send
 python3 src/cli.py status
 ```
 
-`send` refuses to run outside the configured window. `--dry-run` prints the
-exact emails and sends nothing.
+`daily` is the whole loop. It processes replies *before* sending, so anyone who
+wrote back overnight drops out instead of getting the next step anyway. A
+screenshot or IMAP failure is logged and skipped; a send failure stops the run.
+
+Individual steps (`audit`, `mockups`, `replies`, `send`, `suppress`) still exist
+for when something needs poking at by hand.
+
+`send` refuses to run outside the configured window, and while any config value
+still says `TODO`. `--dry-run` prints the exact emails and sends nothing.
+
+## Automating it
+
+The pipeline is a plain CLI, so scheduling is the OS's job.
+
+**macOS / Linux** — `crontab -e`, then one line. Twice on each sending day,
+inside the window, so a run that finds nothing due gets a second chance:
+
+```cron
+0 9,14 * * 2,3,4  /full/path/to/outreach/run-daily.sh
+```
+
+`run-daily.sh` handles cron's minimal PATH and appends to `logs/daily-<date>.log`.
+On macOS, Terminal (or `cron`) needs Full Disk Access or the job dies silently.
+
+**Windows** — Task Scheduler, "Start a program": `python3`, arguments
+`src/cli.py daily`, "Start in" set to the `outreach` folder.
+
+Two things to get right before you automate:
+
+1. **Run it by hand for the first week.** The ramp is at 5/day then, so it costs
+   almost nothing to watch — and the first time you see the real copy go to a
+   real plumber is the time to change your mind about it, not after 200 sends.
+2. **This machine has to be awake.** Cron does not run on a sleeping laptop.
+   If that is a problem, a $5/month VPS or a Raspberry Pi is the fix — the whole
+   pipeline is stdlib plus Playwright.
+
+`daily` is safe to run more often than needed: the daily cap, the ramp and the
+send window all gate it independently, so an extra invocation sends nothing.
 
 ## Lead CSV
 

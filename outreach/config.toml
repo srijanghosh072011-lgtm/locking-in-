@@ -55,6 +55,14 @@ send_days         = [2, 3, 4]   # Tue/Wed/Thu land best for B2B
 embed_image    = true
 max_image_kb   = 250
 
+[template]
+# The built demo site — the folder containing index.html. `mockups` serves this
+# itself on a random free port, so there is no second terminal to babysit.
+dir       = "TODO /absolute/path/to/plumbing-templates/docs"
+# The basePath the site was built with. Its CSS and images are referenced from
+# this absolute prefix; serve it anywhere else and the screenshot is unstyled.
+base_path = "/plumbing-Templates-/"
+
 [qualifying]
 # A lead must clear BOTH bars to enter the sequence.
 min_audit_score  = 40   # how badly they need a new site (0-100, higher = worse site)

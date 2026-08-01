@@ -129,6 +129,7 @@ def cmd_audit(args, cfg, con) -> int:
 
 # --------------------------------------------------------------- mockups ----
 def cmd_mockups(args, cfg, con) -> int:
+    from serve import serve
     from shoot import optimize_for_email, shoot
 
     rows = con.execute(
@@ -139,21 +140,57 @@ def cmd_mockups(args, cfg, con) -> int:
         return 0
 
     MOCKUPS.mkdir(exist_ok=True)
-    for r in rows:
-        out = MOCKUPS / f"{slugify(r['business'])}.png"
-        try:
-            shoot(
-                args.template_url,
-                out,
-                preset="desktop",
-                personalize_cfg=build_config(r["business"], r["city"], r["phone"]),
-            )
-            final = optimize_for_email(out, cfg["sending"]["max_image_kb"])
-            con.execute("UPDATE leads SET mockup=? WHERE id=?", (str(final), r["id"]))
-            print(f"  {final.name}  ({final.stat().st_size/1024:.0f} KB)")
-        except Exception as e:
-            print(f"  ! {r['business']}: {type(e).__name__}: {e}")
+    tpl = cfg["template"]
+    tpl_dir = (ROOT / tpl["dir"]).resolve() if not pathlib.Path(tpl["dir"]).is_absolute() \
+        else pathlib.Path(tpl["dir"])
+
+    with serve(tpl_dir, tpl["base_path"]) as url:
+        print(f"serving template from {tpl_dir}")
+        for r in rows:
+            out = MOCKUPS / f"{slugify(r['business'])}.png"
+            try:
+                shoot(
+                    url,
+                    out,
+                    preset="desktop",
+                    personalize_cfg=build_config(r["business"], r["city"], r["phone"]),
+                )
+                final = optimize_for_email(out, cfg["sending"]["max_image_kb"])
+                con.execute(
+                    "UPDATE leads SET mockup=? WHERE id=?", (str(final), r["id"])
+                )
+                print(f"  {final.name}  ({final.stat().st_size/1024:.0f} KB)")
+            except Exception as e:
+                print(f"  ! {r['business']}: {type(e).__name__}: {e}")
     con.commit()
+    return 0
+
+
+def cmd_daily(args, cfg, con) -> int:
+    """One command for cron: score, draw, catch replies, then send.
+
+    Replies are processed *before* sending so anyone who wrote back overnight
+    drops out of the sequence instead of getting the next step anyway.
+    """
+    steps = [
+        ("audit", cmd_audit),
+        ("mockups", cmd_mockups),
+        ("replies", cmd_replies),
+        ("send", cmd_send),
+    ]
+    for name, fn in steps:
+        print(f"\n=== {name} " + "=" * (60 - len(name)))
+        try:
+            rc = fn(args, cfg, con)
+        except Exception as e:
+            print(f"  ! {name} failed: {type(e).__name__}: {e}")
+            # A screenshot or IMAP hiccup must not stop the send, but a failing
+            # send is the whole job — stop there so the error is noticed.
+            if name == "send":
+                return 1
+            continue
+        if name == "send" and rc != 0:
+            return rc
     return 0
 
 
@@ -193,8 +230,9 @@ def unfilled(cfg: dict) -> list[str]:
     until these are filled. Dry runs still work, so the copy can be read first.
     """
     return [
-        f"sender.{k}"
-        for k, v in cfg["sender"].items()
+        f"{section}.{k}"
+        for section in ("sender", "template")
+        for k, v in cfg.get(section, {}).items()
         if isinstance(v, str) and "TODO" in v
     ]
 
@@ -362,12 +400,14 @@ def main() -> int:
     p.set_defaults(fn=cmd_audit)
 
     p = sub.add_parser("mockups", help="render a personalized mockup per lead")
-    p.add_argument(
-        "--template-url",
-        default="http://127.0.0.1:8899/plumbing-Templates-/",
-        help="URL of the demo template to personalize",
-    )
     p.set_defaults(fn=cmd_mockups)
+
+    p = sub.add_parser("daily", help="audit + mockups + replies + send (for cron)")
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--ignore-window", action="store_true")
+    p.add_argument("--days", type=int, default=14)
+    p.set_defaults(fn=cmd_daily)
 
     p = sub.add_parser("send", help="send whatever is due")
     p.add_argument("--dry-run", action="store_true", help="print emails, send nothing")
