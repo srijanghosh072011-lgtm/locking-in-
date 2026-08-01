@@ -1,0 +1,103 @@
+name: outreach
+
+# Runs the campaign on GitHub's machines, so nothing depends on a laptop being
+# awake. Saskatchewan does not observe DST, so it is UTC-6 year round:
+# 15:00 UTC = 09:00 Regina, 20:00 UTC = 14:00 Regina. Tue/Wed/Thu.
+on:
+  schedule:
+    - cron: "0 15,20 * * 2,3,4"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the emails without sending"
+        type: boolean
+        default: true
+      ignore_window:
+        description: "Send even outside the configured hours"
+        type: boolean
+        default: false
+
+# Two overlapping runs would both read the same daily count and blow the cap.
+concurrency:
+  group: outreach
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The campaign database holds prospects' names and email addresses, and
+      # this job commits it back to the repo. On a public repo that publishes
+      # their contact details. Refuse rather than leak.
+      - name: Refuse to run while this repository is public
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          vis=$(gh repo view "${{ github.repository }}" --json visibility -q .visibility)
+          echo "visibility: $vis"
+          if [ "$vis" = "PUBLIC" ]; then
+            echo "::error::This repo is PUBLIC. The campaign database contains prospect email addresses and is committed back by this workflow. Make the repository private (Settings > General > Danger Zone) before enabling this."
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        working-directory: outreach
+        run: |
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Fetch demo template
+        working-directory: outreach
+        run: python3 src/cli.py fetch-template
+
+      # Informational: `send` has its own hard guard on placeholders, so a
+      # misconfiguration still cannot reach a prospect. Failing here would just
+      # stop you previewing copy before the config is finished.
+      - name: Check configuration
+        continue-on-error: true
+        working-directory: outreach
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python3 src/cli.py doctor
+
+      - name: Run campaign
+        working-directory: outreach
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          args=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then args="$args --dry-run"; fi
+          if [ "${{ inputs.ignore_window }}" = "true" ]; then args="$args --ignore-window"; fi
+          python3 src/cli.py daily $args
+
+      - name: Campaign status
+        if: always()
+        working-directory: outreach
+        run: python3 src/cli.py status || true
+
+      # State must survive between runs: the database records who has been
+      # emailed and how far through the sequence they are, and the mockups are
+      # referenced by path — regenerating is skipped for leads that already
+      # have one, so losing the files would send step 1 with no image.
+      - name: Persist campaign state
+        if: always() && inputs.dry_run != true
+        run: |
+          git config user.name "outreach-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f outreach/data/campaign.db outreach/mockups/*.jpg 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "no state changes"
+          else
+            git commit -m "campaign state $(date -u +%Y-%m-%d)"
+            git push
+          fi

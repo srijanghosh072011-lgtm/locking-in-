@@ -83,6 +83,24 @@ On macOS, Terminal (or `cron`) needs Full Disk Access or the job dies silently.
 **Windows** — Task Scheduler, "Start a program": `python3`, arguments
 `src/cli.py daily`, "Start in" set to the `outreach` folder.
 
+### Or: GitHub Actions (no laptop required)
+
+`.github/workflows/outreach.yml` runs the whole thing on GitHub's machines on
+the same Tue/Wed/Thu schedule, so nothing depends on your computer being awake.
+
+**The repository must be private first.** The campaign database holds prospects'
+names and email addresses, and the workflow commits it back so state survives
+between runs. On a public repo that publishes their contact details. The
+workflow checks this itself and refuses to run until you flip it — Settings →
+General → Danger Zone → Change visibility.
+
+Then: Settings → Secrets and variables → Actions → New repository secret,
+named `GMAIL_APP_PASSWORD`.
+
+Test it before trusting it: Actions → outreach → Run workflow, leaving
+"Print the emails without sending" ticked. That runs the full pipeline and
+prints the emails without sending any. Untick it when you're ready.
+
 Two things to get right before you automate:
 
 1. **Run it by hand for the first week.** The ramp is at 5/day then, so it costs
