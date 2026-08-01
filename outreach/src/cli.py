@@ -360,6 +360,137 @@ def cmd_replies(args, cfg, con) -> int:
 
 
 # ------------------------------------------------------- status / suppress ---
+TEMPLATE_REPO = "https://github.com/srijanghosh072011-lgtm/plumbing-templates-"
+TEMPLATE_BRANCH = "claude/site-replica-seo-aeo-phglx9"
+VENDOR = ROOT / "vendor" / "plumbing-template"
+
+
+def cmd_fetch_template(args, cfg, con) -> int:
+    """Pull the built demo site locally so [template] dir needs no manual clone."""
+    import shutil
+    import subprocess
+
+    if VENDOR.exists() and not args.force:
+        print(f"already present: {VENDOR}  (use --force to re-fetch)")
+        return 0
+    if VENDOR.exists():
+        shutil.rmtree(VENDOR)
+    VENDOR.parent.mkdir(parents=True, exist_ok=True)
+
+    print(f"fetching {TEMPLATE_BRANCH} …")
+    r = subprocess.run(
+        ["git", "clone", "--depth", "1", "--branch", TEMPLATE_BRANCH,
+         TEMPLATE_REPO, str(VENDOR)],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print(r.stderr.strip()[-600:])
+        return 1
+
+    docs = VENDOR / "docs"
+    if not (docs / "index.html").exists():
+        print(f"! clone succeeded but no docs/index.html in {VENDOR}")
+        return 1
+    configured = pathlib.Path(cfg["template"]["dir"])
+    if not configured.is_absolute():
+        configured = (ROOT / configured).resolve()
+    if configured == docs.resolve():
+        print(f"ok — {docs} (already what config.toml points at)")
+    else:
+        print(f"ok — now set [template] dir = \"{docs}\" in config.toml")
+    return 0
+
+
+def _check(label: str, ok: bool, detail: str = "") -> bool:
+    print(f"  [{'ok' if ok else 'XX'}] {label}" + (f" — {detail}" if detail else ""))
+    return ok
+
+
+def cmd_doctor(args, cfg, con) -> int:
+    """Check every prerequisite and say precisely what to fix.
+
+    Exists because the failure modes here are all silent-ish: a missing browser,
+    an app password with spaces in it, a stale template path. Better to find
+    them on purpose than halfway through a send.
+    """
+    import shutil
+
+    fails = 0
+    print("dependencies")
+    try:
+        import playwright  # noqa: F401
+        _check("playwright installed", True)
+    except ImportError:
+        fails += not _check("playwright installed", False, "pip install -r requirements.txt")
+    try:
+        from PIL import Image  # noqa: F401
+        _check("pillow installed", True)
+    except ImportError:
+        fails += not _check("pillow installed", False, "pip install -r requirements.txt")
+
+    browser_ok = False
+    try:
+        from shoot import CHROMIUM
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            launch = {"args": ["--no-sandbox"]}
+            if pathlib.Path(CHROMIUM).exists():
+                launch["executable_path"] = CHROMIUM
+            b = p.chromium.launch(**launch)
+            b.close()
+        browser_ok = True
+    except Exception as e:
+        detail = f"{type(e).__name__} — run: playwright install chromium"
+    fails += not _check("chromium launches", browser_ok,
+                        "" if browser_ok else detail)
+
+    print("\nconfig")
+    todo = unfilled(cfg)
+    fails += not _check("no TODO placeholders", not todo,
+                        ", ".join(todo) if todo else "")
+
+    tpl = pathlib.Path(cfg["template"]["dir"]).expanduser()
+    if not tpl.is_absolute():
+        tpl = (ROOT / tpl).resolve()
+    ok = (tpl / "index.html").exists()
+    fails += not _check("template site present", ok,
+                        str(tpl) if ok else f"{tpl} has no index.html — try: "
+                        "python3 src/cli.py fetch-template")
+
+    print("\ncredentials")
+    load_env()
+    pw = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+    fails += not _check(".env has GMAIL_APP_PASSWORD", bool(pw),
+                        "" if pw else "cp .env.example .env, then fill it in")
+    if pw and len(pw) != 16:
+        _check("app password looks like 16 chars", False,
+               f"got {len(pw)} — that's probably your account password, not an "
+               "App Password from myaccount.google.com/apppasswords")
+
+    if pw and args.network:
+        import smtplib
+        import ssl
+        try:
+            s = smtplib.SMTP(cfg["smtp"]["host"], cfg["smtp"]["port"], timeout=20)
+            s.starttls(context=ssl.create_default_context())
+            s.login(cfg["smtp"]["user"], pw)
+            s.quit()
+            _check("SMTP login", True)
+        except Exception as e:
+            fails += not _check("SMTP login", False, f"{type(e).__name__}: {e}")
+
+    print("\ncampaign")
+    counts = {r["status"]: r["c"] for r in con.execute(
+        "SELECT status, COUNT(*) c FROM leads GROUP BY status")}
+    _check("leads imported", bool(counts), str(counts) if counts else
+           "python3 src/cli.py import leads.csv")
+    ok, why = send_mod.within_window(cfg)
+    _check("send window open now", ok, "" if ok else why)
+    print(f"\n{'all clear' if not fails else str(fails) + ' thing(s) to fix'}")
+    return 1 if fails else 0
+
+
 def cmd_status(args, cfg, con) -> int:
     print(f"allowance today : {send_mod.daily_allowance(cfg, con)}"
           f" (cap {cfg['sending']['daily_cap']})")
@@ -418,6 +549,15 @@ def main() -> int:
     p = sub.add_parser("replies", help="scan inbox and stop sequences")
     p.add_argument("--days", type=int, default=14)
     p.set_defaults(fn=cmd_replies)
+
+    p = sub.add_parser("doctor", help="check everything and say what to fix")
+    p.add_argument("--network", action="store_true",
+                   help="also try a real SMTP login")
+    p.set_defaults(fn=cmd_doctor)
+
+    p = sub.add_parser("fetch-template", help="download the demo site locally")
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(fn=cmd_fetch_template)
 
     p = sub.add_parser("status")
     p.set_defaults(fn=cmd_status)

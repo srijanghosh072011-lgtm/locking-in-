@@ -26,9 +26,18 @@ with *their* name on it gets replies.
 ## Setup
 
 ```bash
-pip install -r requirements.txt          # only needed for mockups
+pip install -r requirements.txt
+playwright install chromium
+python3 src/cli.py fetch-template        # downloads the demo site locally
 cp .env.example .env                     # then add your Gmail App Password
+python3 src/cli.py doctor                # tells you what's still missing
 ```
+
+`doctor` checks dependencies, the browser, config placeholders, the template
+and your credentials, and prints the fix for anything broken. `doctor --network`
+also attempts a real SMTP login, which is the fastest way to find out an App
+Password was pasted wrong. Run it before the first send and any time something
+behaves oddly.
 
 Edit `config.toml` — `mailing_address`, `phone`, `demo_link`, `booking_link`,
 `website`. `send` **refuses to run** while any of them still says `TODO`;

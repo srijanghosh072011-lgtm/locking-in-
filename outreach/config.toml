@@ -58,7 +58,9 @@ max_image_kb   = 250
 [template]
 # The built demo site — the folder containing index.html. `mockups` serves this
 # itself on a random free port, so there is no second terminal to babysit.
-dir       = "TODO /absolute/path/to/plumbing-templates/docs"
+# Relative paths resolve against the outreach/ folder. This is exactly where
+# `python3 src/cli.py fetch-template` puts the built site, so it needs no edit.
+dir       = "vendor/plumbing-template/docs"
 # The basePath the site was built with. Its CSS and images are referenced from
 # this absolute prefix; serve it anywhere else and the screenshot is unstyled.
 base_path = "/plumbing-Templates-/"
