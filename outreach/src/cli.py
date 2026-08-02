@@ -20,6 +20,7 @@ import email
 import imaplib
 import os
 import pathlib
+import re
 import sys
 import tomllib
 
@@ -320,7 +321,7 @@ def cmd_send(args, cfg, con) -> int:
 def cmd_replies(args, cfg, con) -> int:
     """Mark anyone who wrote back as replied so the sequence stops."""
     load_env()
-    pw = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+    pw = re.sub(r"\s+", "", os.environ.get("GMAIL_APP_PASSWORD", ""))
     if not pw:
         print("GMAIL_APP_PASSWORD not set")
         return 1
@@ -460,7 +461,7 @@ def cmd_doctor(args, cfg, con) -> int:
 
     print("\ncredentials")
     load_env()
-    pw = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+    pw = re.sub(r"\s+", "", os.environ.get("GMAIL_APP_PASSWORD", ""))
     fails += not _check(".env has GMAIL_APP_PASSWORD", bool(pw),
                         "" if pw else "cp .env.example .env, then fill it in")
     if pw and len(pw) != 16:

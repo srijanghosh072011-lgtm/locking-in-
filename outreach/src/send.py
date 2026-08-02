@@ -12,6 +12,7 @@ from __future__ import annotations
 import datetime as dt
 import os
 import random
+import re
 import smtplib
 import ssl
 import time
@@ -49,7 +50,7 @@ def within_window(cfg: dict, when: dt.datetime | None = None) -> tuple[bool, str
 
 
 def connect(cfg: dict) -> smtplib.SMTP:
-    password = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+    password = re.sub(r"\s+", "", os.environ.get("GMAIL_APP_PASSWORD", ""))
     if not password:
         raise SendBlocked(
             "GMAIL_APP_PASSWORD is not set — copy .env.example to .env and fill it in"
