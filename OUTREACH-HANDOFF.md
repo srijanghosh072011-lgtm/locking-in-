@@ -36,10 +36,12 @@ Five things that matter more than anything else in this document.
 Caught by the IMAP watcher and pulled from the sequence, but the reply itself is
 sitting in Gmail. It is the only live thread in the entire operation.
 
-### 02. Step 4 says "before September." It is September. — *Before Mon 07:23*
+### 02. Step 4 said "before September." It is September. — *Fixed 2026-09-06*
 
-13 leads receive that email Monday and Tuesday with a deadline that has already
-passed. `offer_free.txt` has the same line.
+13 leads were due to receive that email Monday and Tuesday with a deadline that
+had already passed, and `offer_free.txt` carried the same line. Both sentences
+are now deleted on `main`, so Monday's 07:23 run picks up the corrected copy.
+No replacement date was invented, which is the whole point.
 
 ### 03. The email list runs dry on Tuesday. — *Mon–Tue*
 
@@ -257,7 +259,7 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `step4_price.txt` — 38 sent · **contains the stale deadline**
+#### `step4_price.txt` — 38 sent · *stale deadline removed 2026-09-06*
 
 ```
 Subject: what it actually costs
@@ -270,8 +272,6 @@ replied.
 $1,500 to build it. $250 a month after that covers hosting and any changes you
 want, done the same day you ask. You don't pay the $1,500 until the site is
 live and you're happy with it.
-
-I can take a few more on before September, then I get slower.
 
 The homepage for {{business}} is still sitting here if you want it.
 
@@ -304,7 +304,7 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `offer_free.txt` — 4 sent · **contains the stale deadline**
+#### `offer_free.txt` — 4 sent · *stale deadline removed 2026-09-06*
 
 ```
 Subject: free one
@@ -313,9 +313,8 @@ Hey {{first_name}},
 
 Bit of a different offer.
 
-I'm building my portfolio and I'm doing one plumbing site completely free
-before September. No charge, no catch. I just need a real company in it that
-I can show people.
+I'm building my portfolio and I'm doing one plumbing site completely free.
+No charge, no catch. I just need a real company in it that I can show people.
 
 I already made the homepage for {{business}}, so you'd be the quickest one for
 me to finish.
@@ -1007,10 +1006,10 @@ Everything outstanding, in the order it should be dealt with.
   thread in the operation. The Gmail connector needs re-authorizing before an AI
   session can read it, so check by hand or reconnect Gmail in the claude.ai
   connector settings.
-- [ ] **Fix "before September" in `step4_price.txt` and `offer_free.txt`.**
-  Thirteen leads receive step 4 on Monday and Tuesday with a deadline that has
-  already passed. Delete the sentence or replace it with something true. This is
-  exactly the kind of false claim the rest of the copy was cleaned up to remove.
+- [x] ~~**Fix "before September" in `step4_price.txt` and `offer_free.txt`.**~~
+  Done 2026-09-06, commit `79f7d64` on `email-automation-` `main`. Both sentences
+  deleted rather than redated, so nothing goes stale again. Monday's run picks up
+  the corrected copy on its own, no redeploy needed.
 
 ### This week
 
@@ -1034,6 +1033,20 @@ Everything outstanding, in the order it should be dealt with.
   someone actually says yes: what to ask them for, what the build looks like day
   to day, how they pay, or what the first invoice says. Worth writing before it is
   needed rather than during.
+- **The `Inc..` bug is only half fixed.** The rule was applied to the later
+  templates, but `step1_preview.txt` line 5 still reads
+  `I made a homepage for {{business}}. It's attached.` and `step2_bump.txt`
+  line 5 ends `...I made for {{business}}.` — a period landing straight after
+  the token. `render.py` substitutes `lead["business"]` raw, with no
+  period-stripping anywhere in the path, and nine leads in `leads.csv` have names
+  ending in a period: RANT, Plumbineers, Hello Plumber, E.T. Mechanical, Allen
+  Mechanical, Nickel, Bertelsen, Premium, and Brendon Mackay. Those nine already
+  received `Inc..` and `Ltd..` in steps 1 and 2. It costs nothing now, because
+  neither template will be sent again to the current list — but step 1 goes to
+  every lead of the next import, so fix it before importing a new batch. Either
+  restructure both sentences so no period follows the token, or strip a trailing
+  period from `business` in `render.py`.
+
 - **Reply to Lynn at London Mechanical.** Drafted, never sent. She is suppressed,
   so this is courtesy only, not outreach.
 - **`offer.yml` writes no campaign state,** so manual sends are invisible to the
