@@ -10,12 +10,12 @@ going.
 | | |
 |---|---|
 | **Owner** | Srijan Ghosh, Ghosh Designs, Regina SK |
-| **State as of** | 2026-09-04, 18:22 Regina |
+| **State as of** | 2026-09-09, after the Sept 7 run |
 | **Source** | Live campaign database, not memory |
 
 | Leads | Emails sent | Replies | Clients | Texts sent | Calls made |
 |---:|---:|---:|---:|---:|---:|
-| 61 | 218 | 3 | 0 | 1 | 0 |
+| 61 | 268 | 3 | 0 | 1 | 0 |
 
 ## Contents
 
@@ -36,17 +36,19 @@ Five things that matter more than anything else in this document.
 Caught by the IMAP watcher and pulled from the sequence, but the reply itself is
 sitting in Gmail. It is the only live thread in the entire operation.
 
-### 02. Step 4 said "before September." It is September. — *Fixed 2026-09-06*
+### 02. The sequence was rewritten. — *2026-09-09*
 
-13 leads were due to receive that email Monday and Tuesday with a deadline that
-had already passed, and `offer_free.txt` carried the same line. Both sentences
-are now deleted on `main`, so Monday's 07:23 run picks up the corrected copy.
-No replacement date was invented, which is the whole point.
+Five steps became four, the offer now leads with a free portfolio build, and
+the attached mockup is called a mockup rather than a homepage. Read
+[the sequence](#the-sequence) before importing new leads or editing copy. The
+stale "before September" deadline that prompted this was deleted on Sept 6,
+before the Sept 7 run picked it up.
 
-### 03. The email list runs dry on Tuesday. — *Mon–Tue*
+### 03. The email list is dry. — *Happened Sept 7*
 
-~46 sends Monday, ~4 Tuesday, then 58 of 61 leads are finished and every run
-after that sends zero.
+The Sept 7 run sent 50 and hit the daily cap. 38 leads are done, 20 are still
+in flight, and every scheduled run from here sends close to zero until new
+leads are imported. The sequence was rewritten on Sept 9 for that next batch.
 
 ### 04. 20 of 21 SMS leads have never been texted. — *Not started*
 
@@ -61,7 +63,7 @@ was the original reason for wanting a portfolio piece.
 
 The machine works. It is well built, the bugs found in it were real bugs fixed
 properly, and it costs nothing to run. It has also produced zero clients from
-218 emails and one text — three replies, two of them rejections. About a 1.4%
+268 emails and one text — three replies, two of them rejections. About a 1.1%
 reply rate and a 0% close rate.
 
 The email channel has had a fair test and the answer is mostly no. The untested
@@ -76,7 +78,7 @@ Nothing depends on a laptop being awake.
 
 For each plumbing company in a database it screenshots a homepage mockup built
 for that specific business, emails it to them with a short personal note,
-follows up four more times over roughly sixteen days, watches the inbox over
+follows up three more times over roughly twelve days, watches the inbox over
 IMAP and drops anyone who replies, then commits the updated database back to the
 repo so the next run knows what happened.
 
@@ -106,7 +108,7 @@ email-automation-/
     ├── leads.csv                   # input list
     ├── data/campaign.db            # SQLite state, committed after every run
     ├── mockups/                    # 62 generated .jpg screenshots
-    ├── templates/                  # the six email bodies
+    ├── templates/                  # the five email bodies
     ├── vendor/plumbing-template/   # fetched demo site, screenshotted against
     └── src/
         ├── cli.py         (797)    # command surface + orchestration
@@ -162,49 +164,81 @@ not block the run and can be ignored.
 
 ### The sequence
 
-Five steps. Delays are days since the previous step reached that lead.
+**Rewritten 2026-09-09.** Four steps, down from five. Delays are days since the
+previous step reached that lead.
 
 | Step | Template | Delay | Subject line |
 |---|---|---|---|
-| 1 | `step1_preview` | 0 | made you a homepage for {business} |
-| 2 | `step2_bump` | 3 d | re: made you a homepage for {business} |
-| 3 | `step3_proof` | 4 d | three things worth checking on your site |
-| 4 | `step4_price` | 4 d | what it actually costs |
-| 5 | `step5_close` | 5 d | last one from me |
+| 1 | `step1_mockup` | 0 | made you a homepage mockup for {business} |
+| 2 | `step2_look` | 3 d | the mockup I made for {business} |
+| 3 | `step3_price` | 4 d | what it normally costs |
+| 4 | `step4_close` | 5 d | last one from me |
 
-Step 4 sits before step 5 deliberately. Step 5 promises to stop emailing, so
+Step 3 sits before step 4 deliberately. Step 4 promises to stop emailing, so
 nothing may follow it. Price had to come first — nobody had ever been told what
 this costs, and silence on price is a common reason a warm prospect goes quiet.
+Price now also anchors what the free build is worth.
 
-A sixth template, `offer_free`, is not part of the sequence. It is sent by hand
+A fifth template, `offer_free`, is not part of the sequence. It is sent by hand
 through the offer workflow.
+
+#### What changed, and why
+
+The first version sent 218 emails for three replies and no clients. The rewrite
+is not a polish pass, it is four structural changes:
+
+- **It is a mockup, not a homepage.** Saying "I made a homepage for your
+  company" overclaims: what is attached is a picture of one. Same asset,
+  honest word for it.
+- **The free portfolio build leads.** There are no clients and no portfolio,
+  which is what the last 268 sends tested. One site free for a real company to
+  show, first person to accept gets it. The mockup stays the hook and the free
+  build is the reason to act, in that order, because leading with "free" from a
+  stranger reads as a scam.
+- **`step3_proof` is deleted.** It opened by promising "Last one about the
+  site" and then two more emails followed it, and it told twelve leads with no
+  website what to check on their website.
+- **One ask per email.** The demo link moved from step 1 to step 2, where it
+  doubles as attachment recovery: step 2 now says outright that step 1 arrived
+  as a JPEG, which is a tap-download-open on a phone and easy to miss.
+
+The fake `re:` subject on step 2 is also gone. `render.py` sets a `Message-ID`
+but never `In-Reply-To`, so it was the appearance of a reply rather than an
+actual thread, which is the same species as the fake scarcity already refused.
+
+Word count went from 411 across five emails to 329 across four, but most of
+that is deleting `step3_proof` rather than tightening prose.
 
 **Template tokens.** `{{first_name}}`, `{{business}}`, `{{sender_email}}`,
 `{{website}}`, `{{demo_link?}}`, `{{audit_line?}}`. A token ending in `?` makes
 its whole line vanish when the value is empty — which is why leads with no audit
 finding do not get a blank gap in the middle of the email.
 
-### The six templates, in full
+### The five templates, in full
 
-#### `step1_preview.txt` — 61 sent
+Live copy as of 2026-09-09. Send counts refer to the slot, not this text:
+every template except `step4_close` was rewritten on 2026-09-09, so the
+numbers below are what went out under the previous wording.
+
+#### `step1_mockup.txt` — 61 sent under the old step 1 copy
 
 ```
-Subject: made you a homepage for {{business}}
+Subject: made you a homepage mockup for {{business}}
 ---
 Hey {{first_name}},
 
-I made a homepage for {{business}}. It's attached.
+I'm Srijan, I build websites out of Regina. Rather than email asking if you
+wanted one, I made a homepage mockup for {{business}}.
+It's attached.
 
 {{audit_line?}}
 
-Figured it'd be easier to build one and show you than to email asking if you
-wanted one.
+It's a mockup, not a live site. The layout is the real part, the wording on
+it is placeholder.
 
-The wording on it is placeholder, the layout is the real part. If you want it
-for real I can have it live in a couple of days, and you don't pay until it's
-up and you're happy with it.
-
-Here's a finished one you can click around: {{demo_link?}}
+I'm building my portfolio, so I'm doing one of these free. No charge, nothing
+monthly. I just need a real company I can show people, and the first person
+to say yes gets it.
 
 Want me to build yours out?
 
@@ -214,19 +248,23 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `step2_bump.txt` — 60 sent
+#### `step2_look.txt` — 60 sent under the old step 2 copy
 
 ```
-Subject: re: made you a homepage for {{business}}
+Subject: the mockup I made for {{business}}
 ---
 Hey {{first_name}},
 
-Following up once on the homepage I made for {{business}}.
-Still sitting in my folder.
+Sent you a homepage mockup for {{business}}
+a few days ago. It came through as an attachment, which is easy to miss on
+a phone.
 
-Is it that you don't need a site, or just that it's never made it to the top
-of the list? Either's fine, I only ask because I don't want to keep bugging
-you if it's the first one.
+Here's a finished site of the same build you can click around:
+{{demo_link?}}
+
+Yours would be that, with your name and your towns on it instead.
+
+If the free build is still open when you reply, it's yours.
 
 Srijan
 Ghosh Designs, Regina SK
@@ -234,24 +272,21 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `step3_proof.txt` — 51 sent
+#### `step3_price.txt` — 51 sent as the old step 4
 
 ```
-Subject: three things worth checking on your site
+Subject: what it normally costs
 ---
 Hey {{first_name}},
 
-Last one about the site. Something useful either way.
+In case it helps to know what you'd be getting. This normally runs $1,500 to
+build, then $250 a month for hosting and any changes you want, done the same
+day you ask.
 
-Most plumbing sites I look at lose calls in the same three places. The phone
-number isn't tappable on a phone, so people give up. There's nothing about
-emergency or 24 hour work near the top, so the urgent jobs go to whoever says
-it first. And there are no pages for the towns nearby, so you never come up
-in those searches.
+The portfolio one is free, and if nobody has claimed it by the time you
+reply, it's yours.
 
-Worth checking against, if you've got a site. Worth insisting on, if you ever
-get one built. Either way it's useful to know, whether or not you ever reply
-to me.
+The mockup for {{business}} is still here either way.
 
 Srijan
 Ghosh Designs, Regina SK
@@ -259,29 +294,7 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `step4_price.txt` — 38 sent · *stale deadline removed 2026-09-06*
-
-```
-Subject: what it actually costs
----
-Hey {{first_name}},
-
-I never told you what this costs, which might be the reason you haven't
-replied.
-
-$1,500 to build it. $250 a month after that covers hosting and any changes you
-want, done the same day you ask. You don't pay the $1,500 until the site is
-live and you're happy with it.
-
-The homepage for {{business}} is still sitting here if you want it.
-
-Srijan
-Ghosh Designs, Regina SK
-{{sender_email}}
-{{website}}
-```
-
-#### `step5_close.txt` — 8 sent
+#### `step4_close.txt` — 38 sent as the old step 5, copy unchanged
 
 ```
 Subject: last one from me
@@ -304,10 +317,11 @@ Ghosh Designs, Regina SK
 {{website}}
 ```
 
-#### `offer_free.txt` — 4 sent · *stale deadline removed 2026-09-06*
+#### `offer_free.txt` — 4 sent, by hand, never tracked
 
 ```
 Subject: free one
+
 ---
 Hey {{first_name}},
 
@@ -316,8 +330,8 @@ Bit of a different offer.
 I'm building my portfolio and I'm doing one plumbing site completely free.
 No charge, no catch. I just need a real company in it that I can show people.
 
-I already made the homepage for {{business}}, so you'd be the quickest one for
-me to finish.
+I already made the homepage mockup for {{business}}, so you'd be the quickest
+one for me to finish.
 
 First person to say yes gets it. Reply and I'll start today.
 
@@ -332,7 +346,7 @@ Ghosh Designs, Regina SK
 Every one of these came from a specific correction. Anyone editing the copy has
 to hold them.
 
-- **No em dashes anywhere.** Verified zero across all six templates. They read as
+- **No em dashes anywhere.** Verified zero across all five templates. They read as
   AI-written. They were stripped twice, because they got reintroduced once.
 - **No invented scenarios.** An early draft had a line about "it's 9 p.m. and
   someone's calling." Cut outright. "No one really says that."
@@ -348,7 +362,12 @@ to hold them.
   characters. Breaks were moved to sit after `{{business}}`; worst case is now
   85.
 - **Watch punctuation against tokens.** Business names ending in "Inc." produced
-  `Inc..` The sentence was restructured so no period follows the token.
+  `Inc..` This is now handled in code rather than by rule: `fill()` drops the
+  value's trailing period when the template already supplies one, so a new
+  template cannot reintroduce it. See the bug entry below.
+- **Watch the wrap against long tokens too.** The rule that matters is to break
+  the line immediately after `{{business}}`. The longest name on the list is 39
+  characters, and without that break step 2 rendered a 101-character line.
 
 ### Pricing
 
@@ -597,6 +616,49 @@ instead of 314. A full 50-email day is roughly 50 minutes instead of eight hours
 Deliverability comes from domain authentication, a warm-up ramp and honest
 content, not from whether two messages are one minute or ten minutes apart.
 
+#### `Inc..` in the first line of the email
+
+**Symptom.** Nine leads carry a legal suffix ending in a period: RANT,
+Plumbineers, Hello Plumber, E.T. Mechanical, Allen Mechanical, Nickel,
+Bertelsen, Premium and Brendon Mackay. Dropped into `I made a homepage for
+{{business}}.` they rendered `Premium Plumbing Inc..` All nine got it in steps
+1 and 2 before it was caught.
+
+**Cause.** `render.py` substituted `lead["business"]` raw. The rule had been
+"restructure the sentence so no period follows the token", which held only for
+as long as everyone remembered it, and it was never applied to steps 1 and 2.
+
+```python
+v = str(v)
+if v.endswith(".") and text[m.end():m.end() + 1] == ".":
+    v = v[:-1]
+```
+
+Fixed 2026-09-09. Names without a trailing period are untouched, an ellipsis
+after a token keeps all three dots, and a mid-sentence token keeps its period.
+
+#### The audit sentence was never wrapped
+
+**Symptom.** Every step 1 ever sent carried one 103-character line in the middle
+of an otherwise hand-wrapped plain-text email.
+
+**Cause.** `{{audit_line?}}` sits alone on its own line and the audit sentences
+run to 103 characters, so the substituted value was never re-wrapped.
+`resolve_optional` now wraps optional values to 78, skipping anything
+containing `://` because a line break inside a URL stops it being clickable.
+
+#### There is no bounce detection at all
+
+**Not fixed.** `bounced` appears in the `events` schema comment and nothing in
+the codebase ever writes it. `grep -rn "bounce" src/` returns the schema line
+and nothing else. So the zero bounces recorded against 268 sends is not a
+clean list, it is the absence of a check.
+
+Combined with plain text by choice (no open pixel) and an untracked demo link,
+there is no delivery signal of any kind. 268 sends and the honest answer to
+"did anyone read these" is that nobody knows. Worth parsing NDRs in the IMAP
+pass, since the machinery to scan the inbox already exists.
+
 #### Why offer sends log as `kind='offer'`
 
 Not a bug, a constraint worth knowing. `last_step()` reads only `'sent'` rows and
@@ -605,10 +667,12 @@ one as `'sent'` would crash the next scheduled run with a `TypeError`.
 
 ### Campaign state
 
+Read from the database on 2026-09-09, after the Sept 7 run.
+
 | Status | Count | Meaning |
 |---|---:|---|
-| `active` | 50 | Still in the sequence |
-| `done` | 8 | Finished all five steps |
+| `done` | 38 | Finished the sequence |
+| `active` | 20 | Still in the sequence |
 | `skipped` | 2 | Suppressed, pulled out |
 | `replied` | 1 | Wrote back, left the sequence |
 
@@ -616,10 +680,10 @@ one as `'sent'` would crash the next scheduled run with a `TypeError`.
 |---|---:|---|---|---:|
 | 1 | 61 | | Aug 10 | 5 |
 | 2 | 60 | | Aug 11 | 8 |
-| 3 | 51 | | Aug 12 | 8 |
-| 4 | 38 | | Aug 13 | 12 |
-| 5 | 8 | | Aug 14 | 15 |
-| **Total** | **218** | | Aug 17 | 18 |
+| 3 | 58 | | Aug 12 | 8 |
+| 4 | 51 | | Aug 13 | 12 |
+| 5 | 38 | | Aug 14 | 15 |
+| **Total** | **268** | | Aug 17 | 18 |
 | | | | Aug 18 | 22 |
 | | | | Aug 19 | 8 |
 | | | | Aug 20 | 12 |
@@ -627,26 +691,35 @@ one as `'sent'` would crash the next scheduled run with a `TypeError`.
 | | | | Aug 24 | 34 |
 | | | | Sep 1 | 42 |
 | | | | Sep 2 | 16 |
-| | | | **Total** | **218** |
+| | | | Sep 7 | 50 |
+| | | | **Total** | **268** |
 
-The Aug 24 → Sept 1 gap is the Actions quota outage.
+The Aug 24 → Sept 1 gap is the Actions quota outage. Sept 7 hit the daily cap
+of 50, which is why the backlog did not clear in one run.
 
-#### What is queued next
+Step numbers above are the old five-step sequence. Steps 1 and 2 map to the
+same slots in the new one, old step 4 is now step 3, and old step 5 is now
+step 4.
 
-All 50 active leads come due across Sept 5–6, which are Saturday and Sunday.
-`send_days` is weekdays only, so nothing sends over the weekend and the whole
-backlog lands at once.
+#### What the sequence change does to the 20 still active
 
-| Day | Sends | What |
+`cli.py:224` marks a lead done when its next step is not in the configured
+sequence, so nothing errors. But the cut from five steps to four lands on the
+in-flight leads unevenly:
+
+| Where they were | Count | What now happens |
 |---|---:|---|
-| Mon Sept 7 | ~46 | 30 × step 5, 9 × step 4, 7 × step 3 |
-| Tue Sept 8 | ~4 | step 4, the remainder |
-| Wed onward | 0 | Nothing left to send |
+| Finished old step 4 (price) | 13 | Next would be step 5. There is no step 5, so they are marked done and never receive a breakup email |
+| Finished old step 3 (proof) | 7 | Next is the new step 4, the breakup. They skip the price email |
 
-> **After Tuesday the email channel is finished.**
-> Thirty of Monday's sends are step 5, the breakup email, which promises to stop
-> emailing. Nothing may follow it. 58 of 61 leads will be done, and every
-> scheduled run after that sends zero until new leads are imported.
+The 13 are leads #41 through #54. If they should still get a closing email,
+`offer.yml` sends `step4_close` to a named list in one run, which is exactly
+what that workflow is for. It writes no state, but these leads are already
+marked done, so there is nothing to record.
+
+> **The email channel is finished for this list either way.** 58 of 61 leads
+> are done or nearly so, and every scheduled run sends zero until new leads are
+> imported.
 
 ### The three replies, ever
 
@@ -1000,21 +1073,31 @@ a day still finishes the list inside a week.
 
 Everything outstanding, in the order it should be dealt with.
 
-### Before Monday 07:23 Regina
+### Now
 
-- [ ] **Read Greg Iwankow's reply at Rusty Pipes, dated Sept 1.** The only live
-  thread in the operation. The Gmail connector needs re-authorizing before an AI
-  session can read it, so check by hand or reconnect Gmail in the claude.ai
-  connector settings.
-- [x] ~~**Fix "before September" in `step4_price.txt` and `offer_free.txt`.**~~
-  Done 2026-09-06, commit `79f7d64` on `email-automation-` `main`. Both sentences
-  deleted rather than redated, so nothing goes stale again. Monday's run picks up
-  the corrected copy on its own, no redeploy needed.
+- [ ] **Read Greg Iwankow's reply at Rusty Pipes, dated Sept 1.** Still the only
+  live thread in the operation, and still unread. The Gmail connector needs
+  re-authorizing before an AI session can read it, so check by hand or reconnect
+  Gmail in the claude.ai connector settings.
+- [ ] **Decide on the 13 leads left without a closing email.** The cut from five
+  steps to four means leads #41 through #54 are marked done without receiving a
+  breakup. `offer.yml` can send `step4_close` to that list in one run.
+- [x] ~~**Fix "before September" in the price and free-offer templates.**~~
+  Done 2026-09-06, commit `79f7d64`. Both sentences deleted rather than redated,
+  so nothing goes stale again. The Sept 7 run picked up the corrected copy.
+- [x] ~~**Fix the `Inc..` bug.**~~ Done 2026-09-09, commit `e67944f`. Handled in
+  `fill()` rather than by restructuring sentences, so a future template cannot
+  reintroduce it.
+- [x] ~~**Rewrite the sequence before importing new leads.**~~ Done 2026-09-09,
+  commit `a6cbc30`. Four steps, free portfolio build leads, mockup called a
+  mockup.
 
 ### This week
 
-- [ ] Decide what happens when the list runs dry on Tuesday: import a new batch of
-  leads, or stop email and put the time into calls.
+- [ ] Import the new batch of leads against the rewritten sequence.
+- [ ] Decide whether to add bounce detection before that batch goes out. Right
+  now there is no delivery signal of any kind, so a second list would be sent as
+  blind as the first.
 - [ ] Start the SMS mornings.
 - [ ] Resolve the four channel conflicts, pulling them from email if texting.
 - [ ] Check Cody Mackay and Lupien Jean against the Pembroke and Cornwall email
@@ -1033,19 +1116,15 @@ Everything outstanding, in the order it should be dealt with.
   someone actually says yes: what to ask them for, what the build looks like day
   to day, how they pay, or what the first invoice says. Worth writing before it is
   needed rather than during.
-- **The `Inc..` bug is only half fixed.** The rule was applied to the later
-  templates, but `step1_preview.txt` line 5 still reads
-  `I made a homepage for {{business}}. It's attached.` and `step2_bump.txt`
-  line 5 ends `...I made for {{business}}.` — a period landing straight after
-  the token. `render.py` substitutes `lead["business"]` raw, with no
-  period-stripping anywhere in the path, and nine leads in `leads.csv` have names
-  ending in a period: RANT, Plumbineers, Hello Plumber, E.T. Mechanical, Allen
-  Mechanical, Nickel, Bertelsen, Premium, and Brendon Mackay. Those nine already
-  received `Inc..` and `Ltd..` in steps 1 and 2. It costs nothing now, because
-  neither template will be sent again to the current list — but step 1 goes to
-  every lead of the next import, so fix it before importing a new batch. Either
-  restructure both sentences so no period follows the token, or strip a trailing
-  period from `business` in `render.py`.
+- **No delivery signal of any kind.** No bounce detection, no open tracking, no
+  click tracking. 268 sends and nobody can say whether any of them were read.
+  This is the largest unknown in the operation and it makes every copy decision
+  a guess. Cheapest fix is parsing NDRs during the IMAP pass, which already
+  scans the inbox.
+- **The mockup is still a JPEG attachment.** It is the one thing that proves the
+  whole pitch and it sits behind a tap-download-open on a phone, from a stranger.
+  Hosting a page per lead was considered and rejected as too expensive. Step 2
+  now names the problem outright, which is a mitigation and not a fix.
 
 - **Reply to Lynn at London Mechanical.** Drafted, never sent. She is suppressed,
   so this is courtesy only, not outreach.
